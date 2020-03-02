@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="hristostefanov.starlingdemo.ui.AccountListConverter" />
+
+        <variable
+            name="viewmodel"
+            type="hristostefanov.starlingdemo.presentation.AccountsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.AccountsFragment">
+
+        <TextView
+            android:id="@+id/roundUpAmountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{viewmodel.roundUpAmount}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/roundUpInfoTextView"
+            tools:text="L2.15" />
+
+        <Button
+            android:id="@+id/transferButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:enabled="@{viewmodel.transferCommandEnabled}"
+            android:text="@string/transfer_to_savings_goal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/roundUpAmountTextView" />
+
+        <!--suppress AndroidUnknownAttribute -->
+        <Spinner
+            android:id="@+id/accountSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adapter="@{AccountListConverter.toAdapter(viewmodel.accountList)}"
+            android:onItemSelected="@{(parent,view, position,id) -> viewmodel.onAccountSelectionChanged(position)}"
+            android:selectedItemPosition="@{viewmodel.selectedAccountPosition}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/roundUpInfoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:text="@{viewmodel.roundUpInfo}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/accountSpinner"
+            tools:text="Round Up amount since xx.xx.xx:" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
