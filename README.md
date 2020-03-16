@@ -25,6 +25,7 @@ consider necessary are deliberately left out of scope.
 * Maximum test coverage
 * Optimizations
 * User friendly error messages
+* Offline mode
 * and others :)
 
 ##  Testing

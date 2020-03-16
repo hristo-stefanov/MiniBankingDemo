@@ -13,6 +13,7 @@ interface Repository {
     @Throws(ServiceException::class)
     suspend fun findAllAccounts(): List<Account>
 
+    // TODO instead of passing ZoneId, make the implementation depend on Provider<ZoneId>
     @Throws(ServiceException::class)
     suspend fun findTransactions(
         accountId: String,
@@ -24,6 +25,7 @@ interface Repository {
     suspend fun findSavingGoals(accountId: String): List<SavingsGoal>
 
     @Throws(ServiceException::class)
+    // TODO pass Currency instead of currency code
     suspend fun createSavingsGoal(name: String, accountId: String, currency: String)
 
     @Throws(ServiceException::class)

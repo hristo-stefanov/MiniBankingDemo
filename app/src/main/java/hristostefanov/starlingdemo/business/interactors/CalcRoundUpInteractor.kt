@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 class CalcRoundUpInteractor @Inject constructor(private val _repository: Repository) {
     @Throws(ServiceException::class)
+    // TODO instead of passing ZoneId, depend on Provider<ZoneId>
     suspend fun execute(accountId: String, sinceDate: LocalDate, zoneId: ZoneId): BigDecimal {
         val transactions = _repository.findTransactions(accountId, sinceDate, zoneId)
 
@@ -19,9 +20,15 @@ class CalcRoundUpInteractor @Inject constructor(private val _repository: Reposit
             .map { it.amount.negate() }
 
         return settledPaymentsAmounts
+            // get the fractional part
             .map { it.remainder(BigDecimal.ONE) }
+            // consider only greater than zero factional parts
             .filter { it.compareTo(BigDecimal.ZERO) == 1 }
+            // get the complement to 1
             .map { BigDecimal.ONE.minus(it) }
+            // accumulate the complements
+            // NOTE unlike #reduce, #fold allows empty collection by getting the initial value
+            // as argument instead of using the first element of the collection
             .fold(BigDecimal.ZERO) { acc, bigDecimal -> acc.add(bigDecimal) }
     }
 }
