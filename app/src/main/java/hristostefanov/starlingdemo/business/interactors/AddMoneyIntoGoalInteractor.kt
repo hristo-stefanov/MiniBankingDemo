@@ -7,7 +7,7 @@ import java.util.*
 import javax.inject.Inject
 
 class AddMoneyIntoGoalInteractor @Inject constructor(private val _repository: Repository) {
-    // for idempotency, is cause of executed more than once
+    // for idempotency, in case this is executed more than once
     private val transferId = UUID.randomUUID()
 
     @Throws(ServiceException::class)

@@ -18,6 +18,7 @@ import javax.inject.Singleton
 
 @Module
 class ProvidingModule {
+    // TODO what if the access token changes?
     @Singleton
     @Provides
     fun provideRetrofit(sharedState: SharedState): Retrofit {

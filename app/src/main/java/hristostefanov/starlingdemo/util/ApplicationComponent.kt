@@ -9,6 +9,7 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun getMainViewModel(): AccountsViewModel
     fun getSavingGoalsViewModel(): SavingsGoalsViewModel
+    // TODO use consistent naming with other functions
     fun createSavingsGoalViewModel(): CreateSavingsGoalViewModel
     fun getTransferConfirmationViewModel(): TransferConfirmationViewModel
     fun getAccessTokenViewModel(): AccessTokenViewModel
