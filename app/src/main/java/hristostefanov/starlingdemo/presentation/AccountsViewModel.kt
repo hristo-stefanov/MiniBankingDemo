@@ -35,8 +35,7 @@ class AccountsViewModel @Inject constructor(
     private val _listAccountsInteractor: ListAccountsInteractor,
     private val _localeProvider: Provider<Locale>,
     private val _stringSupplier: StringSupplier,
-    private val _amountFormatter: AmountFormatter,
-    private val _zoneIdProvider: Provider<ZoneId>
+    private val _amountFormatter: AmountFormatter
 ) : ViewModel() {
     private var _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
@@ -117,8 +116,7 @@ class AccountsViewModel @Inject constructor(
             try {
                 _calcRoundUpInteractor.execute(
                     selectedAccount.id,
-                    _roundUpSinceDate,
-                    _zoneIdProvider.get()
+                    _roundUpSinceDate
                 )
             } catch (e: ServiceException) {
                 e.message?.also {

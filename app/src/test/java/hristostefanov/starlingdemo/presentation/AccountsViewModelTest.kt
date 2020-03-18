@@ -60,8 +60,7 @@ class AccountsViewModelTest {
             listAccountsInteractor,
             localeProvider as Provider<Locale>,
             stringSupplier,
-            amountFormatter,
-            zoneIdProvider as Provider<ZoneId>
+            amountFormatter
         )
     }
 
@@ -81,7 +80,6 @@ class AccountsViewModelTest {
     fun testInit() = runBlocking {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         given(localeProvider.get()).willReturn(Locale.UK)
-        given(zoneIdProvider.get()).willReturn(ZoneId.of("GMT"))
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(amountFormatter.format(any(), any(), any())).willReturn("")
 
@@ -90,7 +88,7 @@ class AccountsViewModelTest {
         then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
         then(listAccountsInteractor).shouldHaveNoMoreInteractions()
         then(calcRoundUpInteractor).should(timeout(TIMEOUT))
-            .execute(account1.id, LocalDate.now().minusWeeks(1), ZoneId.of("GMT"))
+            .execute(account1.id, LocalDate.now().minusWeeks(1))
         then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
 
         Unit

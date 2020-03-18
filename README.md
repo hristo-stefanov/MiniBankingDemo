@@ -31,7 +31,7 @@ consider necessary are deliberately left out of scope.
 ##  Testing
 Even though maximum test coverage was out of scope, for demo purposes
 the project includes 3 types of unit tests:
-* 8 unit tests of CalcRoundUpInteractor
+* 9 unit tests of CalcRoundUpInteractor
 * 1 unit test of AccountsViewModel
 * 5 UI unit tests of CreateSavingsGoalFragment
 
