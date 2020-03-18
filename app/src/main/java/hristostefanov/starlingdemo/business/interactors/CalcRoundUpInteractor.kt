@@ -13,7 +13,8 @@ class CalcRoundUpInteractor @Inject constructor(private val _repository: Reposit
     @Throws(ServiceException::class)
     // TODO instead of passing ZoneId, depend on Provider<ZoneId>
     suspend fun execute(accountId: String, sinceDate: LocalDate, zoneId: ZoneId): BigDecimal {
-        val transactions = _repository.findTransactions(accountId, sinceDate, zoneId)
+        val zonedDateTime = sinceDate.atStartOfDay(zoneId)
+        val transactions = _repository.findTransactions(accountId, zonedDateTime)
 
         val settledPaymentsAmounts = transactions
             .filter { it.amount.signum() == -1 && it.status == Status.SETTLED && it.source == Source.EXTERNAL }

@@ -30,9 +30,11 @@ class CalcRoundUpInteractorTest {
     private val anyDate = LocalDate.now()
     private val anyZone = ZoneId.systemDefault()
 
+    // TODO check internactions
+
     @Test
     fun `Specification example case`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-4.35".toBigDecimal(),
@@ -59,7 +61,7 @@ class CalcRoundUpInteractorTest {
 
     @Test
     fun `Ignoring inbound transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 // the amount of inbound transactions is positive!
                 Transaction(
@@ -77,7 +79,7 @@ class CalcRoundUpInteractorTest {
 
     @Test
     fun `Ignoring unsettled transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-1.3".toBigDecimal(),
@@ -94,7 +96,7 @@ class CalcRoundUpInteractorTest {
 
     @Test
     fun `Ignoring internal transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-1.3".toBigDecimal(),
@@ -111,7 +113,7 @@ class CalcRoundUpInteractorTest {
 
     @Test
     fun `Ignoring zero amount transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "0.00".toBigDecimal(),
@@ -128,7 +130,7 @@ class CalcRoundUpInteractorTest {
 
     @Test
     fun `Max roundup`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-0.01".toBigDecimal(),
@@ -145,7 +147,7 @@ class CalcRoundUpInteractorTest {
 
     @Test()
     fun `No roundup`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-4.00".toBigDecimal(),
@@ -167,7 +169,7 @@ class CalcRoundUpInteractorTest {
 
     @Test()
     fun `No transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(emptyList())
+        given(repository.findTransactions(any(), any())).willReturn(emptyList())
 
         val result = interactor.execute("anyId", anyDate, anyZone)
 

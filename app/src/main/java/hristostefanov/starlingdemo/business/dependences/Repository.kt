@@ -4,8 +4,7 @@ import hristostefanov.starlingdemo.business.entities.Account
 import hristostefanov.starlingdemo.business.entities.SavingsGoal
 import hristostefanov.starlingdemo.business.entities.Transaction
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 interface Repository {
@@ -13,20 +12,17 @@ interface Repository {
     @Throws(ServiceException::class)
     suspend fun findAllAccounts(): List<Account>
 
-    // TODO instead of passing ZoneId, make the implementation depend on Provider<ZoneId>
     @Throws(ServiceException::class)
     suspend fun findTransactions(
         accountId: String,
-        sinceDate: LocalDate,
-        zoneId: ZoneId
+        since: ZonedDateTime
     ): List<Transaction>
 
     @Throws(ServiceException::class)
     suspend fun findSavingGoals(accountId: String): List<SavingsGoal>
 
     @Throws(ServiceException::class)
-    // TODO pass Currency instead of currency code
-    suspend fun createSavingsGoal(name: String, accountId: String, currency: String)
+    suspend fun createSavingsGoal(name: String, accountId: String, currency: Currency)
 
     @Throws(ServiceException::class)
     suspend fun addMoneyIntoSavingsGoal(
