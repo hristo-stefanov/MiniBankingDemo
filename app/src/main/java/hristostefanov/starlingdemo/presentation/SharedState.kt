@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class SharedState @Inject constructor() {
     lateinit var savingsGoal: SavingsGoal
     lateinit var accountId: String
-    lateinit var accountCurreny: String
+    lateinit var accountCurreny: String // TODO use Currency?
     lateinit var roundUpAmount: BigDecimal
     var accessToken: String = ""
 }

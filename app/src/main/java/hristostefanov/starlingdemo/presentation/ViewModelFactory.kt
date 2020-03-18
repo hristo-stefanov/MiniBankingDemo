@@ -10,7 +10,7 @@ class ViewModelFactory constructor(private val applicationComponent: Application
         return when (modelClass) {
             AccountsViewModel::class.java -> applicationComponent.getMainViewModel() as T
             SavingsGoalsViewModel::class.java -> applicationComponent.getSavingGoalsViewModel() as T
-            CreateSavingsGoalViewModel::class.java -> applicationComponent.createSavingsGoalViewModel() as T
+            CreateSavingsGoalViewModel::class.java -> applicationComponent.getSavingsGoalViewModel() as T
             TransferConfirmationViewModel::class.java -> applicationComponent.getTransferConfirmationViewModel() as T
             AccessTokenViewModel::class.java -> applicationComponent.getAccessTokenViewModel() as T
             else -> throw IllegalArgumentException()
