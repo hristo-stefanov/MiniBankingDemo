@@ -42,7 +42,7 @@ class TransferConfirmationViewModel @Inject constructor(
     init {
         val amountFormatted = _amountFormatter.format(
             _sharedState.roundUpAmount,
-            _sharedState.accountCurreny,
+            _sharedState.accountCurreny.currencyCode,
             _locale
         )
         _info.value = _stringSupplier.get(R.string.transferInfo)
@@ -55,7 +55,7 @@ class TransferConfirmationViewModel @Inject constructor(
                 _interactor.execute(
                     _sharedState.accountId,
                     _sharedState.savingsGoal.id,
-                    Currency.getInstance(_sharedState.accountCurreny),
+                    _sharedState.accountCurreny,
                     _sharedState.roundUpAmount
                 )
                 _acknowledgementChannel.send(_stringSupplier.get(R.string.success))

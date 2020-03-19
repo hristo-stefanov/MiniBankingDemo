@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 class CreateSavingsGoalViewModel @Inject constructor(
@@ -42,7 +41,7 @@ class CreateSavingsGoalViewModel @Inject constructor(
                 createSavingsGoalInteractor.execute(
                     _name,
                     sharedState.accountId,
-                    Currency.getInstance(sharedState.accountCurreny)
+                    sharedState.accountCurreny
                 )
                 _navigationChannel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination())
             } catch (e: ServiceException) {

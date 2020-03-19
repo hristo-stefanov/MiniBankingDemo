@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
@@ -46,16 +45,16 @@ class AccountsViewModel @Inject constructor(
     private val _accountList = MutableLiveData<List<DisplayAccount>>(emptyList())
     val accountList: LiveData<List<DisplayAccount>> = _accountList
 
-    private val _selectedAccountPosition = MutableLiveData<Int>(0)
+    private val _selectedAccountPosition = MutableLiveData(0)
     val selectedAccountPosition: LiveData<Int> = _selectedAccountPosition
 
-    private val _roundUpAmount = MutableLiveData<String>("")
+    private val _roundUpAmount = MutableLiveData("")
     val roundUpAmount: LiveData<String> = _roundUpAmount
 
-    private val _roundUpInfo = MutableLiveData<String>("")
+    private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
 
-    private val _transferCommandEnabled = MutableLiveData<Boolean>(false)
+    private val _transferCommandEnabled = MutableLiveData(false)
     val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
 
     fun onTransferCommand() {
@@ -109,28 +108,31 @@ class AccountsViewModel @Inject constructor(
     private suspend fun updateStateWithSelectedAccount() {
         val selectedAccount = _accounts.getOrNull(_selectedAccountPosition.value!!)
 
-        _sharedState.accountId = selectedAccount?.id ?: ""
-        _sharedState.accountCurreny = selectedAccount?.currency?.currencyCode ?: ""
-        _sharedState.roundUpAmount = if (selectedAccount == null) BigDecimal.ZERO
-        else withContext(Dispatchers.IO) {
-            try {
-                _calcRoundUpInteractor.execute(
-                    selectedAccount.id,
-                    _roundUpSinceDate
-                )
-            } catch (e: ServiceException) {
-                e.message?.also {
-                    _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+        // TODO leave SharedState uninitialized if selectedAccount is null?
+        if (selectedAccount != null) {
+            _sharedState.accountId = selectedAccount.id
+            _sharedState.accountCurreny = selectedAccount.currency
+            _sharedState.roundUpAmount = withContext(Dispatchers.IO) {
+                try {
+                    _calcRoundUpInteractor.execute(
+                        selectedAccount.id,
+                        _roundUpSinceDate
+                    )
+                } catch (e: ServiceException) {
+                    e.message?.also {
+                        _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+                    }
+                    BigDecimal.ZERO
                 }
-                BigDecimal.ZERO
             }
         }
 
-        _roundUpAmount.value = if (selectedAccount == null) _stringSupplier.get(R.string.no_account)
-        else {
+        _roundUpAmount.value = if (selectedAccount == null) {
+            _stringSupplier.get(R.string.no_account)
+        } else {
             _amountFormatter.format(
                 _sharedState.roundUpAmount,
-                _sharedState.accountCurreny,
+                _sharedState.accountCurreny.currencyCode,
                 _localeProvider.get()
             )
         }
