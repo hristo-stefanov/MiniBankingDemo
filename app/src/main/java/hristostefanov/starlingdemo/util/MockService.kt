@@ -2,6 +2,10 @@ package hristostefanov.starlingdemo.util
 
 import hristostefanov.starlingdemo.data.dependences.Service
 import hristostefanov.starlingdemo.data.models.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 import retrofit2.mock.BehaviorDelegate
 
 class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
@@ -75,7 +79,19 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
     }
 
     override suspend fun createSavingsGoal(accountUid: String, request: SavingsGoalRequestV2) {
-        // empty
+        val errorResponse = """
+            {
+                "success": false,
+                "errors": [
+                    {
+                        "message": "Not supported by the mock service"
+                    }
+                ]
+            }
+        """.trimIndent()
+        val responseBody = errorResponse.toResponseBody("application/json".toMediaType())
+        val response = Response.error<ErrorResponse>(401, responseBody)
+        throw HttpException(response)
     }
 
     override suspend fun addMoneyIntoSavingsGoal(
