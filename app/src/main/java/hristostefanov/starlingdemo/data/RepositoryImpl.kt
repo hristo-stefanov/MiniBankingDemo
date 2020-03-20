@@ -132,7 +132,7 @@ private fun HttpException.toMessage(gson: Gson) =
     } ?: localizedMessage
 
 private fun extractMessageFromErrorBody(responseBody: ResponseBody, gson: Gson): String? =
-    if (responseBody.contentType()?.toString() == "application/json") {
+    if (responseBody.contentType()?.type == "application" && responseBody.contentType()?.subtype == "json") {
         try {
             gson.fromJson(responseBody.string(), ErrorResponse::class.java)
                 ?.errors
