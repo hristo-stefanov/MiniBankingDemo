@@ -11,15 +11,17 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.mock.MockRetrofit
+import retrofit2.mock.NetworkBehavior
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 
 @Module
 class ProvidingModule {
-    // TODO what if the access token changes?
-    @Singleton
+    // Do not scope to allow changing the access token
     @Provides
     fun provideRetrofit(sharedState: SharedState): Retrofit {
         val interceptor = Interceptor { chain ->
@@ -42,10 +44,26 @@ class ProvidingModule {
     @Provides
     fun provideZoneId(): ZoneId = ZoneId.systemDefault()
 
-    @Singleton
+    // Do not scope to allow switching between mock and real service
     @Provides
-    fun provideService(retrofit: Retrofit): Service = retrofit.create(
-        Service::class.java)
+    fun provideService(retrofit: Retrofit, sharedState: SharedState): Service  {
+        if (sharedState.isMockService) {
+            val behavior = NetworkBehavior.create().apply {
+                setErrorPercent(0)
+                setFailurePercent(0)
+                setDelay(300, TimeUnit.MICROSECONDS)
+            }
+
+            val mockRetrofit = MockRetrofit.Builder(retrofit)
+                .networkBehavior(behavior)
+                .build()
+
+            val delegate = mockRetrofit.create(Service::class.java)
+            return MockService(delegate)
+        } else {
+            return retrofit.create(Service::class.java)
+        }
+    }
 
     @Singleton
     @Provides

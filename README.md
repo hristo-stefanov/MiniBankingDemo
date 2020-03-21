@@ -3,6 +3,16 @@ StarlingDemo
 
 Author: Hristo M. Stefanov
 
+This demo app for Android shows how to use the Starling bank public API to build
+a "Round up" feature.
+
+When you start the app, the first screen asks for an access
+token for a sandbox customer ([get from here](https://developer.starlingbank.com/sandbox/select)).
+On the next screen you can select an account and transfer the calculated Round Up amount
+for a week to a Savings Goal. The app provides a function for creating new Savings Goals.
+The Starling sandbox provides Auto-simulator for auto populating customer's history with different transactions.
+
+
 ## Opening the project in Android Studio
 
 It's best to open the project by using the **File > New > Import project** command.
@@ -25,6 +35,7 @@ consider necessary are deliberately left out of scope.
 * Maximum test coverage
 * Optimizations
 * User friendly error messages
+* Caching
 * Offline mode
 * and others :)
 
