@@ -16,7 +16,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
+// Do not scope to allow changing the access token and switch between mock and real service
 class RepositoryImpl @Inject constructor(
     private val _service: Service,
     private val _gson: Gson
