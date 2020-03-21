@@ -7,7 +7,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [ProvidingModule::class, BindingModule::class])
 interface ApplicationComponent {
-    fun getMainViewModel(): AccountsViewModel
+    fun getAccountsViewModel(): AccountsViewModel
     fun getSavingGoalsViewModel(): SavingsGoalsViewModel
     fun getSavingsGoalViewModel(): CreateSavingsGoalViewModel
     fun getTransferConfirmationViewModel(): TransferConfirmationViewModel
