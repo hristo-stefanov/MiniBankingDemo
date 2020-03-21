@@ -14,4 +14,5 @@ class SharedState @Inject constructor() {
     lateinit var accountCurreny: String
     lateinit var roundUpAmount: BigDecimal
     var accessToken: String = ""
+    var isMockService: Boolean = false
 }

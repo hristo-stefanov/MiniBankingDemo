@@ -16,7 +16,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
+// Do not scope to allow changing the access token and switch between mock and real service
 class RepositoryImpl @Inject constructor(
     private val _service: Service,
     private val _gson: Gson
@@ -132,7 +132,7 @@ private fun HttpException.toMessage(gson: Gson) =
     } ?: localizedMessage
 
 private fun extractMessageFromErrorBody(responseBody: ResponseBody, gson: Gson): String? =
-    if (responseBody.contentType()?.toString() == "application/json") {
+    if (responseBody.contentType()?.type == "application" && responseBody.contentType()?.subtype == "json") {
         try {
             gson.fromJson(responseBody.string(), ErrorResponse::class.java)
                 ?.errors

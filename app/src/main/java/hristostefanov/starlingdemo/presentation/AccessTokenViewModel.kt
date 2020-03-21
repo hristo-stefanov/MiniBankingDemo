@@ -29,6 +29,14 @@ class AccessTokenViewModel @Inject constructor(
     }
 
     fun onAcceptCommand() {
+        _sharedState.isMockService = false
+        viewModelScope.launch {
+            _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
+        }
+    }
+
+    fun onUseMockService() {
+        _sharedState.isMockService = true
         viewModelScope.launch {
             _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
         }
