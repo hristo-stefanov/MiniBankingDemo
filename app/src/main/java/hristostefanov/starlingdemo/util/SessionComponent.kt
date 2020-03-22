@@ -4,7 +4,7 @@ import dagger.Subcomponent
 import hristostefanov.starlingdemo.presentation.*
 
 @SessionScope
-@Subcomponent(modules = [ProvidingModule::class, BindingModule::class])
+@Subcomponent(modules = [SessionModule::class])
 interface SessionComponent {
     @Subcomponent.Factory
     interface Factory {
