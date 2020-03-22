@@ -5,8 +5,8 @@ import dagger.Module
 import dagger.Provides
 import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.BuildConfig
-import hristostefanov.starlingdemo.presentation.SharedState
 import hristostefanov.starlingdemo.data.dependences.Service
+import hristostefanov.starlingdemo.presentation.SharedState
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -16,7 +16,6 @@ import retrofit2.mock.NetworkBehavior
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
 
 @Module
@@ -65,7 +64,6 @@ class ProvidingModule {
         }
     }
 
-    @Singleton
     @Provides
     fun provideStringSupplier(): StringSupplier {
         // the provided implementation references the application context which is always
@@ -75,7 +73,6 @@ class ProvidingModule {
         }
     }
 
-    @Singleton
     @Provides
     fun provideGson() = Gson()
 }

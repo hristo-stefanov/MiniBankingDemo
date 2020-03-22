@@ -108,7 +108,6 @@ class AccountsViewModel @Inject constructor(
     private suspend fun updateStateWithSelectedAccount() {
         val selectedAccount = _accounts.getOrNull(_selectedAccountPosition.value!!)
 
-        // TODO leave SharedState uninitialized if selectedAccount is null?
         if (selectedAccount != null) {
             _sharedState.accountId = selectedAccount.id
             _sharedState.accountCurreny = selectedAccount.currency
@@ -136,6 +135,6 @@ class AccountsViewModel @Inject constructor(
                 _localeProvider.get()
             )
         }
-        _transferCommandEnabled.value = _sharedState.roundUpAmount.signum() == 1 // is positive
+        _transferCommandEnabled.value = selectedAccount != null && _sharedState.roundUpAmount.signum() == 1 // is positive
     }
 }

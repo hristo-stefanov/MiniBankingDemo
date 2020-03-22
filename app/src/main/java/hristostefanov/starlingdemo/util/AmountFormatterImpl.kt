@@ -4,9 +4,7 @@ import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import java.math.BigDecimal
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AmountFormatterImpl @Inject constructor():
     AmountFormatter {
     override fun format(amount: BigDecimal, currencyCode: String, locale: Locale): String {
