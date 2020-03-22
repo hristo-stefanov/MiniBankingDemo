@@ -27,7 +27,6 @@ abstract class SessionModule {
     companion object {
         // Do not scope to allow changing the access token
         @Provides
-        @JvmStatic
         fun provideRetrofit(sharedState: SharedState): Retrofit {
             val interceptor = Interceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -44,16 +43,13 @@ abstract class SessionModule {
         }
 
         @Provides
-        @JvmStatic
         fun provideLocale(): Locale = Locale.getDefault()
 
         @Provides
-        @JvmStatic
         fun provideZoneId(): ZoneId = ZoneId.systemDefault()
 
         // Do not scope to allow switching between mock and real service
         @Provides
-        @JvmStatic
         fun provideService(retrofit: Retrofit, sharedState: SharedState): Service  {
             if (sharedState.isMockService) {
                 val behavior = NetworkBehavior.create().apply {
@@ -74,7 +70,6 @@ abstract class SessionModule {
         }
 
         @Provides
-        @JvmStatic
         fun provideStringSupplier(): StringSupplier {
             // the provided implementation references the application context which is always
             // present during the life of the app process, hence no worries about leaks here
@@ -84,7 +79,6 @@ abstract class SessionModule {
         }
 
         @Provides
-        @JvmStatic
         fun provideGson() = Gson()
     }
 
