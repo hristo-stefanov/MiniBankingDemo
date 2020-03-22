@@ -28,10 +28,12 @@ abstract class ApplicationModule {
             }
         }
 
+        @ApplicationScope
         @Provides
         fun provideGson() = Gson()
     }
 
+    @ApplicationScope
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
 }

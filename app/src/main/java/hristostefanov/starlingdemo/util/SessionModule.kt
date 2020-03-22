@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 abstract class SessionModule {
 
     companion object {
-        // Do not scope to allow changing the access token
+        @SessionScope
         @Provides
         fun provideRetrofit(sharedState: SharedState): Retrofit {
             val interceptor = Interceptor { chain ->
@@ -37,7 +37,7 @@ abstract class SessionModule {
                 .build()
         }
 
-        // Do not scope to allow switching between mock and real service
+        @SessionScope
         @Provides
         fun provideService(retrofit: Retrofit, sharedState: SharedState): Service  {
             if (sharedState.isMockService) {
@@ -59,6 +59,7 @@ abstract class SessionModule {
         }
     }
 
+    @SessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
 
