@@ -10,7 +10,7 @@ import java.time.ZoneId
 import java.util.*
 
 @Module(subcomponents = [SessionComponent::class])
-abstract class ApplicationSubcomponentsModule {
+abstract class ApplicationModule {
 
     companion object {
         @Provides
