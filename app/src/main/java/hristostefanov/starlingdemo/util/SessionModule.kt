@@ -7,7 +7,7 @@ import hristostefanov.starlingdemo.BuildConfig
 import hristostefanov.starlingdemo.business.dependences.Repository
 import hristostefanov.starlingdemo.data.RepositoryImpl
 import hristostefanov.starlingdemo.data.dependences.Service
-import hristostefanov.starlingdemo.presentation.SharedState
+import hristostefanov.starlingdemo.presentation.SessionState
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -22,10 +22,10 @@ abstract class SessionModule {
     companion object {
         @SessionScope
         @Provides
-        fun provideRetrofit(sharedState: SharedState): Retrofit {
+        fun provideRetrofit(sessionState: SessionState): Retrofit {
             val interceptor = Interceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer ${sharedState.accessToken}").build()
+                    .addHeader("Authorization", "Bearer ${sessionState.accessToken}").build()
                 chain.proceed(request)
             }
             val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
@@ -39,8 +39,8 @@ abstract class SessionModule {
 
         @SessionScope
         @Provides
-        fun provideService(retrofit: Retrofit, sharedState: SharedState): Service  {
-            if (sharedState.isMockService) {
+        fun provideService(retrofit: Retrofit, sessionState: SessionState): Service  {
+            if (sessionState.isMockService) {
                 val behavior = NetworkBehavior.create().apply {
                     setErrorPercent(0)
                     setFailurePercent(0)

@@ -21,7 +21,6 @@ import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.timeout
 import java.time.LocalDate
-import java.time.ZoneId
 import java.util.*
 import javax.inject.Provider
 
@@ -36,7 +35,7 @@ class AccountsViewModelTest {
 
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    private val sharedState = SharedState()
+    private val sharedState = SessionState()
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val localeProvider: Provider<*> = mock(Provider::class.java)

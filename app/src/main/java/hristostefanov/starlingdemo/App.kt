@@ -12,15 +12,15 @@ class App : Application() {
         lateinit var instance: App
     }
 
-    lateinit var session: SessionComponent
-    val component: ApplicationComponent = DaggerApplicationComponent.create()
+    lateinit var sessionComponent: SessionComponent
+    val applicationComponent: ApplicationComponent = DaggerApplicationComponent.create()
 
     init {
         instance = this
     }
 
     fun newSession() {
-        session = component.getSessionComponentFactory().create()
+        sessionComponent = applicationComponent.getSessionComponentFactory().create()
     }
 
     // using a variable here to allow replacing with a factory that provides

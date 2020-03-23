@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class CreateSavingsGoalViewModel @Inject constructor(
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val sharedState: SharedState
+    private val sessionState: SessionState
 ) : ViewModel() {
 
     private var _name = ""
@@ -40,8 +40,8 @@ class CreateSavingsGoalViewModel @Inject constructor(
             try {
                 createSavingsGoalInteractor.execute(
                     _name,
-                    sharedState.accountId,
-                    sharedState.accountCurreny
+                    sessionState.accountId,
+                    sessionState.accountCurreny
                 )
                 _navigationChannel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination())
             } catch (e: ServiceException) {

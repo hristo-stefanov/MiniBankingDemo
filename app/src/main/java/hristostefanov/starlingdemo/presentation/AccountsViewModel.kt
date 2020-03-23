@@ -29,7 +29,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class AccountsViewModel @Inject constructor(
-    private val _sharedState: SharedState,
+    private val _sessionState: SessionState,
     private val _calcRoundUpInteractor: CalcRoundUpInteractor,
     private val _listAccountsInteractor: ListAccountsInteractor,
     private val _localeProvider: Provider<Locale>,
@@ -109,9 +109,9 @@ class AccountsViewModel @Inject constructor(
         val selectedAccount = _accounts.getOrNull(_selectedAccountPosition.value!!)
 
         if (selectedAccount != null) {
-            _sharedState.accountId = selectedAccount.id
-            _sharedState.accountCurreny = selectedAccount.currency
-            _sharedState.roundUpAmount = withContext(Dispatchers.IO) {
+            _sessionState.accountId = selectedAccount.id
+            _sessionState.accountCurreny = selectedAccount.currency
+            _sessionState.roundUpAmount = withContext(Dispatchers.IO) {
                 try {
                     _calcRoundUpInteractor.execute(
                         selectedAccount.id,
@@ -130,11 +130,11 @@ class AccountsViewModel @Inject constructor(
             _stringSupplier.get(R.string.no_account)
         } else {
             _amountFormatter.format(
-                _sharedState.roundUpAmount,
-                _sharedState.accountCurreny.currencyCode,
+                _sessionState.roundUpAmount,
+                _sessionState.accountCurreny.currencyCode,
                 _localeProvider.get()
             )
         }
-        _transferCommandEnabled.value = selectedAccount != null && _sharedState.roundUpAmount.signum() == 1 // is positive
+        _transferCommandEnabled.value = selectedAccount != null && _sessionState.roundUpAmount.signum() == 1 // is positive
     }
 }

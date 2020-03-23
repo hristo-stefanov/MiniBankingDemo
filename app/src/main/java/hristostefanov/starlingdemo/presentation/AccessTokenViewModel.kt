@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AccessTokenViewModel @Inject constructor(
-    private val _sharedState: SharedState
+    private val _sessionState: SessionState
 ) : ViewModel() {
 
     private val _navigationChannel = Channel<NavDirections>()
@@ -22,21 +22,21 @@ class AccessTokenViewModel @Inject constructor(
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
 
     fun onAccessTokenChanged(accessToken: String) {
-        if (_sharedState.accessToken != accessToken) {
-            _sharedState.accessToken = accessToken
-            _acceptCommandEnabled.value = _sharedState.accessToken.isNotBlank()
+        if (_sessionState.accessToken != accessToken) {
+            _sessionState.accessToken = accessToken
+            _acceptCommandEnabled.value = _sessionState.accessToken.isNotBlank()
         }
     }
 
     fun onAcceptCommand() {
-        _sharedState.isMockService = false
+        _sessionState.isMockService = false
         viewModelScope.launch {
             _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
         }
     }
 
     fun onUseMockService() {
-        _sharedState.isMockService = true
+        _sessionState.isMockService = true
         viewModelScope.launch {
             _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
         }

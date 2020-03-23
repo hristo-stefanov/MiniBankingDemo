@@ -24,7 +24,7 @@ private const val NAVIGATION_DELAY_MS = 2000L
 
 class TransferConfirmationViewModel @Inject constructor(
     private val _interactor: AddMoneyIntoGoalInteractor,
-    private val _sharedState: SharedState,
+    private val _sessionState: SessionState,
     private val _locale: Locale,
     private val _stringSupplier: StringSupplier,
     private val _amountFormatter: AmountFormatter
@@ -41,22 +41,22 @@ class TransferConfirmationViewModel @Inject constructor(
 
     init {
         val amountFormatted = _amountFormatter.format(
-            _sharedState.roundUpAmount,
-            _sharedState.accountCurreny.currencyCode,
+            _sessionState.roundUpAmount,
+            _sessionState.accountCurreny.currencyCode,
             _locale
         )
         _info.value = _stringSupplier.get(R.string.transferInfo)
-            .format(amountFormatted, _sharedState.savingsGoal.name)
+            .format(amountFormatted, _sessionState.savingsGoal.name)
     }
 
     fun onConfirmCommand() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _interactor.execute(
-                    _sharedState.accountId,
-                    _sharedState.savingsGoal.id,
-                    _sharedState.accountCurreny,
-                    _sharedState.roundUpAmount
+                    _sessionState.accountId,
+                    _sessionState.savingsGoal.id,
+                    _sessionState.accountCurreny,
+                    _sessionState.roundUpAmount
                 )
                 _acknowledgementChannel.send(_stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)

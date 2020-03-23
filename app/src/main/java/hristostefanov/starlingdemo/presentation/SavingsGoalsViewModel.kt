@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class SavingsGoalsViewModel @Inject constructor(
     private val listSavingGoalsInteractor: ListSavingGoalsInteractor,
-    private val sharedState: SharedState
+    private val sessionState: SessionState
 ) : ViewModel() {
     private var _goals: List<SavingsGoal> = emptyList()
 
@@ -33,7 +33,7 @@ class SavingsGoalsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _goals = withContext(Dispatchers.IO) {
-                    listSavingGoalsInteractor.execute(sharedState.accountId)
+                    listSavingGoalsInteractor.execute(sessionState.accountId)
                 }
                 _list.value = _goals.map { DisplaySavingsGoal(it.name) }
             } catch (e: ServiceException) {
@@ -46,7 +46,7 @@ class SavingsGoalsViewModel @Inject constructor(
 
     fun onSavingsGoalClicked(position: Int) {
         _goals.getOrNull(position)?.also {
-            sharedState.savingsGoal = it
+            sessionState.savingsGoal = it
 
             viewModelScope.launch {
                 _navigationChannel.send(SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination())

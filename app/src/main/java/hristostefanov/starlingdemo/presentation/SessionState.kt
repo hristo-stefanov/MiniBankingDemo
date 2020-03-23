@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @MainThread
 @SessionScope
-class SharedState @Inject constructor() {
+class SessionState @Inject constructor() {
     lateinit var savingsGoal: SavingsGoal
     lateinit var accountId: String
     lateinit var accountCurreny: Currency
