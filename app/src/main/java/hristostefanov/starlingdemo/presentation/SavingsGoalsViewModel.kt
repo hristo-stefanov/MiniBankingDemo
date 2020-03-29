@@ -1,9 +1,6 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.business.dependences.ServiceException
@@ -18,9 +15,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SavingsGoalsViewModel @Inject constructor(
-    private val listSavingGoalsInteractor: ListSavingGoalsInteractor,
-    private val sessionState: SessionState
+    private val _savedSateHandle: SavedStateHandle
 ) : ViewModel() {
+    @Inject
+    internal lateinit var listSavingGoalsInteractor: ListSavingGoalsInteractor
+
     private var _goals: List<SavingsGoal> = emptyList()
 
     private val _navigationChannel = Channel<NavDirections>()
@@ -33,7 +32,7 @@ class SavingsGoalsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _goals = withContext(Dispatchers.IO) {
-                    listSavingGoalsInteractor.execute(sessionState.accountId)
+                    listSavingGoalsInteractor.execute(_savedSateHandle["accountId"]!!)
                 }
                 _list.value = _goals.map { DisplaySavingsGoal(it.name) }
             } catch (e: ServiceException) {
@@ -46,11 +45,28 @@ class SavingsGoalsViewModel @Inject constructor(
 
     fun onSavingsGoalClicked(position: Int) {
         _goals.getOrNull(position)?.also {
-            sessionState.savingsGoal = it
-
             viewModelScope.launch {
-                _navigationChannel.send(SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination())
+                _navigationChannel.send(
+                    SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                        it,
+                        _savedSateHandle["roundUpAmount"]!!,
+                        _savedSateHandle["accountCurrency"]!!,
+                        _savedSateHandle["accountId"]!!
+                    )
+                )
             }
+        }
+    }
+
+    fun onAddSavingsGoalCommand() {
+        viewModelScope.launch {
+            _navigationChannel.send(
+                SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
+                    _savedSateHandle["accountId"]!!,
+                    _savedSateHandle["accountCurrency"]!!,
+                    _savedSateHandle["roundUpAmount"]!!
+                )
+            )
         }
     }
 }

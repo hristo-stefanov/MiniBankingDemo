@@ -6,17 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.databinding.AccountsFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccountsViewModel
 import kotlinx.android.synthetic.main.accounts_fragment.*
 
 class AccountsFragment : Fragment() {
     private lateinit var binding: AccountsFragmentBinding
-    private lateinit var viewModel: AccountsViewModel
+
+    private val viewModel: AccountsViewModel by viewModels {
+        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,9 +33,6 @@ class AccountsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val viewModelFactory = (requireActivity().application as App).viewModelFactory
-        viewModel = ViewModelProvider(this, viewModelFactory)[AccountsViewModel::class.java]
 
         // needed for observing LiveData
         binding.lifecycleOwner = this
@@ -47,6 +49,19 @@ class AccountsFragment : Fragment() {
                 val directions = viewModel.navigationChannel.receive()
                 findNavController().navigate(directions)
             }
+        }
+    }
+
+    private inner class ViewModelFactory :
+        AbstractSavedStateViewModelFactory(this, null) {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(
+            key: String,
+            modelClass: Class<T>,
+            handle: SavedStateHandle
+        ): T {
+            return AccountsViewModel(handle).also { sessionComponent().inject(it) } as T
         }
     }
 }

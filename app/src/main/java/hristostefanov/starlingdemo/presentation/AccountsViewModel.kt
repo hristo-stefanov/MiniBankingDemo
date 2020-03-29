@@ -1,10 +1,7 @@
 package hristostefanov.starlingdemo.presentation
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.R
@@ -28,14 +25,20 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
-class AccountsViewModel @Inject constructor(
-    private val _sessionState: SessionState,
-    private val _calcRoundUpInteractor: CalcRoundUpInteractor,
-    private val _listAccountsInteractor: ListAccountsInteractor,
-    private val _localeProvider: Provider<Locale>,
-    private val _stringSupplier: StringSupplier,
-    private val _amountFormatter: AmountFormatter
+class AccountsViewModel constructor(
+    private val _savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    @Inject
+    internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
+    @Inject
+    internal lateinit var _listAccountsInteractor: ListAccountsInteractor
+    @Inject
+    internal lateinit var _localeProvider: Provider<Locale>
+    @Inject
+    internal lateinit var _stringSupplier: StringSupplier
+    @Inject
+    internal lateinit var _amountFormatter: AmountFormatter
+
     private var _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
 
@@ -59,7 +62,10 @@ class AccountsViewModel @Inject constructor(
 
     fun onTransferCommand() {
         viewModelScope.launch {
-            _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination())
+            _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                _savedStateHandle["accountId"]!!,
+                _savedStateHandle["accountCurrency"]!!,
+                _savedStateHandle["roundUpAmount"]!!))
         }
     }
 
@@ -72,7 +78,8 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    init {
+    @Inject
+    fun init() {
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(_localeProvider.get())
         val sinceDateFormatted = _roundUpSinceDate.format(formatter)
@@ -109,9 +116,9 @@ class AccountsViewModel @Inject constructor(
         val selectedAccount = _accounts.getOrNull(_selectedAccountPosition.value!!)
 
         if (selectedAccount != null) {
-            _sessionState.accountId = selectedAccount.id
-            _sessionState.accountCurreny = selectedAccount.currency
-            _sessionState.roundUpAmount = withContext(Dispatchers.IO) {
+            _savedStateHandle["accountId"] = selectedAccount.id
+            _savedStateHandle["accountCurrency"] = selectedAccount.currency
+            _savedStateHandle["roundUpAmount"] = withContext(Dispatchers.IO) {
                 try {
                     _calcRoundUpInteractor.execute(
                         selectedAccount.id,
@@ -130,11 +137,13 @@ class AccountsViewModel @Inject constructor(
             _stringSupplier.get(R.string.no_account)
         } else {
             _amountFormatter.format(
-                _sessionState.roundUpAmount,
-                _sessionState.accountCurreny.currencyCode,
+                _savedStateHandle["roundUpAmount"]!!,
+                _savedStateHandle.get<Currency>("accountCurrency")!!.currencyCode,
                 _localeProvider.get()
             )
         }
-        _transferCommandEnabled.value = selectedAccount != null && _sessionState.roundUpAmount.signum() == 1 // is positive
+        // TODO use Transformations
+        _transferCommandEnabled.value = selectedAccount != null
+                && _savedStateHandle.get<BigDecimal>("roundUpAmount")!!.signum() == 1 // is positive
     }
 }

@@ -1,9 +1,6 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.business.dependences.ServiceException
@@ -15,35 +12,38 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class CreateSavingsGoalViewModel @Inject constructor(
-    private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val sessionState: SessionState
+class CreateSavingsGoalViewModel constructor(
+    private val _savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    private var _name = ""
+    @Inject
+    internal lateinit var createSavingsGoalInteractor: CreateSavingsGoalInteractor
 
     private val _navigationChannel = Channel<NavDirections>()
     val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
 
-    private val _createCommandEnabled = MutableLiveData(false)
+    private val _createCommandEnabled = Transformations.map(_savedStateHandle.getLiveData("name", "")) {
+        it.isNotBlank()
+    }
     val createCommandEnabled: LiveData<Boolean> = _createCommandEnabled
 
     fun onNameChanged(name: String) {
-        if (_name != name) {
-            _name = name
-            _createCommandEnabled.value = _name.isNotBlank()
-        }
+        _savedStateHandle["name"] = name
     }
 
     fun onCreateCommand() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 createSavingsGoalInteractor.execute(
-                    _name,
-                    sessionState.accountId,
-                    sessionState.accountCurreny
+                    _savedStateHandle["name"]!!,
+                    _savedStateHandle["accountId"]!!,
+                    _savedStateHandle["accountCurrency"]!!
                 )
-                _navigationChannel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination())
+                // TODO consider navigating UP instead
+                _navigationChannel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
+                    _savedStateHandle["accountId"]!!,
+                    _savedStateHandle["accountCurrency"]!!,
+                    _savedStateHandle["roundUpAmount"]!!
+                ))
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
                     _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))

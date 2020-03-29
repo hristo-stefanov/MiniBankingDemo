@@ -6,16 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import hristostefanov.starlingdemo.App
+import androidx.navigation.fragment.navArgs
 import hristostefanov.starlingdemo.databinding.CreateSavingsGoalFragmentBinding
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel
 
 class CreateSavingsGoalFragment : Fragment() {
     private lateinit var _binding: CreateSavingsGoalFragmentBinding
-    private lateinit var viewModel: CreateSavingsGoalViewModel
+
+    private val args by navArgs<CreateSavingsGoalFragmentArgs>()
+
+    private val viewModel: CreateSavingsGoalViewModel by viewModels {
+        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,10 +36,6 @@ class CreateSavingsGoalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModelFactory = (requireActivity().application as App).viewModelFactory
-        viewModel =
-            ViewModelProvider(this, viewModelFactory)[CreateSavingsGoalViewModel::class.java]
-
         _binding.viewmodel = viewModel
         _binding.lifecycleOwner = this // needed for observing LiveData
 
@@ -42,6 +46,19 @@ class CreateSavingsGoalFragment : Fragment() {
                 val directions = viewModel.navigationChannel.receive()
                 findNavController().navigate(directions)
             }
+        }
+    }
+
+    private inner class ViewModelFactory :
+        AbstractSavedStateViewModelFactory(this, args.toBundle()) {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(
+            key: String,
+            modelClass: Class<T>,
+            handle: SavedStateHandle
+        ): T {
+            return CreateSavingsGoalViewModel(handle).also { sessionComponent().inject(it) } as T
         }
     }
 }

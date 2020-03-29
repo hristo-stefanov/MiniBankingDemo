@@ -16,7 +16,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +29,7 @@ import org.junit.runner.RunWith
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class CreateSavingsGoalFragmentTest {
@@ -43,10 +43,8 @@ class CreateSavingsGoalFragmentTest {
 
     @Before
     fun beforeEach() {
-        val app = ApplicationProvider.getApplicationContext<App>()
-
         // make the fragment use the mock view model
-        app.viewModelFactory = object : ViewModelProvider.Factory {
+        UIUnitTestRegistry.viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return viewModel as T
@@ -106,7 +104,7 @@ class CreateSavingsGoalFragmentTest {
         launchFragment()
 
         runBlocking {
-            channel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination())
+            channel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination("1", Currency.getInstance("GBP"), "123.45".toBigDecimal()))
         }
 
         then(viewModel).should().navigationChannel

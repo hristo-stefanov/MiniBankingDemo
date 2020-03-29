@@ -6,19 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.presentation.SavingsGoalsViewModel
 import kotlinx.android.synthetic.main.savings_goals_fragment.*
 
 class SavingsGoalsFragment : Fragment() {
 
-    private lateinit var viewModel: SavingsGoalsViewModel
+    private val args: SavingsGoalsFragmentArgs by navArgs()
+
+    private val viewModel: SavingsGoalsViewModel by viewModels {
+        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +32,6 @@ class SavingsGoalsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val viewModelFactory = (requireActivity().application as App).viewModelFactory
-        viewModel = ViewModelProvider(this, viewModelFactory)[SavingsGoalsViewModel::class.java]
 
         savingsGoalsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -50,12 +50,24 @@ class SavingsGoalsFragment : Fragment() {
         }
 
         addSavingsGoalButton.setOnClickListener {
-            // shortcut, just navigating
-            findNavController().navigate(SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination())
+            viewModel.onAddSavingsGoalCommand()
         }
     }
 
     private fun onSavingsGoalClicked(position: Int) {
         viewModel.onSavingsGoalClicked(position)
+    }
+
+    private inner class ViewModelFactory :
+        AbstractSavedStateViewModelFactory(this, args.toBundle()) {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(
+            key: String,
+            modelClass: Class<T>,
+            handle: SavedStateHandle
+        ): T {
+            return SavingsGoalsViewModel(handle).also { sessionComponent().inject(it) } as T
+        }
     }
 }

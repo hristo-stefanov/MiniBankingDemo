@@ -1,6 +1,7 @@
 package hristostefanov.starlingdemo.presentation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.entities.Account
@@ -12,10 +13,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Test
-
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
@@ -35,11 +35,9 @@ class AccountsViewModelTest {
 
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    private val sharedState = SessionState()
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val localeProvider: Provider<*> = mock(Provider::class.java)
-    private val zoneIdProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
 
@@ -53,14 +51,15 @@ class AccountsViewModelTest {
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
-        AccountsViewModel(
-            sharedState,
-            calcRoundUpInteractor,
-            listAccountsInteractor,
-            localeProvider as Provider<Locale>,
-            stringSupplier,
-            amountFormatter
-        )
+        AccountsViewModel(SavedStateHandle()).apply {
+            // manual field and mothod injection
+            _calcRoundUpInteractor = calcRoundUpInteractor
+            _listAccountsInteractor = listAccountsInteractor
+            _localeProvider = localeProvider as Provider<Locale>
+            _stringSupplier = stringSupplier
+            _amountFormatter = amountFormatter
+            init()
+        }
     }
 
 

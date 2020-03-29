@@ -36,6 +36,15 @@
         <action
             android:id="@+id/action_to_transferConfirmationDestination"
             app:destination="@id/transferConfirmationDestination" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
+        <argument
+            android:name="roundUpAmount"
+            app:argType="java.math.BigDecimal" />
     </fragment>
     <fragment
         android:id="@+id/createSavingsGoalDestination"
@@ -47,6 +56,15 @@
             app:destination="@id/savingsGoalsDestination"
             app:popUpTo="@id/savingsGoalsDestination"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
+        <argument
+            android:name="roundUpAmount"
+            app:argType="java.math.BigDecimal" />
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"
@@ -58,6 +76,18 @@
             app:destination="@id/accountsDestination"
             app:popUpTo="@id/accountsDestination"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="savingsGoal"
+            app:argType="hristostefanov.starlingdemo.business.entities.SavingsGoal" />
+        <argument
+            android:name="roundUpAmount"
+            app:argType="java.math.BigDecimal" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
     </fragment>
 
     <action
