@@ -35,10 +35,15 @@ class TransferConfirmationViewModel constructor(
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
 
-    private val _savingsGoal: SavingsGoal = _savedStateHandle["savingsGoal"]!!
-    private val _accountId: String = _savedStateHandle["accountId"]!!
-    private val _roundUpAmount: BigDecimal = _savedStateHandle["roundUpAmount"]!!
-    private val _accountCurrency: Currency = _savedStateHandle["accountCurrency"]!!
+    private val _savingsGoal: SavingsGoal = _savedStateHandle[SAVINGS_GOAL_KEY]
+        ?: throw java.lang.IllegalArgumentException(SAVINGS_GOAL_KEY)
+    private val _accountId: String = _savedStateHandle[ACCOUNT_ID_KEY]
+        ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
+    private val _accountCurrency: Currency = _savedStateHandle[ACCOUNT_CURRENCY_KEY]
+        ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
+    private val _roundUpAmount: BigDecimal = _savedStateHandle[ROUND_UP_AMOUNT_KEY]
+        ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
+
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel

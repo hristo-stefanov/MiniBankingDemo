@@ -28,13 +28,7 @@ private const val TIMEOUT = 100L
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
-class AccountsViewModelTest {
-
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-
+class AccountsViewModelTest: BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val localeProvider: Provider<*> = mock(Provider::class.java)
@@ -52,7 +46,7 @@ class AccountsViewModelTest {
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
         AccountsViewModel(SavedStateHandle()).apply {
-            // manual field and mothod injection
+            // manual field and method injection
             _calcRoundUpInteractor = calcRoundUpInteractor
             _listAccountsInteractor = listAccountsInteractor
             _localeProvider = localeProvider as Provider<Locale>
@@ -60,18 +54,6 @@ class AccountsViewModelTest {
             _amountFormatter = amountFormatter
             init()
         }
-    }
-
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-        mainThreadSurrogate.close()
     }
 
     @Test

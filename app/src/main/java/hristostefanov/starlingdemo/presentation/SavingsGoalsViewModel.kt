@@ -12,6 +12,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalArgumentException
+import java.math.BigDecimal
+import java.util.*
 import javax.inject.Inject
 
 class SavingsGoalsViewModel @Inject constructor(
@@ -28,11 +31,18 @@ class SavingsGoalsViewModel @Inject constructor(
     private val _list = MutableLiveData<List<DisplaySavingsGoal>>()
     val list: LiveData<List<DisplaySavingsGoal>> = _list
 
+    private val _accountId: String = _savedSateHandle[ACCOUNT_ID_KEY]
+        ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
+    private val _roundUpAmount: BigDecimal = _savedSateHandle[ROUND_UP_AMOUNT_KEY]
+        ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
+    private val _accountCurrency: Currency = _savedSateHandle[ACCOUNT_CURRENCY_KEY]
+        ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
+
     init {
         viewModelScope.launch {
             try {
                 _goals = withContext(Dispatchers.IO) {
-                    listSavingGoalsInteractor.execute(_savedSateHandle["accountId"]!!)
+                    listSavingGoalsInteractor.execute(_accountId)
                 }
                 _list.value = _goals.map { DisplaySavingsGoal(it.name) }
             } catch (e: ServiceException) {
@@ -43,15 +53,16 @@ class SavingsGoalsViewModel @Inject constructor(
         }
     }
 
+
     fun onSavingsGoalClicked(position: Int) {
         _goals.getOrNull(position)?.also {
             viewModelScope.launch {
                 _navigationChannel.send(
                     SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
                         it,
-                        _savedSateHandle["roundUpAmount"]!!,
-                        _savedSateHandle["accountCurrency"]!!,
-                        _savedSateHandle["accountId"]!!
+                        _roundUpAmount,
+                        _accountCurrency,
+                        _accountId
                     )
                 )
             }
@@ -62,9 +73,9 @@ class SavingsGoalsViewModel @Inject constructor(
         viewModelScope.launch {
             _navigationChannel.send(
                 SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
-                    _savedSateHandle["accountId"]!!,
-                    _savedSateHandle["accountCurrency"]!!,
-                    _savedSateHandle["roundUpAmount"]!!
+                    _accountId,
+                    _accountCurrency,
+                    _roundUpAmount
                 )
             )
         }

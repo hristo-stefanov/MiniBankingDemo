@@ -51,8 +51,8 @@ class AccountsViewModel constructor(
     private val _selectedAccountPosition = MutableLiveData(0)
     val selectedAccountPosition: LiveData<Int> = _selectedAccountPosition
 
-    private val _roundUpAmount = MutableLiveData("")
-    val roundUpAmount: LiveData<String> = _roundUpAmount
+    private val _roundUpAmountText = MutableLiveData("")
+    val roundUpAmountText: LiveData<String> = _roundUpAmountText
 
     private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
@@ -60,12 +60,25 @@ class AccountsViewModel constructor(
     private val _transferCommandEnabled = MutableLiveData(false)
     val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
 
+    private var _roundUpAmount: BigDecimal
+    get() = _savedStateHandle[ROUND_UP_AMOUNT_KEY]
+        ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
+    set(value) { _savedStateHandle[ROUND_UP_AMOUNT_KEY] = value }
+
+    private var _accountId: String
+    get() = _savedStateHandle[ACCOUNT_ID_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
+    set(value) {_savedStateHandle[ACCOUNT_ID_KEY] = value}
+
+    private var _accountCurrency: Currency
+    get() = _savedStateHandle[ACCOUNT_CURRENCY_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
+    set(value) { _savedStateHandle[ACCOUNT_CURRENCY_KEY] = value }
+
     fun onTransferCommand() {
         viewModelScope.launch {
             _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                _savedStateHandle["accountId"]!!,
-                _savedStateHandle["accountCurrency"]!!,
-                _savedStateHandle["roundUpAmount"]!!))
+                _accountId,
+                _accountCurrency,
+                _roundUpAmount))
         }
     }
 
@@ -113,12 +126,12 @@ class AccountsViewModel constructor(
 
     @MainThread
     private suspend fun updateStateWithSelectedAccount() {
-        val selectedAccount = _accounts.getOrNull(_selectedAccountPosition.value!!)
+        val selectedAccount = _selectedAccountPosition.value?.let { _accounts.getOrNull(it) }
 
         if (selectedAccount != null) {
-            _savedStateHandle["accountId"] = selectedAccount.id
-            _savedStateHandle["accountCurrency"] = selectedAccount.currency
-            _savedStateHandle["roundUpAmount"] = withContext(Dispatchers.IO) {
+            _accountId = selectedAccount.id
+            _accountCurrency = selectedAccount.currency
+            _roundUpAmount = withContext(Dispatchers.IO) {
                 try {
                     _calcRoundUpInteractor.execute(
                         selectedAccount.id,
@@ -133,17 +146,18 @@ class AccountsViewModel constructor(
             }
         }
 
-        _roundUpAmount.value = if (selectedAccount == null) {
+        _roundUpAmountText.value = if (selectedAccount == null) {
             _stringSupplier.get(R.string.no_account)
         } else {
             _amountFormatter.format(
-                _savedStateHandle["roundUpAmount"]!!,
-                _savedStateHandle.get<Currency>("accountCurrency")!!.currencyCode,
+                _roundUpAmount,
+                _savedStateHandle.get<Currency>(ACCOUNT_CURRENCY_KEY)?.currencyCode
+                    ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY),
                 _localeProvider.get()
             )
         }
         // TODO use Transformations
         _transferCommandEnabled.value = selectedAccount != null
-                && _savedStateHandle.get<BigDecimal>("roundUpAmount")!!.signum() == 1 // is positive
+                && _roundUpAmount.signum() == 1 // is positive
     }
 }
