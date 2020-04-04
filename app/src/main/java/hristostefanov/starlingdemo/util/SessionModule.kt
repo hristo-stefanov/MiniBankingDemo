@@ -1,5 +1,6 @@
 package hristostefanov.starlingdemo.util
 
+import androidx.navigation.NavDirections
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -8,6 +9,7 @@ import hristostefanov.starlingdemo.business.dependences.Repository
 import hristostefanov.starlingdemo.data.RepositoryImpl
 import hristostefanov.starlingdemo.data.dependences.Service
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
+import kotlinx.coroutines.channels.Channel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -21,11 +23,6 @@ import javax.inject.Named
 abstract class SessionModule {
 
     companion object {
-        // TODO remove?
-        @Provides
-        @Named("savingsGoalId")
-        fun provide() = ""
-
         @SessionScope
         @Provides
         fun provideRetrofit(tokenStore: TokenStore): Retrofit {

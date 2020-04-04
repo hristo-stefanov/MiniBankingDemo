@@ -13,7 +13,10 @@ import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.timeout
 import java.util.*
+
+private const val TIMEOUT = 100L
 
 class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
@@ -38,55 +41,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         }
     }
 
-    // Rule: disabled commands should not run
-    @Test
-    fun `Init with no name - onCreate`() = runBlocking {
-        givenValidInitialState()
-        given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
-
-        viewModelUnderTest.onCreateCommand()
-
-        then(createSavingsGoalsIterator).shouldHaveNoInteractions()
-    }
-
-    @Test
-    fun `Init with no name - observe createCommandEnabled`() {
-        givenValidInitialState()
-
-        var result: Boolean? = null
-        viewModelUnderTest.createCommandEnabled.observeForever {
-            result = it
-        }
-
-        assertThat(result, `is`(false))
-    }
-
-    @Test
-    fun `Init with invalid name - observe createCommandEnabled`() {
-        givenValidInitialState()
-        initialStateMap[NAME_KEY] = ""
-
-        var result: Boolean? = null
-        viewModelUnderTest.createCommandEnabled.observeForever {
-            result = it
-        }
-
-        assertThat(result, `is`(false))
-    }
-
-    @Test
-    fun `Init with valid name - observe createCommandEnabled`() {
-        givenValidInitialState()
-        initialStateMap[NAME_KEY] = goal1Name
-
-        var result: Boolean? = null
-        viewModelUnderTest.createCommandEnabled.observeForever {
-            result = it
-        }
-
-        assertThat(result, `is`(true))
-    }
-
     @Test
     fun `Goal name changes are saved`() = runBlocking {
         givenValidInitialState()
@@ -97,32 +51,39 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun `Should Interact on Create command`() = runBlocking {
+    fun `Interaction and argument passing`() = runBlocking {
         givenValidInitialState()
         viewModelUnderTest.onNameChanged(goal1Name)
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
-        viewModelUnderTest.onCreateCommand()
+        viewModelUnderTest.createCommand.execute()
 
-        then(createSavingsGoalsIterator).should().execute(goal1Name, account1Id, gbp)
+        then(createSavingsGoalsIterator).should().validateName(goal1Name)
+        then(createSavingsGoalsIterator).should(timeout(TIMEOUT)).execute(goal1Name, account1Id, gbp)
+        then(createSavingsGoalsIterator).shouldHaveNoMoreInteractions()
     }
 
     @Test
-    fun `Create succeeds`() = runBlocking {
+    fun `Interactor succeeds - navigation`() = runBlocking {
         givenValidInitialState()
+        initialStateMap[NAME_KEY] = goal1Name
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
 
-        viewModelUnderTest.onCreateCommand()
+        viewModelUnderTest.createCommand.execute()
 
         val dir = viewModelUnderTest.navigationChannel.receive()
         assertThat(dir, equalTo(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(account1Id, gbp, oneHundred)))
     }
 
     @Test
-    fun `Create fails`() = runBlocking {
+    fun `Interactor fails - navigation`() = runBlocking {
         givenValidInitialState()
+        initialStateMap[NAME_KEY] = goal1Name
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willThrow(ServiceException(error1))
 
-        viewModelUnderTest.onCreateCommand()
+        viewModelUnderTest.createCommand.execute()
 
         val dir = viewModelUnderTest.navigationChannel.receive()
         assertThat(dir, equalTo(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))

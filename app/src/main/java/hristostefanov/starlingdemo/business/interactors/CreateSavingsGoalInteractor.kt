@@ -10,4 +10,6 @@ class CreateSavingsGoalInteractor @Inject constructor(private val _repository: R
     suspend fun execute(name: String, accountId: String, currency: Currency) {
         _repository.createSavingsGoal(name, accountId, currency)
     }
+
+    fun validateName(name: String) = name.isNotBlank()
 }
