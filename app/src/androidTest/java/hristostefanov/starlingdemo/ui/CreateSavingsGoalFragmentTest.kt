@@ -1,6 +1,7 @@
 package hristostefanov.starlingdemo.ui
 
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +19,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel
+import hristostefanov.starlingdemo.presentation.ICmd
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.equalTo
@@ -34,7 +36,8 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class CreateSavingsGoalFragmentTest {
 
-    private val viewModel: CreateSavingsGoalViewModel = mock(CreateSavingsGoalViewModel::class.java)
+    private val viewModel = mock(CreateSavingsGoalViewModel::class.java)
+    private val createCommand = mock(ICmd::class.java)
 
     private val navController = TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
         setGraph(R.navigation.nav_graph)
@@ -55,29 +58,32 @@ class CreateSavingsGoalFragmentTest {
     @Test()
     fun buttonEnabled() {
         given(viewModel.navigationChannel).willReturn(Channel())
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
+        given(viewModel.createCommand).willReturn(createCommand)
+        given(createCommand.enabledLive).willReturn(MutableLiveData(true))
 
         launchFragment()
 
-        then(viewModel).should().createCommandEnabled
+        then(viewModel.createCommand).should().enabledLive
         onView(withId(R.id.createSavingsGoalButton)).check(matches(isEnabled()))
     }
 
     @Test
     fun buttonDisabled() {
         given(viewModel.navigationChannel).willReturn(Channel())
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(false))
+        given(viewModel.createCommand).willReturn(createCommand)
+        given(createCommand.enabledLive).willReturn(MutableLiveData(false))
 
         launchFragment()
 
-        then(viewModel).should().createCommandEnabled
+        then(viewModel.createCommand).should().enabledLive
         onView(withId(R.id.createSavingsGoalButton)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun nameTextPassed() {
         given(viewModel.navigationChannel).willReturn(Channel())
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(false))
+        given(viewModel.createCommand).willReturn(createCommand)
+        given(createCommand.enabledLive).willReturn(MutableLiveData(false))
         launchFragment()
 
         onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
@@ -88,19 +94,21 @@ class CreateSavingsGoalFragmentTest {
     @Test
     fun buttonClicked() {
         given(viewModel.navigationChannel).willReturn(Channel())
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
+        given(viewModel.createCommand).willReturn(createCommand)
+        given(createCommand.enabledLive).willReturn(MutableLiveData(true))
         launchFragment()
 
         onView(withId(R.id.createSavingsGoalButton)).perform(click())
 
-        then(viewModel).should().onCreateCommand()
+        then(viewModel.createCommand).should().execute()
     }
 
     @Test
     fun navigated() {
         val channel = Channel<NavDirections>()
         given(viewModel.navigationChannel).willReturn(channel)
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
+        given(viewModel.createCommand).willReturn(createCommand)
+        given(createCommand.enabledLive).willReturn(MutableLiveData(true))
         launchFragment()
 
         runBlocking {
