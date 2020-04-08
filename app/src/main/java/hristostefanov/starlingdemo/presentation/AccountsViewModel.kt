@@ -23,6 +23,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
+import java.util.function.Consumer
+import java.util.function.Predicate
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -80,18 +82,21 @@ class AccountsViewModel constructor(
     private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
 
-    private val _transferCommandEnabled = MutableLiveData(false)
-    val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
-
-
-    fun onTransferCommand() {
-        viewModelScope.launch {
-            _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                _state.accountId,
-                _state.accountCurrency,
-                _state.roundUpAmount))
+    val transferCommand: ICmd = Cmd(
+        _state,
+        Predicate {
+                state -> state.roundUpAmount.signum() == 1 // is positive
+             },
+        listOf(ROUND_UP_AMOUNT_KEY),
+        Consumer { state ->
+            viewModelScope.launch {
+                _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                    state.accountId,
+                    state.accountCurrency,
+                    state.roundUpAmount))
+            }
         }
-    }
+    )
 
     fun onAccountSelectionChanged(position: Int) {
         if (position != _selectedAccountPosition.value) {
@@ -166,8 +171,5 @@ class AccountsViewModel constructor(
                 _localeProvider.get()
             )
         }
-        // TODO use Transformations
-        _transferCommandEnabled.value = selectedAccount != null
-                && _state.roundUpAmount.signum() == 1 // is positive
     }
 }

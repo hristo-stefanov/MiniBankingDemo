@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import hristostefanov.starlingdemo.databinding.AccountsFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccountsViewModel
-import kotlinx.android.synthetic.main.accounts_fragment.*
 
 class AccountsFragment : Fragment() {
     private lateinit var binding: AccountsFragmentBinding
@@ -37,10 +36,6 @@ class AccountsFragment : Fragment() {
         // needed for observing LiveData
         binding.lifecycleOwner = this
         binding.viewmodel = viewModel
-
-        transferButton.setOnClickListener {
-            viewModel.onTransferCommand()
-        }
 
         // launch a lifecycle aware coroutine
         lifecycleScope.launchWhenStarted {

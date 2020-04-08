@@ -69,21 +69,21 @@ constructor(
         _state,
         Predicate { state -> createSavingsGoalInteractor.validateName(state.name) },
         listOf(NAME_KEY),
-        Consumer {
+        Consumer {state ->
             viewModelScope.launch {
                 try {
                     createSavingsGoalInteractor.execute(
-                        _state.name,
-                        _state.accountIdArg,
-                        _state.accountCurrencyArg
+                        state.name,
+                        state.accountIdArg,
+                        state.accountCurrencyArg
                     )
 
                     // TODO consider navigating UP instead
                     _navigationChannel.send(
                         CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
-                            _state.accountIdArg,
-                            _state.accountCurrencyArg,
-                            _state.roundUpAmountArg
+                            state.accountIdArg,
+                            state.accountCurrencyArg,
+                            state.roundUpAmountArg
                         )
                     )
                 } catch (e: ServiceException) {
