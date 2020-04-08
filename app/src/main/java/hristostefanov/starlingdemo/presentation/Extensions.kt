@@ -1,27 +1,30 @@
 package hristostefanov.starlingdemo.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import hristostefanov.starlingdemo.business.entities.SavingsGoal
 import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.util.*
 
-// these constants corresponds to the fragment argument names in
-// the navigation graph
+// these keys corresponds to the fragment argument names in
+// the navigation graph, so as arguments can be directly added to the [SavedStateHandle] instances
 const val ACCOUNT_ID_KEY = "accountId"
 const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
 const val ACCOUNT_CURRENCY_KEY = "accountCurrency"
-const val NAME_KEY = "name"
 const val SAVINGS_GOAL_KEY = "savingsGoal"
 
-var SavedStateHandle.name: String
-    get() = this[NAME_KEY] ?: throw IllegalArgumentException(NAME_KEY)
-    set(value) { this[NAME_KEY] = value }
-
-val SavedStateHandle.currency: Currency
+var SavedStateHandle.accountCurrency: Currency
     get() = this[ACCOUNT_CURRENCY_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
+    set(value) { this[ACCOUNT_CURRENCY_KEY] = value}
 
-val SavedStateHandle.accountId: String
+var SavedStateHandle.accountId: String
     get() = this[ACCOUNT_ID_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
+    set(value) { this[ACCOUNT_ID_KEY] = value}
 
-val SavedStateHandle.roundUpAmount: BigDecimal
+var SavedStateHandle.roundUpAmount: BigDecimal
     get() = this[ROUND_UP_AMOUNT_KEY] ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
+    set(value) { this[ROUND_UP_AMOUNT_KEY] = value}
+
+var SavedStateHandle.savingsGoal: SavingsGoal
+    get() = this[SAVINGS_GOAL_KEY] ?: throw IllegalArgumentException(SAVINGS_GOAL_KEY)
+    set(value) { this[SAVINGS_GOAL_KEY] = value}

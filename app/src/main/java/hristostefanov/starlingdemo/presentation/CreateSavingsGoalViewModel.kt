@@ -11,17 +11,30 @@ import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 import java.util.function.Consumer
 import java.util.function.Predicate
 import javax.inject.Inject
 
 class CreateSavingsGoalViewModel
 /**
- * Expected arguments [ACCOUNT_CURRENCY_KEY], [ACCOUNT_ID_KEY] and [ROUND_UP_AMOUNT_KEY]
+ * Expected arguments passed through [SavedStateHandle]:
+ * [ACCOUNT_CURRENCY_KEY], [ACCOUNT_ID_KEY] and [ROUND_UP_AMOUNT_KEY]
  */
 constructor(
-    private val _savedStateHandle: SavedStateHandle
+    private val _state: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        private const val NAME_KEY = "name"
+
+        var SavedStateHandle.name: String
+            get() = this[NAME_KEY] ?: throw IllegalArgumentException(NAME_KEY)
+            set(value) {
+                this[NAME_KEY] = value
+            }
+    }
+
     @Inject
     internal lateinit var createSavingsGoalInteractor: CreateSavingsGoalInteractor
 
@@ -29,28 +42,28 @@ constructor(
     val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
 
     fun onNameChanged(name: String) {
-        _savedStateHandle.name = name
+        _state.name = name
     }
 
     val createCommand: ICmd = Cmd(
-        _savedStateHandle,
-        Predicate { createSavingsGoalInteractor.validateName(it.name) },
+        _state,
+        Predicate { state -> createSavingsGoalInteractor.validateName(state.name) },
         listOf(NAME_KEY),
         Consumer {
             viewModelScope.launch {
                 try {
                     createSavingsGoalInteractor.execute(
-                        _savedStateHandle.name,
-                        _savedStateHandle.accountId,
-                        _savedStateHandle.currency
+                        _state.name,
+                        _state.accountId,
+                        _state.accountCurrency
                     )
 
                     // TODO consider navigating UP instead
                     _navigationChannel.send(
                         CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
-                            _savedStateHandle.accountId,
-                            _savedStateHandle.currency,
-                            _savedStateHandle.roundUpAmount
+                            _state.accountId,
+                            _state.accountCurrency,
+                            _state.roundUpAmount
                         )
                     )
                 } catch (e: ServiceException) {
@@ -61,3 +74,4 @@ constructor(
             }
         })
 }
+

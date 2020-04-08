@@ -25,8 +25,11 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
+/**
+ * Expected arguments passed through [SavedStateHandle]: None
+ */
 class AccountsViewModel constructor(
-    private val _savedStateHandle: SavedStateHandle
+    private val _state: SavedStateHandle
 ) : ViewModel() {
     @Inject
     internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
@@ -60,25 +63,13 @@ class AccountsViewModel constructor(
     private val _transferCommandEnabled = MutableLiveData(false)
     val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
 
-    private var _roundUpAmount: BigDecimal
-    get() = _savedStateHandle[ROUND_UP_AMOUNT_KEY]
-        ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
-    set(value) { _savedStateHandle[ROUND_UP_AMOUNT_KEY] = value }
-
-    private var _accountId: String
-    get() = _savedStateHandle[ACCOUNT_ID_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
-    set(value) {_savedStateHandle[ACCOUNT_ID_KEY] = value}
-
-    private var _accountCurrency: Currency
-    get() = _savedStateHandle[ACCOUNT_CURRENCY_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
-    set(value) { _savedStateHandle[ACCOUNT_CURRENCY_KEY] = value }
 
     fun onTransferCommand() {
         viewModelScope.launch {
             _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                _accountId,
-                _accountCurrency,
-                _roundUpAmount))
+                _state.accountId,
+                _state.accountCurrency,
+                _state.roundUpAmount))
         }
     }
 
@@ -129,9 +120,9 @@ class AccountsViewModel constructor(
         val selectedAccount = _selectedAccountPosition.value?.let { _accounts.getOrNull(it) }
 
         if (selectedAccount != null) {
-            _accountId = selectedAccount.id
-            _accountCurrency = selectedAccount.currency
-            _roundUpAmount = withContext(Dispatchers.IO) {
+            _state.accountId = selectedAccount.id
+            _state.accountCurrency = selectedAccount.currency
+            _state.roundUpAmount = withContext(Dispatchers.IO) {
                 try {
                     _calcRoundUpInteractor.execute(
                         selectedAccount.id,
@@ -150,14 +141,13 @@ class AccountsViewModel constructor(
             _stringSupplier.get(R.string.no_account)
         } else {
             _amountFormatter.format(
-                _roundUpAmount,
-                _savedStateHandle.get<Currency>(ACCOUNT_CURRENCY_KEY)?.currencyCode
-                    ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY),
+                _state.roundUpAmount,
+                _state.accountCurrency.currencyCode,
                 _localeProvider.get()
             )
         }
         // TODO use Transformations
         _transferCommandEnabled.value = selectedAccount != null
-                && _roundUpAmount.signum() == 1 // is positive
+                && _state.roundUpAmount.signum() == 1 // is positive
     }
 }

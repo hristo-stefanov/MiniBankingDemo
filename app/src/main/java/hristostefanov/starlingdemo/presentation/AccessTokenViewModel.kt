@@ -9,7 +9,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class AccessTokenViewModel  (private val _savedStateHandle: SavedStateHandle)
+class AccessTokenViewModel  (private val _state: SavedStateHandle)
  : ViewModel() {
     @Inject
     internal lateinit var _tokenStore: TokenStore
