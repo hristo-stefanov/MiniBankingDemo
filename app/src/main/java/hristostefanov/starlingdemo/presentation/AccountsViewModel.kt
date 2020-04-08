@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -31,6 +32,25 @@ import javax.inject.Provider
 class AccountsViewModel constructor(
     private val _state: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
+        const val ACCOUNT_ID_KEY = "accountId"
+        const val ACCOUNT_CURRENCY_KEY = "accountCurrency"
+
+        var SavedStateHandle.accountCurrency: Currency
+            get() = this[ACCOUNT_CURRENCY_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
+            set(value) { this[ACCOUNT_CURRENCY_KEY] = value}
+
+        var SavedStateHandle.roundUpAmount: BigDecimal
+            get() = this[ROUND_UP_AMOUNT_KEY] ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
+            set(value) { this[ROUND_UP_AMOUNT_KEY] = value}
+
+        var SavedStateHandle.accountId: String
+            get() = this[ACCOUNT_ID_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
+            set(value) { this[ACCOUNT_ID_KEY] = value}
+    }
+
     @Inject
     internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
     @Inject

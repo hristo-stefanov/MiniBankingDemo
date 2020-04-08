@@ -4,7 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
+import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.accountCurrencyArg
+import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.accountIdArg
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.name
+import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.roundUpAmountArg
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -89,8 +92,8 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
 
     private fun givenValidInitialState() {
-        state.accountId = account1Id
-        state.accountCurrency = gbp
-        state.roundUpAmount = oneHundred
+        state.accountIdArg = account1Id
+        state.accountCurrencyArg = gbp
+        state.roundUpAmountArg = oneHundred
     }
 }

@@ -12,6 +12,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
+import java.math.BigDecimal
+import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
 import javax.inject.Inject
@@ -19,14 +21,32 @@ import javax.inject.Inject
 class CreateSavingsGoalViewModel
 /**
  * Expected arguments passed through [SavedStateHandle]:
- * [ACCOUNT_CURRENCY_KEY], [ACCOUNT_ID_KEY] and [ROUND_UP_AMOUNT_KEY]
+ * [ACCOUNT_CURRENCY_ARG_KEY], [ACCOUNT_ID_ARG_KEY] and [ROUND_UP_AMOUNT_ARG_KEY]
  */
 constructor(
     private val _state: SavedStateHandle
 ) : ViewModel() {
 
     companion object {
-        private const val NAME_KEY = "name"
+        // argument keys correspond to the keys used in the navigation graph
+        const val ROUND_UP_AMOUNT_ARG_KEY = "roundUpAmount"
+        const val ACCOUNT_ID_ARG_KEY = "accountId"
+        const val ACCOUNT_CURRENCY_ARG_KEY = "accountCurrency"
+
+        const val NAME_KEY = "name"
+
+        var SavedStateHandle.accountCurrencyArg: Currency
+            get() = this[ACCOUNT_CURRENCY_ARG_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_ARG_KEY)
+            set(value) { this[ACCOUNT_CURRENCY_ARG_KEY] = value}
+
+
+        var SavedStateHandle.roundUpAmountArg: BigDecimal
+            get() = this[ROUND_UP_AMOUNT_ARG_KEY] ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_ARG_KEY)
+            set(value) { this[ROUND_UP_AMOUNT_ARG_KEY] = value}
+
+        var SavedStateHandle.accountIdArg: String
+            get() = this[ACCOUNT_ID_ARG_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_ARG_KEY)
+            set(value) { this[ACCOUNT_ID_ARG_KEY] = value}
 
         var SavedStateHandle.name: String
             get() = this[NAME_KEY] ?: throw IllegalArgumentException(NAME_KEY)
@@ -54,16 +74,16 @@ constructor(
                 try {
                     createSavingsGoalInteractor.execute(
                         _state.name,
-                        _state.accountId,
-                        _state.accountCurrency
+                        _state.accountIdArg,
+                        _state.accountCurrencyArg
                     )
 
                     // TODO consider navigating UP instead
                     _navigationChannel.send(
                         CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
-                            _state.accountId,
-                            _state.accountCurrency,
-                            _state.roundUpAmount
+                            _state.accountIdArg,
+                            _state.accountCurrencyArg,
+                            _state.roundUpAmountArg
                         )
                     )
                 } catch (e: ServiceException) {
