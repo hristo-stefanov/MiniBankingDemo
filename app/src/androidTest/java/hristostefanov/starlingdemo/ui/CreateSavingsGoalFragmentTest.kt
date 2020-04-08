@@ -1,7 +1,6 @@
 package hristostefanov.starlingdemo.ui
 
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +18,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel
-import hristostefanov.starlingdemo.presentation.ICmd
+import hristostefanov.starlingdemo.presentation.Command
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.equalTo
@@ -37,7 +36,7 @@ import java.util.*
 class CreateSavingsGoalFragmentTest {
 
     private val viewModel = mock(CreateSavingsGoalViewModel::class.java)
-    private val createCommand = mock(ICmd::class.java)
+    private val createCommand = mock(Command::class.java)
 
     private val navController = TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
         setGraph(R.navigation.nav_graph)

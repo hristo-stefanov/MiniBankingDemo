@@ -82,7 +82,7 @@ class AccountsViewModel constructor(
     private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
 
-    val transferCommand: ICmd = Cmd(
+    val transferCommand: Command = CommandImpl(
         _state,
         Predicate {
                 state -> state.roundUpAmount.signum() == 1 // is positive

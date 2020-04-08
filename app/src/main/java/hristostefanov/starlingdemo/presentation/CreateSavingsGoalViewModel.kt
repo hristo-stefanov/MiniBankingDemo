@@ -65,7 +65,7 @@ constructor(
         _state.name = name
     }
 
-    val createCommand: ICmd = Cmd(
+    val createCommand: Command = CommandImpl(
         _state,
         Predicate { state -> createSavingsGoalInteractor.validateName(state.name) },
         listOf(NAME_KEY),

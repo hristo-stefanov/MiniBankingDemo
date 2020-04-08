@@ -13,7 +13,7 @@ import java.util.function.Consumer
 import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
-class CmdTest : BaseViewModelTest() {
+class CommandImplTest : BaseViewModelTest() {
 
     private val state = SavedStateHandle()
     private lateinit var keys: List<String>
@@ -22,7 +22,7 @@ class CmdTest : BaseViewModelTest() {
     private val predicate = mock(Predicate::class.java) as Predicate<SavedStateHandle>
 
     val cmdUnderTest by lazy {
-        Cmd(state, predicate, keys, consumer)
+        CommandImpl(state, predicate, keys, consumer)
     }
 
     @Test

@@ -7,11 +7,11 @@ import androidx.lifecycle.Transformations
 import java.util.function.Consumer
 import java.util.function.Predicate
 
-class Cmd(private val state: SavedStateHandle,
-          private val predicate: Predicate<SavedStateHandle>,
-          private val keys: List<String>,
-          private val block: Consumer<SavedStateHandle>
-): ICmd {
+class CommandImpl(private val state: SavedStateHandle,
+                  private val predicate: Predicate<SavedStateHandle>,
+                  private val keys: List<String>,
+                  private val block: Consumer<SavedStateHandle>
+): Command {
 
     override val enabledLive: LiveData<Boolean>
 
@@ -36,7 +36,7 @@ class Cmd(private val state: SavedStateHandle,
     }
 }
 
-interface ICmd {
+interface Command {
     val enabledLive: LiveData<Boolean>
     fun execute()
 }
