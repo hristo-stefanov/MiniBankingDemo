@@ -17,14 +17,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
-import java.util.function.Consumer
-import java.util.function.Predicate
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -36,36 +33,34 @@ class AccountsViewModel constructor(
 ) : ViewModel() {
 
     companion object {
-        const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
-        const val ACCOUNT_ID_KEY = "accountId"
-        const val ACCOUNT_CURRENCY_KEY = "accountCurrency"
+        private const val ACCOUNT_ID_KEY = "accountId"
 
-        var SavedStateHandle.accountCurrency: Currency
-            get() = this[ACCOUNT_CURRENCY_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_KEY)
-            set(value) { this[ACCOUNT_CURRENCY_KEY] = value}
-
-        var SavedStateHandle.roundUpAmount: BigDecimal
-            get() = this[ROUND_UP_AMOUNT_KEY] ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_KEY)
-            set(value) { this[ROUND_UP_AMOUNT_KEY] = value}
-
-        var SavedStateHandle.accountId: String
-            get() = this[ACCOUNT_ID_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_KEY)
-            set(value) { this[ACCOUNT_ID_KEY] = value}
+        var SavedStateHandle.accountId: String?
+            get() = this[ACCOUNT_ID_KEY]
+            set(value) {
+                this[ACCOUNT_ID_KEY] = value
+            }
     }
 
     @Inject
     internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
+
     @Inject
     internal lateinit var _listAccountsInteractor: ListAccountsInteractor
+
     @Inject
     internal lateinit var _localeProvider: Provider<Locale>
+
     @Inject
     internal lateinit var _stringSupplier: StringSupplier
+
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
 
-    private var _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
+    private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
+    private var _selectedAccount: Account? = null
+    private var _roundUpAmount: BigDecimal? = null
 
     private val _navigationChannel = Channel<NavDirections>()
     val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
@@ -82,25 +77,29 @@ class AccountsViewModel constructor(
     private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
 
-    val transferCommand: Command = CommandImpl(
-        _state,
-        Predicate {
-                state -> state.roundUpAmount.signum() == 1 // is positive
-             },
-        listOf(ROUND_UP_AMOUNT_KEY),
-        Consumer { state ->
-            viewModelScope.launch {
-                _navigationChannel.send(AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                    state.accountId,
-                    state.accountCurrency,
-                    state.roundUpAmount))
+    private val _transferCommandEnabled = MutableLiveData(false)
+    val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
+
+    fun onTransferCommand() {
+        _selectedAccount?.also { account ->
+            _roundUpAmount?.also { roundUpAmount ->
+                viewModelScope.launch {
+                    _navigationChannel.send(
+                        AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                            account.id,
+                            account.currency,
+                            roundUpAmount
+                        )
+                    )
+                }
             }
         }
-    )
+    }
 
     fun onAccountSelectionChanged(position: Int) {
-        if (position != _selectedAccountPosition.value) {
-            _selectedAccountPosition.value = position
+        val newAccountId = _accounts.getOrNull(position)?.id
+        if (newAccountId != _state.accountId) {
+            _state.accountId = newAccountId
             viewModelScope.launch {
                 updateStateWithSelectedAccount()
             }
@@ -110,10 +109,12 @@ class AccountsViewModel constructor(
     @Inject
     fun init() {
         val formatter =
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(_localeProvider.get())
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                .withLocale(_localeProvider.get())
         val sinceDateFormatted = _roundUpSinceDate.format(formatter)
 
-        _roundUpInfo.value = _stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
+        _roundUpInfo.value =
+            _stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
 
         viewModelScope.launch {
             _accounts = withContext(Dispatchers.IO) {
@@ -127,6 +128,7 @@ class AccountsViewModel constructor(
                 }
             }
 
+            // map Account to DisplayAccount
             _accountList.value = _accounts.map {
                 val displayBalance = _amountFormatter.format(
                     it.balance,
@@ -142,34 +144,34 @@ class AccountsViewModel constructor(
 
     @MainThread
     private suspend fun updateStateWithSelectedAccount() {
-        val selectedAccount = _selectedAccountPosition.value?.let { _accounts.getOrNull(it) }
+        _selectedAccount = _accounts.find { it.id == _state.accountId } ?: _accounts.getOrNull(0)
 
-        if (selectedAccount != null) {
-            _state.accountId = selectedAccount.id
-            _state.accountCurrency = selectedAccount.currency
-            _state.roundUpAmount = withContext(Dispatchers.IO) {
+        _selectedAccountPosition.value = _accounts.indexOf(_selectedAccount)
+
+        _roundUpAmount = _selectedAccount?.let { account ->
+            withContext(Dispatchers.IO) {
                 try {
                     _calcRoundUpInteractor.execute(
-                        selectedAccount.id,
+                        account.id,
                         _roundUpSinceDate
                     )
                 } catch (e: ServiceException) {
                     e.message?.also {
                         _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
                     }
-                    BigDecimal.ZERO
+                    null
                 }
             }
         }
 
-        _roundUpAmountText.value = if (selectedAccount == null) {
-            _stringSupplier.get(R.string.no_account)
-        } else {
-            _amountFormatter.format(
-                _state.roundUpAmount,
-                _state.accountCurrency.currencyCode,
-                _localeProvider.get()
-            )
-        }
+        _roundUpAmountText.value = _roundUpAmount?.let { roundUpAmount ->
+            _selectedAccount?.let { selectedAccount ->
+                _amountFormatter.format(
+                    roundUpAmount,
+                    selectedAccount.currency.currencyCode,
+                    _localeProvider.get()
+                )
+            }
+        } ?: _stringSupplier.get(R.string.no_account)
     }
 }

@@ -1,20 +1,18 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.entities.Account
 import hristostefanov.starlingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
+import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
@@ -26,8 +24,8 @@ import javax.inject.Provider
 
 private const val TIMEOUT = 100L
 
-@ExperimentalCoroutinesApi
-@ObsoleteCoroutinesApi
+//@ExperimentalCoroutinesApi
+//@ObsoleteCoroutinesApi
 class AccountsViewModelTest: BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
@@ -36,16 +34,27 @@ class AccountsViewModelTest: BaseViewModelTest() {
     private val amountFormatter = mock(AmountFormatter::class.java)
 
     private val account1 = Account(
-        "1",
-        "111",
+        "1",        "111",
         "cat1",
         Currency.getInstance("GBP"),
         "100".toBigDecimal()
     )
 
+    private val account2 = Account(
+        "2",
+        "222",
+        "cat2",
+        Currency.getInstance("EUR"),
+        "200".toBigDecimal()
+    )
+
+    private val quarter = "0.25".toBigDecimal()
+
+    val state = SavedStateHandle()
+
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
-        AccountsViewModel(SavedStateHandle()).apply {
+        AccountsViewModel(state).apply {
             // manual field and method injection
             _calcRoundUpInteractor = calcRoundUpInteractor
             _listAccountsInteractor = listAccountsInteractor
@@ -56,21 +65,55 @@ class AccountsViewModelTest: BaseViewModelTest() {
         }
     }
 
-    @Test
-    fun testInit() = runBlocking {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-        given(localeProvider.get()).willReturn(Locale.UK)
+    @Before
+    fun beforeEach() {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
+        given(stringSupplier.get(R.string.no_account)).willReturn("No account")
+        given(localeProvider.get()).willReturn(Locale.UK)
         given(amountFormatter.format(any(), any(), any())).willReturn("")
+    }
+
+    @Test
+    fun `Initial interactions`() = runBlocking {
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
+        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
 
         viewModel // instantiate
 
         then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
         then(listAccountsInteractor).shouldHaveNoMoreInteractions()
+
         then(calcRoundUpInteractor).should(timeout(TIMEOUT))
             .execute(account1.id, LocalDate.now().minusWeeks(1))
         then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
 
         Unit
+    }
+
+    @Test()
+    fun testFirstAccountIsSelectedByDefault() = runBlocking {
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
+        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
+
+        var position: Int? = null
+        viewModel.selectedAccountPosition.observeForever { position = it }
+
+        assertThat(position, equalTo(0))
+    }
+
+    @Test
+    fun testRestoringSelectedAccount() = runBlocking {
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
+        state.accountId = account2.id
+
+        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
+
+        viewModel // instantiate
+
+        var position: Int? = null
+        viewModel.selectedAccountPosition.observeForever { position = it }
+
+        delay(100)
+        assertThat(position, equalTo(1))
     }
 }
