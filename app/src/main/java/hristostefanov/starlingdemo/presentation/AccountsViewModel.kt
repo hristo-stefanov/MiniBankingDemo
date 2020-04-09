@@ -101,7 +101,7 @@ class AccountsViewModel constructor(
         if (newAccountId != _state.accountId) {
             _state.accountId = newAccountId
             viewModelScope.launch {
-                updateStateWithSelectedAccount()
+                updateStateDependingOnSelectedAccount()
             }
         }
     }
@@ -138,12 +138,12 @@ class AccountsViewModel constructor(
                 DisplayAccount(it.accountNum, it.currency.currencyCode, displayBalance)
             }
 
-            updateStateWithSelectedAccount()
+            updateStateDependingOnSelectedAccount()
         }
     }
 
     @MainThread
-    private suspend fun updateStateWithSelectedAccount() {
+    private suspend fun updateStateDependingOnSelectedAccount() {
         _selectedAccount = _accounts.find { it.id == _state.accountId } ?: _accounts.getOrNull(0)
 
         _selectedAccountPosition.value = _accounts.indexOf(_selectedAccount)
@@ -173,5 +173,7 @@ class AccountsViewModel constructor(
                 )
             }
         } ?: _stringSupplier.get(R.string.no_account)
+
+        _transferCommandEnabled.value = _roundUpAmount?.signum() == 1 // if positive
     }
 }

@@ -10,6 +10,7 @@ import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.acco
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.*
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -115,5 +116,17 @@ class AccountsViewModelTest: BaseViewModelTest() {
 
         delay(100)
         assertThat(position, equalTo(1))
+    }
+
+    @Test
+    fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() = runBlocking {
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
+        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
+
+        var enabled: Boolean? = null
+        viewModel.transferCommandEnabled.observeForever { enabled = it }
+
+        delay(100)
+        assertThat(enabled, `is`(true))
     }
 }
