@@ -97,7 +97,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
-    debugImplementation 'androidx.fragment:fragment-testing:1.2.2'
+    debugImplementation 'androidx.fragment:fragment-testing:1.2.4'
     androidTestImplementation "org.mockito:mockito-core:3.1.0"
     // using the "inline" edition of this dexmaker by LinkedIn, allows mocking final classes
     // on Android P (9) or later. If this is not needed, one can use 'org.mockito:mockito-android:3.1.0'
