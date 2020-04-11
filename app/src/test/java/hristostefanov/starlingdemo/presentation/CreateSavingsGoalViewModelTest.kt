@@ -4,10 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
-import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.accountCurrencyArg
-import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.accountIdArg
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.name
-import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.roundUpAmountArg
+import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -34,9 +32,10 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     private val error1 = "Error 1"
 
     private val state = SavedStateHandle()
+    private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp, oneHundred)
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(state).apply {
+        CreateSavingsGoalViewModel(validArgs, state).apply {
             // manual field injection
             createSavingsGoalInteractor = createSavingsGoalsIterator
         }
@@ -44,8 +43,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `Goal name changes are saved`() = runBlocking {
-        givenValidInitialState()
-
         viewModelUnderTest.onNameChanged(goal1Name)
 
         assertThat(state.name, `is`(goal1Name))
@@ -53,7 +50,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `Interaction and argument passing`() = runBlocking {
-        givenValidInitialState()
         viewModelUnderTest.onNameChanged(goal1Name)
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
@@ -66,7 +62,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `Interactor succeeds - navigation`() = runBlocking {
-        givenValidInitialState()
         state.name = goal1Name
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
@@ -79,7 +74,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `Interactor fails - navigation`() = runBlocking {
-        givenValidInitialState()
         state.name = goal1Name
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willThrow(ServiceException(error1))
@@ -90,10 +84,4 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         assertThat(dir, equalTo(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
     }
 
-
-    private fun givenValidInitialState() {
-        state.accountIdArg = account1Id
-        state.accountCurrencyArg = gbp
-        state.roundUpAmountArg = oneHundred
-    }
 }

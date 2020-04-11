@@ -50,7 +50,7 @@ class CreateSavingsGoalFragment : Fragment() {
     }
 
     private inner class ViewModelFactory :
-        AbstractSavedStateViewModelFactory(this, args.toBundle()) {
+        AbstractSavedStateViewModelFactory(this, null) {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(
@@ -58,7 +58,7 @@ class CreateSavingsGoalFragment : Fragment() {
             modelClass: Class<T>,
             handle: SavedStateHandle
         ): T {
-            return CreateSavingsGoalViewModel(handle).also { sessionComponent().inject(it) } as T
+            return CreateSavingsGoalViewModel(args, handle).also { sessionComponent().inject(it) } as T
         }
     }
 }

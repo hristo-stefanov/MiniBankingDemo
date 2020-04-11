@@ -7,6 +7,7 @@ import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
+import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -19,34 +20,14 @@ import java.util.function.Predicate
 import javax.inject.Inject
 
 class CreateSavingsGoalViewModel
-/**
- * Expected arguments passed through [SavedStateHandle]:
- * [ACCOUNT_CURRENCY_ARG_KEY], [ACCOUNT_ID_ARG_KEY] and [ROUND_UP_AMOUNT_ARG_KEY]
- */
+
 constructor(
+    private val _args: CreateSavingsGoalFragmentArgs,
     private val _state: SavedStateHandle
 ) : ViewModel() {
 
     companion object {
-        // argument keys correspond to the keys used in the navigation graph
-        const val ROUND_UP_AMOUNT_ARG_KEY = "roundUpAmount"
-        const val ACCOUNT_ID_ARG_KEY = "accountId"
-        const val ACCOUNT_CURRENCY_ARG_KEY = "accountCurrency"
-
         const val NAME_KEY = "name"
-
-        var SavedStateHandle.accountCurrencyArg: Currency
-            get() = this[ACCOUNT_CURRENCY_ARG_KEY] ?: throw IllegalArgumentException(ACCOUNT_CURRENCY_ARG_KEY)
-            set(value) { this[ACCOUNT_CURRENCY_ARG_KEY] = value}
-
-
-        var SavedStateHandle.roundUpAmountArg: BigDecimal
-            get() = this[ROUND_UP_AMOUNT_ARG_KEY] ?: throw IllegalArgumentException(ROUND_UP_AMOUNT_ARG_KEY)
-            set(value) { this[ROUND_UP_AMOUNT_ARG_KEY] = value}
-
-        var SavedStateHandle.accountIdArg: String
-            get() = this[ACCOUNT_ID_ARG_KEY] ?: throw IllegalArgumentException(ACCOUNT_ID_ARG_KEY)
-            set(value) { this[ACCOUNT_ID_ARG_KEY] = value}
 
         var SavedStateHandle.name: String
             get() = this[NAME_KEY] ?: throw IllegalArgumentException(NAME_KEY)
@@ -74,16 +55,16 @@ constructor(
                 try {
                     createSavingsGoalInteractor.execute(
                         state.name,
-                        state.accountIdArg,
-                        state.accountCurrencyArg
+                        _args.accountId,
+                        _args.accountCurrency
                     )
 
                     // TODO consider navigating UP instead
                     _navigationChannel.send(
                         CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
-                            state.accountIdArg,
-                            state.accountCurrencyArg,
-                            state.roundUpAmountArg
+                            _args.accountId,
+                            _args.accountCurrency,
+                            _args.roundUpAmount
                         )
                     )
                 } catch (e: ServiceException) {
