@@ -60,16 +60,10 @@ class TransferConfirmationFragment : Fragment() {
         }
     }
 
-    private inner class ViewModelFactory :
-        AbstractSavedStateViewModelFactory(this, args.toBundle()) {
-
+    private inner class ViewModelFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle
-        ): T {
-            return TransferConfirmationViewModel(handle).also { sessionComponent().inject(it) } as T
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return TransferConfirmationViewModel(args).also { sessionComponent().inject(it) } as T
         }
     }
 }
