@@ -25,9 +25,6 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
-/**
- * Expected arguments passed through [SavedStateHandle]: None
- */
 class AccountsViewModel constructor(
     private val _state: SavedStateHandle
 ) : ViewModel() {
