@@ -79,19 +79,23 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
     }
 
     override suspend fun createSavingsGoal(accountUid: String, request: SavingsGoalRequestV2) {
-        val errorResponse = """
+        if (request.name == "Pass") {
+            _delegate.returningResponse(Unit).createSavingsGoal(accountUid, request)
+        } else {
+            val errorResponse = """
             {
                 "success": false,
                 "errors": [
                     {
-                        "message": "Not supported by the mock service"
+                        "message": "Demo error message. Use 'Pass' as name to succeed."
                     }
                 ]
             }
         """.trimIndent()
-        val responseBody = errorResponse.toResponseBody("application/json".toMediaType())
-        val response = Response.error<ErrorResponse>(401, responseBody)
-        throw HttpException(response)
+            val responseBody = errorResponse.toResponseBody("application/json".toMediaType())
+            val response = Response.error<ErrorResponse>(401, responseBody)
+            throw HttpException(response)
+        }
     }
 
     override suspend fun addMoneyIntoSavingsGoal(
