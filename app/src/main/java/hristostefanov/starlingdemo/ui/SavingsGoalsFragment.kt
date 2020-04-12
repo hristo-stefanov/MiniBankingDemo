@@ -7,8 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import hristostefanov.starlingdemo.R
@@ -39,15 +40,6 @@ class SavingsGoalsFragment : Fragment() {
             savingsGoalsRecyclerView.adapter =
                 SavingsGoalsRecyclerViewAdapter(it, ::onSavingsGoalClicked)
         })
-
-        // launch a lifecycle aware coroutine
-        lifecycleScope.launchWhenStarted {
-            // the terminating condition of the loop is the cancellation of the coroutine
-            while (true) {
-                val directions = viewModel.navigationChannel.receive()
-                findNavController().navigate(directions)
-            }
-        }
 
         addSavingsGoalButton.setOnClickListener {
             viewModel.onAddSavingsGoalCommand()

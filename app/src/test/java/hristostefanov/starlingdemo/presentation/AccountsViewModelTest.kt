@@ -10,6 +10,7 @@ import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.acco
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.*
+import org.greenrobot.eventbus.EventBus
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -33,6 +34,9 @@ class AccountsViewModelTest: BaseViewModelTest() {
     private val localeProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
+    // TODO mocking a type that do not own
+    private val eventBus = mock(EventBus::class.java)
+
 
     private val account1 = Account(
         "1",        "111",
@@ -55,14 +59,15 @@ class AccountsViewModelTest: BaseViewModelTest() {
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
-        AccountsViewModel(state).apply {
+        AccountsViewModel(state).also {
             // manual field and method injection
-            _calcRoundUpInteractor = calcRoundUpInteractor
-            _listAccountsInteractor = listAccountsInteractor
-            _localeProvider = localeProvider as Provider<Locale>
-            _stringSupplier = stringSupplier
-            _amountFormatter = amountFormatter
-            init()
+            it._calcRoundUpInteractor = calcRoundUpInteractor
+            it._listAccountsInteractor = listAccountsInteractor
+            it._localeProvider = localeProvider as Provider<Locale>
+            it._stringSupplier = stringSupplier
+            it._amountFormatter = amountFormatter
+            it.eventBus = eventBus
+            it.init()
         }
     }
 

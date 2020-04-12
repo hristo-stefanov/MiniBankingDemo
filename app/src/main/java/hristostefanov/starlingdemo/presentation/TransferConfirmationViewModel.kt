@@ -4,20 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.ui.TransferConfirmationFragmentArgs
-import hristostefanov.starlingdemo.ui.TransferConfirmationFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import java.util.*
 import javax.inject.Inject
 
@@ -34,16 +33,14 @@ class TransferConfirmationViewModel constructor(
     internal lateinit var _stringSupplier: StringSupplier
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
-
+    @Inject
+    internal lateinit var eventBus: EventBus
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel
 
     private val _info = MutableLiveData("")
     val info: LiveData<String> = _info
-
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
 
     @Inject
     internal fun init() {
@@ -65,13 +62,14 @@ class TransferConfirmationViewModel constructor(
                     _args.accountCurrency,
                     _args.roundUpAmount
                 )
+
                 _acknowledgementChannel.send(_stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)
-
-                _navigationChannel.send(TransferConfirmationFragmentDirections.actionToAccountsDestination())
+                // TODO consider thread-safety
+                eventBus.post(Navigation.Before(R.id.savingsGoalsDestination))
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
-                    _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+                    eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                 }
             }
         }

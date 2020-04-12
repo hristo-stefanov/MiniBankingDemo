@@ -1,21 +1,19 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.lifecycle.*
-import androidx.navigation.NavDirections
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
 import hristostefanov.starlingdemo.ui.AccessTokenFragmentDirections
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
-class AccessTokenViewModel  (private val _state: SavedStateHandle)
- : ViewModel() {
+class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
     @Inject
     internal lateinit var _tokenStore: TokenStore
-
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
+    @Inject
+    internal lateinit var eventBus: EventBus
 
     private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
@@ -31,15 +29,11 @@ class AccessTokenViewModel  (private val _state: SavedStateHandle)
     }
 
     fun onAcceptCommand() {
-        viewModelScope.launch {
-            _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
-        }
+        eventBus.post(Navigation.Forward(AccessTokenFragmentDirections.actionToAccountsDestination()))
     }
 
     fun onUseMockService() {
         _tokenStore.token = null
-        viewModelScope.launch {
-            _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
-        }
+        eventBus.post(Navigation.Forward(AccessTokenFragmentDirections.actionToAccountsDestination()))
     }
 }

@@ -2,21 +2,22 @@ package hristostefanov.starlingdemo.presentation
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
-import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.entities.Account
 import hristostefanov.starlingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -41,26 +42,21 @@ class AccountsViewModel constructor(
 
     @Inject
     internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
-
     @Inject
     internal lateinit var _listAccountsInteractor: ListAccountsInteractor
-
     @Inject
     internal lateinit var _localeProvider: Provider<Locale>
-
     @Inject
     internal lateinit var _stringSupplier: StringSupplier
-
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
+    @Inject
+    internal lateinit var eventBus: EventBus
 
     private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
     private var _selectedAccount: Account? = null
     private var _roundUpAmount: BigDecimal? = null
-
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
 
     private val _accountList = MutableLiveData<List<DisplayAccount>>(emptyList())
     val accountList: LiveData<List<DisplayAccount>> = _accountList
@@ -80,15 +76,11 @@ class AccountsViewModel constructor(
     fun onTransferCommand() {
         _selectedAccount?.also { account ->
             _roundUpAmount?.also { roundUpAmount ->
-                viewModelScope.launch {
-                    _navigationChannel.send(
-                        AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                            account.id,
-                            account.currency,
-                            roundUpAmount
-                        )
-                    )
-                }
+                eventBus.post(Navigation.Forward(AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                    account.id,
+                    account.currency,
+                    roundUpAmount
+                )))
             }
         }
     }
@@ -105,6 +97,21 @@ class AccountsViewModel constructor(
 
     @Inject
     fun init() {
+        load()
+        eventBus.register(this)
+    }
+
+    override fun onCleared() {
+        eventBus.unregister(this)
+        super.onCleared()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onDataSourceChanged(event: DataSourceChangedEvent) {
+        load()
+    }
+
+    private fun load() {
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 .withLocale(_localeProvider.get())
@@ -119,7 +126,7 @@ class AccountsViewModel constructor(
                     _listAccountsInteractor.execute()
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+                        eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                     }
                     emptyList<Account>()
                 }
@@ -154,7 +161,7 @@ class AccountsViewModel constructor(
                     )
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+                        eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                     }
                     null
                 }

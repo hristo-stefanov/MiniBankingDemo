@@ -6,7 +6,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.R
+import hristostefanov.starlingdemo.presentation.Navigation
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -28,5 +32,27 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.navHostFragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onNavigation(navigation: Navigation) {
+        val navController = findNavController(R.id.navHostFragment)
+        when (navigation) {
+            is Navigation.Forward -> navController.navigate(navigation.navDirections)
+            is Navigation.Backward -> navController.popBackStack()
+            is Navigation.BackTo -> navController.popBackStack(navigation.destinationId, false)
+            is Navigation.Before -> navController.popBackStack(navigation.destinationId, true)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // TODO consider injection
+        App.instance.applicationComponent.getEventBus().register(this)
+    }
+
+    override fun onStop() {
+        App.instance.applicationComponent.getEventBus().unregister(this)
+        super.onStop()
     }
 }

@@ -10,8 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccessTokenViewModel
@@ -36,15 +34,6 @@ class AccessTokenFragment : Fragment() {
 
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
-
-        // launch a lifecycle aware coroutine
-        lifecycleScope.launchWhenStarted {
-            // the terminating condition of the loop is the cancellation of the coroutine
-            while (true) {
-                val directions = viewModel.navigationChannel.receive()
-                findNavController().navigate(directions)
-            }
-        }
     }
 
     private inner class ViewModelFactory :

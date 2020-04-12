@@ -8,6 +8,7 @@ import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Compa
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.runBlocking
+import org.greenrobot.eventbus.EventBus
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
@@ -23,21 +24,23 @@ private const val TIMEOUT = 100L
 class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
+    // TODO mocking a type that do not own
+    private val eventBus = mock(EventBus::class.java)
 
     // test data
     private val gbp = Currency.getInstance("GBP")
-    private val oneHundred = "100.00".toBigDecimal()
     private val account1Id = "1"
     private val goal1Name = "Goal1"
     private val error1 = "Error 1"
 
     private val state = SavedStateHandle()
-    private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp, oneHundred)
+    private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp)
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(validArgs, state).apply {
+        CreateSavingsGoalViewModel(validArgs, state).also {
             // manual field injection
-            createSavingsGoalInteractor = createSavingsGoalsIterator
+            it.createSavingsGoalInteractor = createSavingsGoalsIterator
+            it.eventBus = eventBus
         }
     }
 
@@ -68,8 +71,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
         viewModelUnderTest.createCommand.execute()
 
-        val dir = viewModelUnderTest.navigationChannel.receive()
-        assertThat(dir, equalTo(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(account1Id, gbp, oneHundred)))
+        then(eventBus).should(timeout(TIMEOUT)).post(Navigation.Backward)
     }
 
     @Test
@@ -80,8 +82,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
         viewModelUnderTest.createCommand.execute()
 
-        val dir = viewModelUnderTest.navigationChannel.receive()
-        assertThat(dir, equalTo(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
+        then(eventBus).should(timeout(TIMEOUT)).post(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
     }
-
 }

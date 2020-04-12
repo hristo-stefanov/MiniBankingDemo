@@ -3,18 +3,13 @@ package hristostefanov.starlingdemo.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
-import java.math.BigDecimal
-import java.util.*
+import org.greenrobot.eventbus.EventBus
 import java.util.function.Consumer
 import java.util.function.Predicate
 import javax.inject.Inject
@@ -38,9 +33,8 @@ constructor(
 
     @Inject
     internal lateinit var createSavingsGoalInteractor: CreateSavingsGoalInteractor
-
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
+    @Inject
+    internal lateinit var eventBus: EventBus
 
     fun onNameChanged(name: String) {
         _state.name = name
@@ -59,17 +53,10 @@ constructor(
                         _args.accountCurrency
                     )
 
-                    // TODO consider navigating UP instead
-                    _navigationChannel.send(
-                        CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination(
-                            _args.accountId,
-                            _args.accountCurrency,
-                            _args.roundUpAmount
-                        )
-                    )
+                    eventBus.post(Navigation.Backward)
                 } catch (e: ServiceException) {
                     e.localizedMessage?.also {
-                        _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+                        eventBus.post(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(it)))
                     }
                 }
             }

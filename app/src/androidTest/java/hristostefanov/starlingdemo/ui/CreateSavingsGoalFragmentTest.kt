@@ -56,7 +56,6 @@ class CreateSavingsGoalFragmentTest {
 
     @Test()
     fun buttonEnabled() {
-        given(viewModel.navigationChannel).willReturn(Channel())
         given(viewModel.createCommand).willReturn(createCommand)
         given(createCommand.enabledLive).willReturn(MutableLiveData(true))
 
@@ -68,7 +67,6 @@ class CreateSavingsGoalFragmentTest {
 
     @Test
     fun buttonDisabled() {
-        given(viewModel.navigationChannel).willReturn(Channel())
         given(viewModel.createCommand).willReturn(createCommand)
         given(createCommand.enabledLive).willReturn(MutableLiveData(false))
 
@@ -80,7 +78,6 @@ class CreateSavingsGoalFragmentTest {
 
     @Test
     fun nameTextPassed() {
-        given(viewModel.navigationChannel).willReturn(Channel())
         given(viewModel.createCommand).willReturn(createCommand)
         given(createCommand.enabledLive).willReturn(MutableLiveData(false))
         launchFragment()
@@ -92,7 +89,6 @@ class CreateSavingsGoalFragmentTest {
 
     @Test
     fun buttonClicked() {
-        given(viewModel.navigationChannel).willReturn(Channel())
         given(viewModel.createCommand).willReturn(createCommand)
         given(createCommand.enabledLive).willReturn(MutableLiveData(true))
         launchFragment()
@@ -102,10 +98,11 @@ class CreateSavingsGoalFragmentTest {
         then(viewModel.createCommand).should().execute()
     }
 
+    // TODO this test should go to MainActivityTest
+/*
     @Test
     fun navigated() {
         val channel = Channel<NavDirections>()
-        given(viewModel.navigationChannel).willReturn(channel)
         given(viewModel.createCommand).willReturn(createCommand)
         given(createCommand.enabledLive).willReturn(MutableLiveData(true))
         launchFragment()
@@ -114,10 +111,9 @@ class CreateSavingsGoalFragmentTest {
             channel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination("1", Currency.getInstance("GBP"), "123.45".toBigDecimal()))
         }
 
-        then(viewModel).should().navigationChannel
         Espresso.onIdle()
         assertThat(navController.currentDestination?.id, equalTo(R.id.savingsGoalsDestination))
-    }
+    }*/
 
     private fun launchFragment() {
         // launch the fragment in isolation - in empty activity

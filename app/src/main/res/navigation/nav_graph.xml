@@ -51,31 +51,18 @@
         android:name="hristostefanov.starlingdemo.ui.CreateSavingsGoalFragment"
         android:label="New Savings Goal"
         tools:layout="@layout/create_savings_goal_fragment" >
-        <action
-            android:id="@+id/action_to_savingsGoalsDestination"
-            app:destination="@id/savingsGoalsDestination"
-            app:popUpTo="@id/savingsGoalsDestination"
-            app:popUpToInclusive="true" />
         <argument
             android:name="accountId"
             app:argType="string" />
         <argument
             android:name="accountCurrency"
             app:argType="java.util.Currency" />
-        <argument
-            android:name="roundUpAmount"
-            app:argType="java.math.BigDecimal" />
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"
         android:name="hristostefanov.starlingdemo.ui.TransferConfirmationFragment"
         android:label="Confirm transfer"
         tools:layout="@layout/transfer_confirmation_fragment">
-        <action
-            android:id="@+id/action_to_accountsDestination"
-            app:destination="@id/accountsDestination"
-            app:popUpTo="@id/accountsDestination"
-            app:popUpToInclusive="true" />
         <argument
             android:name="savingsGoal"
             app:argType="hristostefanov.starlingdemo.business.entities.SavingsGoal" />

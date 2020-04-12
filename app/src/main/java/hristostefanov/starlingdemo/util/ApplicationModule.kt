@@ -7,6 +7,7 @@ import dagger.Provides
 import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
+import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
 
@@ -14,6 +15,10 @@ import java.util.*
 abstract class ApplicationModule {
 
     companion object {
+        @ApplicationScope
+        @Provides
+        fun provideEventBus() = EventBus()
+
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()
 
