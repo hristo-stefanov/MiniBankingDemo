@@ -7,6 +7,7 @@ import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInterac
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.name
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.hamcrest.CoreMatchers.`is`
@@ -25,7 +26,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
     // TODO mocking a type that do not own
-    private val eventBus = mock(EventBus::class.java)
+    private val eventBus = mock(Channel::class.java) as Channel<Navigation>
 
     // test data
     private val gbp = Currency.getInstance("GBP")
@@ -40,7 +41,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         CreateSavingsGoalViewModel(validArgs, state).also {
             // manual field injection
             it.createSavingsGoalInteractor = createSavingsGoalsIterator
-            it.eventBus = eventBus
+            it.navigationChannel = eventBus
         }
     }
 
@@ -71,7 +72,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
         viewModelUnderTest.createCommand.execute()
 
-        then(eventBus).should(timeout(TIMEOUT)).post(Navigation.Backward)
+        then(eventBus).should(timeout(TIMEOUT)).send(Navigation.Backward)
     }
 
     @Test
@@ -82,6 +83,6 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
         viewModelUnderTest.createCommand.execute()
 
-        then(eventBus).should(timeout(TIMEOUT)).post(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
+        then(eventBus).should(timeout(TIMEOUT)).send(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
     }
 }

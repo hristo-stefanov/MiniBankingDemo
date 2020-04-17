@@ -5,8 +5,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import hristostefanov.starlingdemo.App
+import hristostefanov.starlingdemo.presentation.Navigation
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
+import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
@@ -18,6 +20,10 @@ abstract class ApplicationModule {
         @ApplicationScope
         @Provides
         fun provideEventBus() = EventBus()
+
+        @ApplicationScope
+        @Provides @NavigationChannel
+        fun provideNavigationChannel() = Channel<Navigation>()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()

@@ -3,13 +3,13 @@ package hristostefanov.starlingdemo.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
+import hristostefanov.starlingdemo.util.NavigationChannel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import java.util.function.Consumer
 import java.util.function.Predicate
 import javax.inject.Inject
@@ -33,8 +33,8 @@ constructor(
 
     @Inject
     internal lateinit var createSavingsGoalInteractor: CreateSavingsGoalInteractor
-    @Inject
-    internal lateinit var eventBus: EventBus
+    @Inject @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     fun onNameChanged(name: String) {
         _state.name = name
@@ -53,10 +53,10 @@ constructor(
                         _args.accountCurrency
                     )
 
-                    eventBus.post(Navigation.Backward)
+                    navigationChannel.send(Navigation.Backward)
                 } catch (e: ServiceException) {
                     e.localizedMessage?.also {
-                        eventBus.post(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(it)))
+                        navigationChannel.send(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(it)))
                     }
                 }
             }

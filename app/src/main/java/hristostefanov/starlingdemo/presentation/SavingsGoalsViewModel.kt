@@ -11,7 +11,9 @@ import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListSavingGoalsInteractor
 import hristostefanov.starlingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.starlingdemo.ui.SavingsGoalsFragmentDirections
+import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
@@ -28,6 +30,10 @@ class SavingsGoalsViewModel @Inject constructor(
 
     @Inject
     internal lateinit var listSavingGoalsInteractor: ListSavingGoalsInteractor
+
+    @Inject
+    @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     private var _goals: List<SavingsGoal> = emptyList()
 
@@ -59,7 +65,7 @@ class SavingsGoalsViewModel @Inject constructor(
                 _list.value = _goals.map { DisplaySavingsGoal(it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
-                    eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                 }
             }
         }
@@ -68,27 +74,31 @@ class SavingsGoalsViewModel @Inject constructor(
 
     fun onSavingsGoalClicked(position: Int) {
         _goals.getOrNull(position)?.also {
-            eventBus.post(
-                Navigation.Forward(
-                    SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
-                        it,
-                        _args.roundUpAmount,
-                        _args.accountCurrency,
-                        _args.accountId
+            viewModelScope.launch {
+                navigationChannel.send(
+                    Navigation.Forward(
+                        SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                            it,
+                            _args.roundUpAmount,
+                            _args.accountCurrency,
+                            _args.accountId
+                        )
                     )
                 )
-            )
+            }
         }
     }
 
     fun onAddSavingsGoalCommand() {
-        eventBus.post(
-            Navigation.Forward(
-                SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
-                    _args.accountId,
-                    _args.accountCurrency
+        viewModelScope.launch {
+            navigationChannel.send(
+                Navigation.Forward(
+                    SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
+                        _args.accountId,
+                        _args.accountCurrency
+                    )
                 )
             )
-        )
+        }
     }
 }

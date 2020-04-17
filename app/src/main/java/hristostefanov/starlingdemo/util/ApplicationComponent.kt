@@ -1,6 +1,7 @@
 package hristostefanov.starlingdemo.util
 
 import dagger.Component
+import hristostefanov.starlingdemo.ui.MainActivity
 import org.greenrobot.eventbus.EventBus
 
 @ApplicationScope
@@ -8,4 +9,6 @@ import org.greenrobot.eventbus.EventBus
 interface ApplicationComponent {
     fun getSessionComponentFactory(): SessionComponent.Factory
     fun getEventBus(): EventBus
+
+    fun inject(activity: MainActivity)
 }

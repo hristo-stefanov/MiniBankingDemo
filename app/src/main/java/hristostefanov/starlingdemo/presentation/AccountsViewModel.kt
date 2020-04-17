@@ -11,8 +11,10 @@ import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
+import hristostefanov.starlingdemo.util.NavigationChannel
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
@@ -52,6 +54,8 @@ class AccountsViewModel constructor(
     internal lateinit var _amountFormatter: AmountFormatter
     @Inject
     internal lateinit var eventBus: EventBus
+    @Inject @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
@@ -76,11 +80,17 @@ class AccountsViewModel constructor(
     fun onTransferCommand() {
         _selectedAccount?.also { account ->
             _roundUpAmount?.also { roundUpAmount ->
-                eventBus.post(Navigation.Forward(AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                    account.id,
-                    account.currency,
-                    roundUpAmount
-                )))
+                viewModelScope.launch {
+                    navigationChannel.send(
+                        Navigation.Forward(
+                            AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                                account.id,
+                                account.currency,
+                                roundUpAmount
+                            )
+                        )
+                    )
+                }
             }
         }
     }
@@ -126,7 +136,7 @@ class AccountsViewModel constructor(
                     _listAccountsInteractor.execute()
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                     }
                     emptyList<Account>()
                 }
@@ -161,7 +171,7 @@ class AccountsViewModel constructor(
                     )
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                     }
                     null
                 }

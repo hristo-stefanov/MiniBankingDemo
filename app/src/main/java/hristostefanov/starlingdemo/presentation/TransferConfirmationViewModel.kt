@@ -10,13 +10,13 @@ import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.ui.TransferConfirmationFragmentArgs
+import hristostefanov.starlingdemo.util.NavigationChannel
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import java.util.*
 import javax.inject.Inject
 
@@ -33,8 +33,8 @@ class TransferConfirmationViewModel constructor(
     internal lateinit var _stringSupplier: StringSupplier
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
-    @Inject
-    internal lateinit var eventBus: EventBus
+    @Inject @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel
@@ -65,11 +65,10 @@ class TransferConfirmationViewModel constructor(
 
                 _acknowledgementChannel.send(_stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)
-                // TODO consider thread-safety
-                eventBus.post(Navigation.Before(R.id.savingsGoalsDestination))
+                navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
-                    eventBus.post(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
                 }
             }
         }
