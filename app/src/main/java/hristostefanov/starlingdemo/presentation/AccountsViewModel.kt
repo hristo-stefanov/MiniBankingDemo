@@ -100,7 +100,7 @@ class AccountsViewModel constructor(
         if (newAccountId != _state.accountId) {
             _state.accountId = newAccountId
             viewModelScope.launch {
-                updateStateDependingOnSelectedAccount()
+                updateStateDependentOnSelectedAccount()
             }
         }
     }
@@ -152,12 +152,12 @@ class AccountsViewModel constructor(
                 DisplayAccount(it.accountNum, it.currency.currencyCode, displayBalance)
             }
 
-            updateStateDependingOnSelectedAccount()
+            updateStateDependentOnSelectedAccount()
         }
     }
 
     @MainThread
-    private suspend fun updateStateDependingOnSelectedAccount() {
+    private suspend fun updateStateDependentOnSelectedAccount() {
         _selectedAccount = _accounts.find { it.id == _state.accountId } ?: _accounts.getOrNull(0)
 
         _selectedAccountPosition.value = _accounts.indexOf(_selectedAccount)
