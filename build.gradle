@@ -8,12 +8,14 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        // TODO for some reasons instrumented tests fail with v. 3.6.2, but work with 3.5.3
+        classpath 'com.android.tools.build:gradle:3.5.3'
+
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.2.1"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.2.2"
     }
 }
 
