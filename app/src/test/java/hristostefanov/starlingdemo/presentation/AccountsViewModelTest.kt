@@ -5,11 +5,13 @@ import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.entities.Account
 import hristostefanov.starlingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.util.StringSupplier
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
@@ -55,7 +57,7 @@ class AccountsViewModelTest: BaseViewModelTest() {
 
     private val quarter = "0.25".toBigDecimal()
 
-    val state = SavedStateHandle()
+    private val state = SavedStateHandle()
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
@@ -72,19 +74,21 @@ class AccountsViewModelTest: BaseViewModelTest() {
     }
 
     @Before
-    fun beforeEach() {
+    fun beforeEach() = runBlocking {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(localeProvider.get()).willReturn(Locale.UK)
         given(amountFormatter.format(any(), any(), any())).willReturn("")
+        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
+        Unit
     }
 
     @Test
     fun `Initial interactions`() = runBlocking {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
-
         viewModel // instantiate
+
+        then(eventBus).should().register(viewModel)
 
         then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
         then(listAccountsInteractor).shouldHaveNoMoreInteractions()
@@ -96,10 +100,26 @@ class AccountsViewModelTest: BaseViewModelTest() {
         Unit
     }
 
+    @Test
+    fun `Interactions on DataSourceChangedEvent`() = runBlocking {
+        viewModel.onDataSourceChanged(DataSourceChangedEvent())
+
+        then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
+        then(calcRoundUpInteractor).should(timeout(TIMEOUT).times(2))
+            .execute(account1.id, LocalDate.now().minusWeeks(1))
+        Unit
+    }
+
+    @Test
+    fun `OnCleared interactions`() {
+        viewModel.onCleared()
+        then(eventBus).should().unregister(viewModel)
+    }
+
+
     @Test()
     fun testFirstAccountIsSelectedByDefault() = runBlocking {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
-        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
 
         var position: Int? = null
         viewModel.selectedAccountPosition.observeForever { position = it }
@@ -112,8 +132,6 @@ class AccountsViewModelTest: BaseViewModelTest() {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
         state.accountId = account2.id
 
-        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
-
         viewModel // instantiate
 
         var position: Int? = null
@@ -125,9 +143,6 @@ class AccountsViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() = runBlocking {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
-
         var enabled: Boolean? = null
         viewModel.transferCommandEnabled.observeForever { enabled = it }
 

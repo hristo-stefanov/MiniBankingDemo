@@ -111,7 +111,7 @@ class AccountsViewModel constructor(
         eventBus.register(this)
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         eventBus.unregister(this)
         super.onCleared()
     }
