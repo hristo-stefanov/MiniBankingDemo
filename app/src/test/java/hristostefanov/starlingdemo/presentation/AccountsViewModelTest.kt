@@ -9,7 +9,9 @@ import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
+import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
@@ -25,23 +27,28 @@ import org.mockito.Mockito.timeout
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Provider
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private const val TIMEOUT = 100L
 
 //@ExperimentalCoroutinesApi
 //@ObsoleteCoroutinesApi
-class AccountsViewModelTest: BaseViewModelTest() {
+class AccountsViewModelTest : BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val localeProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
+
     // TODO mocking a type that do not own
     private val eventBus = mock(EventBus::class.java)
 
+    // TODO mocking a type that do not own
+    private val navigationChannel = mock(Channel::class.java) as Channel<Navigation>
 
     private val account1 = Account(
-        "1",        "111",
+        "1", "111",
         "cat1",
         Currency.getInstance("GBP"),
         "100".toBigDecimal()
@@ -69,6 +76,7 @@ class AccountsViewModelTest: BaseViewModelTest() {
             it._stringSupplier = stringSupplier
             it._amountFormatter = amountFormatter
             it.eventBus = eventBus
+            it.navigationChannel = navigationChannel
             it.init()
         }
     }
@@ -79,7 +87,7 @@ class AccountsViewModelTest: BaseViewModelTest() {
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(localeProvider.get()).willReturn(Locale.UK)
         given(amountFormatter.format(any(), any(), any())).willReturn("")
-        given(calcRoundUpInteractor.execute(any(),any())).willReturn(quarter)
+        given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         Unit
     }
@@ -114,6 +122,29 @@ class AccountsViewModelTest: BaseViewModelTest() {
     fun `OnCleared interactions`() {
         viewModel.onCleared()
         then(eventBus).should().unregister(viewModel)
+    }
+
+
+    @Test
+    fun onTransferCommand() = runBlocking {
+        // for for the command to get enabled
+        suspendCoroutine<Unit> {continuation ->
+            viewModel.transferCommandEnabled.observeForever {
+                if (it)
+                    continuation.resume(Unit)
+            }
+        }
+
+        viewModel.onTransferCommand()
+
+        then(navigationChannel).should(timeout(TIMEOUT)).send(
+            Navigation.Forward(
+                AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                    account1.id,
+                    account1.currency, quarter
+                )
+            )
+        )
     }
 
 
