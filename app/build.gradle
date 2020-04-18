@@ -72,7 +72,9 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    implementation 'org.greenrobot:eventbus:3.2.0'
+    def eventbus_version = '3.2.0'
+    implementation "org.greenrobot:eventbus:$eventbus_version"
+    kapt "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -105,4 +107,10 @@ dependencies {
     // which includes everything needed except inlining.
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0'
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+}
+
+kapt {
+    arguments {
+        arg('eventBusIndex', 'hristostefanov.starlingdemo.util.EventBusIndex')
+    }
 }

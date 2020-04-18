@@ -19,7 +19,7 @@ abstract class ApplicationModule {
     companion object {
         @ApplicationScope
         @Provides
-        fun provideEventBus() = EventBus()
+        fun provideEventBus() = EventBus.builder().addIndex(EventBusIndex()).build()
 
         @ApplicationScope
         @Provides @NavigationChannel
