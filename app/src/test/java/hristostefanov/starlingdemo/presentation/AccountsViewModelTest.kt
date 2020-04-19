@@ -13,12 +13,8 @@ import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
@@ -83,24 +79,19 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Before
-    fun beforeEach() {
+    fun beforeEach() = runBlocking {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(localeProvider.get()).willReturn(Locale.UK)
         given(amountFormatter.format(any(), any(), any())).willReturn("")
-
+        given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         Unit
     }
 
-    suspend fun setup() {
-        given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-    }
 
     @Test
     fun `Initial interactions`() = runBlocking {
-        setup()
-
         viewModel // instantiate
 
         then(eventBus).should().register(viewModel)
@@ -115,7 +106,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `Interactions on DataSourceChangedEvent`() = runBlocking {
-        setup()
         viewModel.onDataSourceChanged(DataSourceChangedEvent())
 
         then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
@@ -126,7 +116,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `OnCleared interactions`() = runBlocking {
-        setup()
         viewModel.onCleared()
         then(eventBus).should().unregister(viewModel)
     }
@@ -134,7 +123,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test
     fun onTransferCommand() = runBlocking {
-        setup()
         // wait for the command to get enabled
         suspendCoroutine<Unit> {continuation ->
             viewModel.transferCommandEnabled.observeForever {
@@ -158,7 +146,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test()
     fun testFirstAccountIsSelectedByDefault() = runBlocking {
-        setup()
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
         @Suppress("UNCHECKED_CAST")
         val observer = mock(Observer::class.java) as Observer<Int>
@@ -170,7 +157,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test
     fun testRestoringSelectedAccount() = runBlocking {
-        setup()
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
         state.accountId = account2.id
@@ -186,7 +172,6 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() = runBlocking {
-        setup()
         @Suppress("UNCHECKED_CAST")
         val observer = mock(Observer::class.java) as Observer<Boolean>
 
