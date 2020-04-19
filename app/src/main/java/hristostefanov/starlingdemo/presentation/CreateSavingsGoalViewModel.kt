@@ -14,7 +14,7 @@ import java.util.function.Consumer
 import java.util.function.Predicate
 import javax.inject.Inject
 
-class CreateSavingsGoalViewModel
+open class CreateSavingsGoalViewModel
 
 constructor(
     private val _args: CreateSavingsGoalFragmentArgs,
@@ -36,11 +36,11 @@ constructor(
     @Inject @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
-    fun onNameChanged(name: String) {
+    open fun onNameChanged(name: String) {
         _state.name = name
     }
 
-    val createCommand: Command = CommandImpl(
+    open val createCommand: Command = CommandImpl(
         _state,
         Predicate { state -> createSavingsGoalInteractor.validateName(state.name) },
         listOf(NAME_KEY),
