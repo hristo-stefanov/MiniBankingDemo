@@ -115,7 +115,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `OnCleared interactions`() = runBlocking {
+    fun `OnCleared interactions`() {
         viewModel.onCleared()
         then(eventBus).should().unregister(viewModel)
     }
@@ -171,7 +171,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
 
     @Test
-    fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() = runBlocking {
+    fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() {
         @Suppress("UNCHECKED_CAST")
         val observer = mock(Observer::class.java) as Observer<Boolean>
 
