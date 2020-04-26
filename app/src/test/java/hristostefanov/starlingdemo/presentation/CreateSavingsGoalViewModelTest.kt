@@ -1,10 +1,11 @@
 package hristostefanov.starlingdemo.presentation
 
+import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
-import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.name
+import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel.Companion.NAME_KEY
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import kotlinx.coroutines.channels.Channel
@@ -24,19 +25,26 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
     // TODO mocking a type that do not own
+    @Suppress("UNCHECKED_CAST")
     private val navigationChannel = mock(Channel::class.java) as Channel<Navigation>
+
+    @Suppress("UNCHECKED_CAST")
+    val commandEnabledObserver = mock(Observer::class.java) as Observer<Boolean>
 
     // test data
     private val gbp = Currency.getInstance("GBP")
     private val account1Id = "1"
-    private val goal1Name = "Goal1"
     private val error1 = "Error 1"
 
-    private val state = SavedStateHandle()
+    // the values of goal names do not matter because we mock the validation function
+    private val validGoalName = "Goal1"
+    private val invalidGoalName = ""
+
+    private val savedState = SavedStateHandle()
     private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp)
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(validArgs, state).also {
+        CreateSavingsGoalViewModel(validArgs, savedState).also {
             // manual field injection
             it.createSavingsGoalInteractor = createSavingsGoalsIterator
             it.navigationChannel = navigationChannel
@@ -44,27 +52,89 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun `Goal name changes are saved`() = runBlocking {
-        viewModelUnderTest.onNameChanged(goal1Name)
+    fun `WHEN name changes THEN name is saved`() = runBlocking {
+        viewModelUnderTest.onNameChanged(validGoalName)
 
-        assertThat(state.name, `is`(goal1Name))
+        assertThat(savedState[NAME_KEY], `is`(validGoalName))
     }
 
     @Test
-    fun `Interaction and argument passing`() = runBlocking {
-        viewModelUnderTest.onNameChanged(goal1Name)
+    fun `GIVEN saved name is valid WHEN constructed THEN Create command is enabled`() {
+        savedState[NAME_KEY] = validGoalName
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
+
+        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+
+        then(createSavingsGoalsIterator).should().validateName(validGoalName)
+        then(commandEnabledObserver).should().onChanged(true)
+    }
+
+    @Test
+    fun `GIVEN saved name is invalid WHEN constructed THEN Create command is disabled`() {
+        savedState[NAME_KEY] = invalidGoalName
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(false)
+
+        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+
+        then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
+        then(commandEnabledObserver).should().onChanged(false)
+    }
+
+    @Test
+    fun `GIVEN invalid name WHEN name is changed to valid one THEN Create command is enabled`() {
+        savedState[NAME_KEY] = invalidGoalName
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(false).willReturn(true)
+        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+
+        viewModelUnderTest.onNameChanged(validGoalName)
+
+        then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
+        then(commandEnabledObserver).should().onChanged(false)
+        then(commandEnabledObserver).should().onChanged(true)
+        then(commandEnabledObserver).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun `GIVEN valid name WHEN name is changed to invalid one THEN Create command is disabled`() {
+        savedState[NAME_KEY] = validGoalName
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true).willReturn(false)
+        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+
+        viewModelUnderTest.onNameChanged(invalidGoalName)
+
+        then(createSavingsGoalsIterator).should().validateName(validGoalName)
+        then(commandEnabledObserver).should().onChanged(true)
+        then(commandEnabledObserver).should().onChanged(false)
+        then(commandEnabledObserver).shouldHaveNoMoreInteractions()
+    }
+
+
+    @Test
+    fun `GIVEN name is valid WHEN executing Create command THEN will interact`() = runBlocking {
+        viewModelUnderTest.onNameChanged(validGoalName)
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
         viewModelUnderTest.createCommand.execute()
 
-        then(createSavingsGoalsIterator).should().validateName(goal1Name)
-        then(createSavingsGoalsIterator).should(timeout(TIMEOUT)).execute(goal1Name, account1Id, gbp)
+        then(createSavingsGoalsIterator).should().validateName(validGoalName)
+        then(createSavingsGoalsIterator).should(timeout(TIMEOUT)).execute(validGoalName, account1Id, gbp)
         then(createSavingsGoalsIterator).shouldHaveNoMoreInteractions()
     }
 
     @Test
-    fun `Interactor succeeds - navigation`() = runBlocking {
-        state.name = goal1Name
+    fun `GIVEN name is invalid WHEN executing Create command THEN will not interact`() {
+        viewModelUnderTest.onNameChanged(invalidGoalName)
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(false)
+
+        viewModelUnderTest.createCommand.execute()
+
+        then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
+        then(createSavingsGoalsIterator).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun `WHEN interactor succeeds THEN navigate back`() = runBlocking {
+        savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
 
@@ -74,8 +144,8 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun `Interactor fails - navigation`() = runBlocking {
-        state.name = goal1Name
+    fun `WHEN interactor fails THEN navigate to error dialog`() = runBlocking {
+        savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willThrow(ServiceException(error1))
 
