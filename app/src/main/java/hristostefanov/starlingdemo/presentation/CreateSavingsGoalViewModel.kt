@@ -37,32 +37,32 @@ constructor(
         savedState.name = name
     }
 
-    open val createCommand: Command = object : Command {
-        override val enabledLive: LiveData<Boolean> = Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
+    open val createCommandEnabled: LiveData<Boolean> =
+        Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
             createSavingsGoalInteractor.validateName(name)
         }
 
-        override fun execute() {
-            savedState.name.also { name ->
-                if (createSavingsGoalInteractor.validateName(name)) {
-                    viewModelScope.launch {
-                        try {
-                            createSavingsGoalInteractor.execute(
-                                name,
-                                args.accountId,
-                                args.accountCurrency
-                            )
-                            navigationChannel.send(Navigation.Backward)
-                        } catch (e: ServiceException) {
-                            e.localizedMessage?.also {
-                                navigationChannel.send(
-                                    Navigation.Forward(
-                                        CreateSavingsGoalFragmentDirections.toErrorDialog(
-                                            it
-                                        )
+
+    open fun onCreateCommand() {
+        savedState.name.also { name ->
+            if (createSavingsGoalInteractor.validateName(name)) {
+                viewModelScope.launch {
+                    try {
+                        createSavingsGoalInteractor.execute(
+                            name,
+                            args.accountId,
+                            args.accountCurrency
+                        )
+                        navigationChannel.send(Navigation.Backward)
+                    } catch (e: ServiceException) {
+                        e.localizedMessage?.also {
+                            navigationChannel.send(
+                                Navigation.Forward(
+                                    CreateSavingsGoalFragmentDirections.toErrorDialog(
+                                        it
                                     )
                                 )
-                            }
+                            )
                         }
                     }
                 }

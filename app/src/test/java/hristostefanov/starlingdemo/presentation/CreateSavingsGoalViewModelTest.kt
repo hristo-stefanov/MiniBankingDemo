@@ -63,7 +63,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
-        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+        viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         then(createSavingsGoalsIterator).should().validateName(validGoalName)
         then(commandEnabledObserver).should().onChanged(true)
@@ -74,7 +74,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         savedState[NAME_KEY] = invalidGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(false)
 
-        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+        viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
         then(commandEnabledObserver).should().onChanged(false)
@@ -84,7 +84,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     fun `GIVEN invalid name WHEN name is changed to valid one THEN Create command is enabled`() {
         savedState[NAME_KEY] = invalidGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(false).willReturn(true)
-        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+        viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         viewModelUnderTest.onNameChanged(validGoalName)
 
@@ -98,7 +98,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     fun `GIVEN valid name WHEN name is changed to invalid one THEN Create command is disabled`() {
         savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true).willReturn(false)
-        viewModelUnderTest.createCommand.enabledLive.observeForever(commandEnabledObserver)
+        viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         viewModelUnderTest.onNameChanged(invalidGoalName)
 
@@ -114,7 +114,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         viewModelUnderTest.onNameChanged(validGoalName)
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
-        viewModelUnderTest.createCommand.execute()
+        viewModelUnderTest.onCreateCommand()
 
         then(createSavingsGoalsIterator).should().validateName(validGoalName)
         then(createSavingsGoalsIterator).should(timeout(TIMEOUT)).execute(validGoalName, account1Id, gbp)
@@ -126,7 +126,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         viewModelUnderTest.onNameChanged(invalidGoalName)
         given(createSavingsGoalsIterator.validateName(any())).willReturn(false)
 
-        viewModelUnderTest.createCommand.execute()
+        viewModelUnderTest.onCreateCommand()
 
         then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
         then(createSavingsGoalsIterator).shouldHaveNoMoreInteractions()
@@ -138,7 +138,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
 
-        viewModelUnderTest.createCommand.execute()
+        viewModelUnderTest.onCreateCommand()
 
         then(navigationChannel).should(timeout(TIMEOUT)).send(Navigation.Backward)
     }
@@ -149,7 +149,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willThrow(ServiceException(error1))
 
-        viewModelUnderTest.createCommand.execute()
+        viewModelUnderTest.onCreateCommand()
 
         then(navigationChannel).should(timeout(TIMEOUT)).send(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
     }
