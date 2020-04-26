@@ -19,8 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.timeout
+import org.mockito.Mockito.*
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Provider
@@ -38,11 +37,9 @@ class AccountsViewModelTest : BaseViewModelTest() {
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
 
-    // TODO mocking a type that do not own
-    private val eventBus = mock(EventBus::class.java)
-
-    // TODO mocking a type that do not own
-    private val navigationChannel = mock(Channel::class.java) as Channel<Navigation>
+    private val eventBus = spy(EventBus::class.java)
+    @Suppress("UNCHECKED_CAST")
+    private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
 
     private val account1 = Account(
         "1", "111",
@@ -148,7 +145,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     fun testFirstAccountIsSelectedByDefault() = runBlocking {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
         @Suppress("UNCHECKED_CAST")
-        val observer = mock(Observer::class.java) as Observer<Int>
+        val observer = spy(Observer::class.java) as Observer<Int>
 
         viewModel.selectedAccountPosition.observeForever(observer)
 
@@ -161,7 +158,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
         given(listAccountsInteractor.execute()).willReturn(accounts)
         state.accountId = account2.id
         @Suppress("UNCHECKED_CAST")
-        val observer = mock(Observer::class.java) as Observer<Int>
+        val observer = spy(Observer::class.java) as Observer<Int>
 
         viewModel.selectedAccountPosition.observeForever(observer)
 
@@ -173,7 +170,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     @Test
     fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() {
         @Suppress("UNCHECKED_CAST")
-        val observer = mock(Observer::class.java) as Observer<Boolean>
+        val observer = spy(Observer::class.java) as Observer<Boolean>
 
         viewModel.transferCommandEnabled.observeForever(observer)
 

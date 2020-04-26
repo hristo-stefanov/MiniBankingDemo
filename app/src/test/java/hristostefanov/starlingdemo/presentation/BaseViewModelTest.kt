@@ -25,7 +25,7 @@ open class BaseViewModelTest {
         Dispatchers.resetMain()
 
         // workaround of a race-condition issue that randomly causes exceptions in tests
-        sleep(1)
+        sleep(2)
 
         mainThreadSurrogate.close()
     }

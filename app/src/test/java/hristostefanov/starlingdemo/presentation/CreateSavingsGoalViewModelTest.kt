@@ -13,10 +13,7 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.mockito.BDDMockito.given
-import org.mockito.BDDMockito.then
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.timeout
+import org.mockito.BDDMockito.*
 import java.util.*
 
 private const val TIMEOUT = 100L
@@ -24,12 +21,12 @@ private const val TIMEOUT = 100L
 class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
-    // TODO mocking a type that do not own
-    @Suppress("UNCHECKED_CAST")
-    private val navigationChannel = mock(Channel::class.java) as Channel<Navigation>
 
     @Suppress("UNCHECKED_CAST")
-    val commandEnabledObserver = mock(Observer::class.java) as Observer<Boolean>
+    private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
+
+    @Suppress("UNCHECKED_CAST")
+    val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
 
     // test data
     private val gbp = Currency.getInstance("GBP")
