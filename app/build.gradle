@@ -76,6 +76,9 @@ dependencies {
     implementation "org.greenrobot:eventbus:$eventbus_version"
     kapt "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
 
+    // for EncryptedSharedPreferences
+    implementation 'androidx.security:security-crypto:1.0.0-rc01'
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     testImplementation 'junit:junit:4.12'
