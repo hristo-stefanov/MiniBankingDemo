@@ -18,9 +18,9 @@ class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
 
     fun onAccessTokenChanged(accessToken: String) {
-        // NOTE: do not save the token in SavedStateHandle for security reasons,
-        // this also requires EditEdit#saveEnabled = false
-
+        // SECURITY: do not save the token in SavedStateHandle, which is saved in the
+        // "saved instance state" by ActivityManager service
+        // this also requires EditText#saveEnabled = false !!!
         if (_tokenStore.token != accessToken) {
             _tokenStore.token = accessToken
             _acceptCommandEnabled.value = accessToken.isNotBlank()

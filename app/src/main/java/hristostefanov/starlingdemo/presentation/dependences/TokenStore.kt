@@ -1,6 +1,6 @@
 package hristostefanov.starlingdemo.presentation.dependences
 
 interface TokenStore {
-    // TODO null means no token or mock service?
+    // null value means using a mack service
     var token: String?
 }

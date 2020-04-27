@@ -85,23 +85,6 @@ class CreateSavingsGoalFragmentTest {
         then(viewModel).should().onCreateCommand()
     }
 
-    // TODO this test should go to MainActivityTest
-/*
-    @Test
-    fun navigated() {
-        val channel = Channel<NavDirections>()
-        given(viewModel.createCommand).willReturn(createCommand)
-        given(createCommand.enabledLive).willReturn(MutableLiveData(true))
-        launchFragment()
-
-        runBlocking {
-            channel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination("1", Currency.getInstance("GBP"), "123.45".toBigDecimal()))
-        }
-
-        Espresso.onIdle()
-        assertThat(navController.currentDestination?.id, equalTo(R.id.savingsGoalsDestination))
-    }*/
-
     private fun launchFragment() {
         // launch the fragment in isolation - in empty activity
         val fragmentScenario = launchFragmentInContainer<CreateSavingsGoalFragment>()

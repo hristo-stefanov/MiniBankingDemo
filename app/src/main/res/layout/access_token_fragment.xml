@@ -13,6 +13,8 @@
         android:layout_height="match_parent"
         tools:context=".ui.AccessTokenFragment">
 
+<!--        SECURITY: saveEnabled="false" to avoid saving the token in the "saved instance state"
+            by ActivityManager service -->
         <!--suppress AndroidUnknownAttribute -->
         <EditText
             android:id="@+id/accessTokenEditText"
