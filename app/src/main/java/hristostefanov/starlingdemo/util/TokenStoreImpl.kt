@@ -15,8 +15,8 @@ class TokenStoreImpl(context: Context): TokenStore {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
     }
 
-    override var token: String?
-        get() = pref.getString("token", null)
+    override var token: String
+        get() = pref.getString("token", null) ?: ""
         set(value) {
             pref.edit().putString("token", value).apply()
         }

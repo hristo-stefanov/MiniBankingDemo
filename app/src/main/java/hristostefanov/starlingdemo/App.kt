@@ -16,7 +16,7 @@ class App : Application() {
 
     init {
         instance = this
-        newSession() // TODO needed when resurrecting the app but not when starting initially
+        newSession()
     }
 
     fun newSession() {

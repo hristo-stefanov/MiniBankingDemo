@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -12,13 +13,13 @@ import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.presentation.Navigation
 import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
-import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    @Inject @NavigationChannel
+    @Inject
+    @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +43,23 @@ class MainActivity : AppCompatActivity() {
                 when (navigation) {
                     is Navigation.Forward -> navController.navigate(navigation.navDirections)
                     is Navigation.Backward -> navController.popBackStack()
-                    is Navigation.BackTo -> navController.popBackStack(navigation.destinationId, false)
-                    is Navigation.Before -> navController.popBackStack(navigation.destinationId, true)
+                    is Navigation.Restart -> {
+                        // this way is better than restarting the Activity which may cause
+                        // race condition for consuming the navigation emission
+                        navController.navigate(R.id.accountsDestination, null, navOptions {
+                            popUpTo(R.id.accountsDestination) {
+                                inclusive = true
+                            }
+                        })
+                    }
+                    is Navigation.BackTo -> navController.popBackStack(
+                        navigation.destinationId,
+                        false
+                    )
+                    is Navigation.Before -> navController.popBackStack(
+                        navigation.destinationId,
+                        true
+                    )
                 }
             }
         }

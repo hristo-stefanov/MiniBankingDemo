@@ -43,7 +43,7 @@ abstract class SessionModule {
         @SessionScope
         @Provides
         fun provideService(retrofit: Retrofit, tokenStore: TokenStore): Service  {
-            if (tokenStore.token == null) {
+            if (BuildConfig.SERVICE_BASE_URL == "http:mock") {
                 val behavior = NetworkBehavior.create().apply {
                     setErrorPercent(0)
                     setFailurePercent(0)

@@ -2,6 +2,7 @@ package hristostefanov.starlingdemo.presentation
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
+import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.business.dependences.ServiceException
@@ -10,6 +11,7 @@ import hristostefanov.starlingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
+import hristostefanov.starlingdemo.presentation.dependences.TokenStore
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.NavigationChannel
 import hristostefanov.starlingdemo.util.StringSupplier
@@ -44,18 +46,28 @@ class AccountsViewModel constructor(
 
     @Inject
     internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
+
     @Inject
     internal lateinit var _listAccountsInteractor: ListAccountsInteractor
+
     @Inject
     internal lateinit var _localeProvider: Provider<Locale>
+
     @Inject
     internal lateinit var _stringSupplier: StringSupplier
+
     @Inject
     internal lateinit var _amountFormatter: AmountFormatter
+
     @Inject
     internal lateinit var eventBus: EventBus
-    @Inject @NavigationChannel
+
+    @Inject
+    @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
+
+    @Inject
+    internal lateinit var _tokenStore: TokenStore
 
     private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
@@ -121,7 +133,19 @@ class AccountsViewModel constructor(
         load()
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onAuthenticated(event: AuthenticatedEvent) {
+        load()
+    }
+
     private fun load() {
+        if (_tokenStore.token.isBlank()) {
+            viewModelScope.launch {
+                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
+            }
+            return
+        }
+
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 .withLocale(_localeProvider.get())
@@ -136,7 +160,11 @@ class AccountsViewModel constructor(
                     _listAccountsInteractor.execute()
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                        navigationChannel.send(
+                            Navigation.Forward(
+                                NavGraphXmlDirections.toErrorDialog(it)
+                            )
+                        )
                     }
                     emptyList<Account>()
                 }
@@ -171,7 +199,11 @@ class AccountsViewModel constructor(
                     )
                 } catch (e: ServiceException) {
                     e.message?.also {
-                        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
+                        navigationChannel.send(
+                            Navigation.Forward(
+                                NavGraphXmlDirections.toErrorDialog(it)
+                            )
+                        )
                     }
                     null
                 }
@@ -189,5 +221,14 @@ class AccountsViewModel constructor(
         } ?: _stringSupplier.get(R.string.no_account)
 
         _transferCommandEnabled.value = _roundUpAmount?.signum() == 1 // if positive
+    }
+
+    fun onLogout() {
+        _tokenStore.token = ""
+        App.instance.newSession()
+        // restart to get deps from the new session
+        viewModelScope.launch {
+            navigationChannel.send(Navigation.Restart)
+        }
     }
 }

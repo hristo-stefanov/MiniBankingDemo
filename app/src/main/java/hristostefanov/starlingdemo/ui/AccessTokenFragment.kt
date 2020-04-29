@@ -10,9 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccessTokenViewModel
+import kotlinx.android.synthetic.main.access_token_fragment.*
 
 class AccessTokenFragment : Fragment() {
     private lateinit var binding: AccessTokenFragmentBinding
@@ -34,6 +34,8 @@ class AccessTokenFragment : Fragment() {
 
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
+
+        accessTokenEditText.requestFocus()
     }
 
     private inner class ViewModelFactory :
@@ -45,8 +47,6 @@ class AccessTokenFragment : Fragment() {
             modelClass: Class<T>,
             handle: SavedStateHandle
         ): T {
-            App.instance.newSession()
-
             return AccessTokenViewModel(handle).also { sessionComponent().inject(it) } as T
         }
     }

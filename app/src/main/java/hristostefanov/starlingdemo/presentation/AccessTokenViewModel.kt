@@ -2,10 +2,10 @@ package hristostefanov.starlingdemo.presentation
 
 import androidx.lifecycle.*
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
-import hristostefanov.starlingdemo.ui.AccessTokenFragmentDirections
 import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
@@ -13,6 +13,8 @@ class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
     internal lateinit var _tokenStore: TokenStore
     @Inject @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
+    @Inject
+    internal lateinit var eventBus: EventBus
 
     private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
@@ -28,15 +30,9 @@ class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
     }
 
     fun onAcceptCommand() {
+        eventBus.post(AuthenticatedEvent())
         viewModelScope.launch {
-            navigationChannel.send(Navigation.Forward(AccessTokenFragmentDirections.actionToAccountsDestination()))
-        }
-    }
-
-    fun onUseMockService() {
-        _tokenStore.token = null
-        viewModelScope.launch {
-            navigationChannel.send(Navigation.Forward(AccessTokenFragmentDirections.actionToAccountsDestination()))
+            navigationChannel.send(Navigation.Backward)
         }
     }
 }

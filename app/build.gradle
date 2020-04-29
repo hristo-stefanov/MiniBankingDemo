@@ -16,13 +16,22 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "SERVICE_BASE_URL", '"https://api-sandbox.starlingbank.com"')
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // this app does not support the production environment
+//            buildConfigField("String", "SERVICE_BASE_URL", '"https://api.starlingbank.com"')
+        }
+
+        debug {
+            buildConfigField("String", "SERVICE_BASE_URL", '"http:mock"')
+        }
+
+        sandbox {
+            initWith debug
+            buildConfigField("String", "SERVICE_BASE_URL", '"https://api-sandbox.starlingbank.com"')
         }
     }
     compileOptions {
