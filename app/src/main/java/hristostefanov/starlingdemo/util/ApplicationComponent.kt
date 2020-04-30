@@ -14,5 +14,5 @@ interface ApplicationComponent {
     }
 
     val sessionRegistry: SessionRegistry
-    fun inject(activity: MainActivity)
+    fun inject(target: MainActivity)
 }

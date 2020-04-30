@@ -11,9 +11,9 @@ interface SessionComponent {
         fun create(): SessionComponent
     }
 
-    fun inject(vm: AccessTokenViewModel)
-    fun inject(vm: AccountsViewModel)
-    fun inject(vm: TransferConfirmationViewModel)
-    fun inject(vm: CreateSavingsGoalViewModel)
-    fun inject(vm: SavingsGoalsViewModel)
+    fun inject(target: AccessTokenViewModel)
+    fun inject(target: AccountsViewModel)
+    fun inject(target: TransferConfirmationViewModel)
+    fun inject(target: CreateSavingsGoalViewModel)
+    fun inject(target: SavingsGoalsViewModel)
 }
