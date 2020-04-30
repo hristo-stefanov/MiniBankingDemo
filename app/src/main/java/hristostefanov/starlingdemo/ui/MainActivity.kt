@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        App.instance.applicationComponent.inject(this)
+        (application as App).applicationComponent.inject(this)
 
         // needed to hide the Up button on the ActionBar for top-level destinations
         val topLevelDestinationIds = setOf(R.id.accessTokenDestination, R.id.accountsDestination)
