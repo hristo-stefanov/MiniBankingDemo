@@ -2,7 +2,6 @@ package hristostefanov.starlingdemo.presentation
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
-import hristostefanov.starlingdemo.App
 import hristostefanov.starlingdemo.NavGraphXmlDirections
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.business.dependences.ServiceException
@@ -14,6 +13,7 @@ import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.NavigationChannel
+import hristostefanov.starlingdemo.util.SessionRegistry
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -68,6 +68,9 @@ class AccountsViewModel constructor(
 
     @Inject
     internal lateinit var _tokenStore: TokenStore
+
+    @Inject
+    internal lateinit var sessionRegistry: SessionRegistry
 
     private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var _accounts: List<Account> = emptyList()
@@ -225,7 +228,7 @@ class AccountsViewModel constructor(
 
     fun onLogout() {
         _tokenStore.token = ""
-        App.instance.newSession()
+        sessionRegistry.newSession()
         // restart to get deps from the new session
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)

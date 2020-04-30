@@ -10,16 +10,9 @@ class App : Application() {
         lateinit var instance: App
     }
 
-    lateinit var sessionComponent: SessionComponent
-
     val applicationComponent: ApplicationComponent = DaggerApplicationComponent.create()
 
     init {
         instance = this
-        newSession()
-    }
-
-    fun newSession() {
-        sessionComponent = applicationComponent.getSessionComponentFactory().create()
     }
 }
