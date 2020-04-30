@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.databinding.AccountsFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccountsViewModel
@@ -16,7 +13,9 @@ class AccountsFragment : Fragment() {
     private lateinit var binding: AccountsFragmentBinding
 
     private val viewModel: AccountsViewModel by viewModels {
-        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+        viewModelFactory { savedStateHandle ->
+            AccountsViewModel(savedStateHandle).also { sessionComponent().inject(it) }
+        }
     }
 
     override fun onCreateView(
@@ -46,19 +45,6 @@ class AccountsFragment : Fragment() {
             true
         } else {
             super.onOptionsItemSelected(item)
-        }
-    }
-
-    private inner class ViewModelFactory :
-        AbstractSavedStateViewModelFactory(this, null) {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle
-        ): T {
-            return AccountsViewModel(handle).also { sessionComponent().inject(it) } as T
         }
     }
 }

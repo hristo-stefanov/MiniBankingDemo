@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import hristostefanov.starlingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccessTokenViewModel
 import kotlinx.android.synthetic.main.access_token_fragment.*
@@ -19,7 +16,9 @@ class AccessTokenFragment : Fragment() {
     private lateinit var binding: AccessTokenFragmentBinding
 
     private val viewModel: AccessTokenViewModel by viewModels {
-        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+        viewModelFactory { savedStateHandle ->
+            AccessTokenViewModel(savedStateHandle).also { sessionComponent().inject(it) }
+        }
     }
 
     override fun onCreateView(
@@ -44,19 +43,6 @@ class AccessTokenFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             requireActivity().finish()
-        }
-    }
-
-    private inner class ViewModelFactory :
-        AbstractSavedStateViewModelFactory(this, null) {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle
-        ): T {
-            return AccessTokenViewModel(handle).also { sessionComponent().inject(it) } as T
         }
     }
 }

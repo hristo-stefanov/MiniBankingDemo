@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import hristostefanov.starlingdemo.R
@@ -21,7 +19,9 @@ class SavingsGoalsFragment : Fragment() {
     private val args: SavingsGoalsFragmentArgs by navArgs()
 
     private val viewModel: SavingsGoalsViewModel by viewModels {
-        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+        viewModelFactory {
+            SavingsGoalsViewModel(args).also { sessionComponent().inject(it) }
+        }
     }
 
     override fun onCreateView(
@@ -48,12 +48,5 @@ class SavingsGoalsFragment : Fragment() {
 
     private fun onSavingsGoalClicked(position: Int) {
         viewModel.onSavingsGoalClicked(position)
-    }
-
-    private inner class ViewModelFactory : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return SavingsGoalsViewModel(args).also { sessionComponent().inject(it) } as T
-        }
     }
 }

@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
@@ -20,7 +18,9 @@ import kotlinx.android.synthetic.main.transfer_confirmation_fragment.*
 class TransferConfirmationFragment : Fragment() {
 
     private val viewModel: TransferConfirmationViewModel by viewModels {
-        UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory()
+        viewModelFactory {
+            TransferConfirmationViewModel(args).also { sessionComponent().inject(it) }
+        }
     }
 
     private val args: TransferConfirmationFragmentArgs by navArgs()
@@ -50,13 +50,6 @@ class TransferConfirmationFragment : Fragment() {
 
         confirmButton.setOnClickListener {
             viewModel.onConfirmCommand()
-        }
-    }
-
-    private inner class ViewModelFactory : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return TransferConfirmationViewModel(args).also { sessionComponent().inject(it) } as T
         }
     }
 }
