@@ -59,6 +59,7 @@ abstract class SessionModule {
         }
     }
 
+    // Repositories may cache session specific data, hence the scoping to session
     @SessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
