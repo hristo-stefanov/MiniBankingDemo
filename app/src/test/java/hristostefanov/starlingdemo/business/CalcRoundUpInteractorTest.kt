@@ -12,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.Matchers.comparesEqualTo
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
@@ -21,27 +20,21 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month
 import java.time.ZoneId
-import javax.inject.Provider
 
 @ExperimentalCoroutinesApi
 class CalcRoundUpInteractorTest {
 
     private val repository = mock(Repository::class.java)
-    private val zoneIdProvider: Provider<*> = mock(Provider::class.java)
 
     @Suppress("UNCHECKED_CAST")
     private val interactor by lazy {
-        CalcRoundUpInteractor(repository, zoneIdProvider as Provider<ZoneId>)
+        CalcRoundUpInteractor(repository, someZone)
     }
 
     private val someDate = LocalDate.of(2020, Month.MARCH, 18)
     private val someZone = ZoneId.of("EET")
     private val someAccountId = "someId"
 
-    @Before
-    fun beforeEach() {
-        given(zoneIdProvider.get()).willReturn(someZone)
-    }
 
     @Test
     fun `Interacting with dependences`() = runBlockingTest {
@@ -49,8 +42,6 @@ class CalcRoundUpInteractorTest {
 
         interactor.execute(someAccountId, someDate)
 
-        then(zoneIdProvider).should().get()
-        then(zoneIdProvider).shouldHaveNoMoreInteractions()
         then(repository).should().findTransactions(someAccountId, someDate.atStartOfDay(someZone))
         then(repository).shouldHaveNoMoreInteractions()
     }

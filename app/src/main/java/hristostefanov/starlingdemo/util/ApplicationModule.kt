@@ -19,11 +19,11 @@ abstract class ApplicationModule {
     companion object {
         @ApplicationScope
         @Provides
-        fun provideEventBus() = EventBus.builder().addIndex(EventBusIndex()).build()
+        fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
         @ApplicationScope
         @Provides @NavigationChannel
-        fun provideNavigationChannel() = Channel<Navigation>()
+        fun provideNavigationChannel(): Channel<Navigation> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()
@@ -46,12 +46,10 @@ abstract class ApplicationModule {
             return TokenStoreImpl(application)
         }
 
-        @ApplicationScope
         @Provides
         fun provideGson() = Gson()
     }
 
-    @ApplicationScope
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
 }

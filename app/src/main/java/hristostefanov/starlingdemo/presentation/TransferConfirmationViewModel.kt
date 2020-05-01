@@ -17,7 +17,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 private const val NAVIGATION_DELAY_MS = 2000L
@@ -27,8 +26,6 @@ class TransferConfirmationViewModel constructor(
 ) : ViewModel() {
     @Inject
     internal lateinit var _interactor: AddMoneyIntoGoalInteractor
-    @Inject
-    internal lateinit var _locale: Locale
     @Inject
     internal lateinit var _stringSupplier: StringSupplier
     @Inject
@@ -46,8 +43,7 @@ class TransferConfirmationViewModel constructor(
     internal fun init() {
         val amountFormatted = _amountFormatter.format(
             _args.roundUpAmount,
-            _args.accountCurrency.currencyCode,
-            _locale
+            _args.accountCurrency.currencyCode
         )
         _info.value = _stringSupplier.get(R.string.transferInfo)
              .format(amountFormatted, _args.savingsGoal.name)

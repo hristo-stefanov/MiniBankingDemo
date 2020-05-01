@@ -28,7 +28,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Provider
 
 class AccountsViewModel constructor(
     private val _state: SavedStateHandle
@@ -51,7 +50,7 @@ class AccountsViewModel constructor(
     internal lateinit var _listAccountsInteractor: ListAccountsInteractor
 
     @Inject
-    internal lateinit var _localeProvider: Provider<Locale>
+    internal lateinit var _locale: Locale
 
     @Inject
     internal lateinit var _stringSupplier: StringSupplier
@@ -151,7 +150,7 @@ class AccountsViewModel constructor(
 
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                .withLocale(_localeProvider.get())
+                .withLocale(_locale)
         val sinceDateFormatted = _roundUpSinceDate.format(formatter)
 
         _roundUpInfo.value =
@@ -177,8 +176,7 @@ class AccountsViewModel constructor(
             _accountList.value = _accounts.map {
                 val displayBalance = _amountFormatter.format(
                     it.balance,
-                    it.currency.currencyCode,
-                    _localeProvider.get()
+                    it.currency.currencyCode
                 )
                 DisplayAccount(it.accountNum, it.currency.currencyCode, displayBalance)
             }
@@ -217,8 +215,7 @@ class AccountsViewModel constructor(
             _selectedAccount?.let { selectedAccount ->
                 _amountFormatter.format(
                     roundUpAmount,
-                    selectedAccount.currency.currencyCode,
-                    _localeProvider.get()
+                    selectedAccount.currency.currencyCode
                 )
             }
         } ?: _stringSupplier.get(R.string.no_account)

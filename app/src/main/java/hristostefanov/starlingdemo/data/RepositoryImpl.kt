@@ -13,7 +13,6 @@ import java.math.BigDecimal
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class RepositoryImpl @Inject constructor(
     private val _service: Service,

@@ -23,7 +23,6 @@ import org.mockito.BDDMockito.then
 import org.mockito.Mockito.*
 import java.time.LocalDate
 import java.util.*
-import javax.inject.Provider
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -34,7 +33,6 @@ private const val TIMEOUT = 100L
 class AccountsViewModelTest : BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
-    private val localeProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
@@ -68,7 +66,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
             // manual field and method injection
             it._calcRoundUpInteractor = calcRoundUpInteractor
             it._listAccountsInteractor = listAccountsInteractor
-            it._localeProvider = localeProvider as Provider<Locale>
+            it._locale = Locale.UK
             it._stringSupplier = stringSupplier
             it._amountFormatter = amountFormatter
             it.eventBus = eventBus
@@ -82,8 +80,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     fun beforeEach() = runBlocking {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
-        given(localeProvider.get()).willReturn(Locale.UK)
-        given(amountFormatter.format(any(), any(), any())).willReturn("")
+        given(amountFormatter.format(any(), any())).willReturn("")
         given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         given(tokenStore.token).willReturn("token")

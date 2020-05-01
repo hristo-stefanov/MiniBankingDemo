@@ -8,15 +8,14 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
-import javax.inject.Provider
 
 class CalcRoundUpInteractor @Inject constructor(
     private val _repository: Repository,
-    private val _zoneIdProvider: Provider<ZoneId>
+    private val _zoneId: ZoneId
 ) {
     @Throws(ServiceException::class)
     suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
-        val zonedDateTime = sinceDate.atStartOfDay(_zoneIdProvider.get())
+        val zonedDateTime = sinceDate.atStartOfDay(_zoneId)
         val transactions = _repository.findTransactions(accountId, zonedDateTime)
 
         val settledPaymentsAmounts = transactions

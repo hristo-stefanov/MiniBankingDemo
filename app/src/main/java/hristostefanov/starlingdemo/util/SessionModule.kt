@@ -1,6 +1,5 @@
 package hristostefanov.starlingdemo.util
 
-import androidx.navigation.NavDirections
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -9,7 +8,6 @@ import hristostefanov.starlingdemo.business.dependences.Repository
 import hristostefanov.starlingdemo.data.RepositoryImpl
 import hristostefanov.starlingdemo.data.dependences.Service
 import hristostefanov.starlingdemo.presentation.dependences.TokenStore
-import kotlinx.coroutines.channels.Channel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -17,7 +15,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 
 @Module
 abstract class SessionModule {
