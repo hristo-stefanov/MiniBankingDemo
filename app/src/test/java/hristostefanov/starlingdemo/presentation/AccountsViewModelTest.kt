@@ -10,6 +10,7 @@ import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
+import hristostefanov.starlingdemo.presentation.dependences.TokenStore
 import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -36,6 +37,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     private val localeProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
+    private val tokenStore = mock(TokenStore::class.java)
 
     private val eventBus = spy(EventBus::class.java)
     @Suppress("UNCHECKED_CAST")
@@ -71,6 +73,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
             it._amountFormatter = amountFormatter
             it.eventBus = eventBus
             it.navigationChannel = navigationChannel
+            it._tokenStore = tokenStore
             it.init()
         }
     }
@@ -83,6 +86,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
         given(amountFormatter.format(any(), any(), any())).willReturn("")
         given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
+        given(tokenStore.token).willReturn("token")
         Unit
     }
 
