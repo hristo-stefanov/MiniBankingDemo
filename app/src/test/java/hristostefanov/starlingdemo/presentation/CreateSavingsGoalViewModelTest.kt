@@ -41,10 +41,8 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp)
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(validArgs, savedState).also {
-            // manual field injection
-            it.createSavingsGoalInteractor = createSavingsGoalsIterator
-            it.navigationChannel = navigationChannel
+        CreateSavingsGoalViewModel(createSavingsGoalsIterator, navigationChannel).apply {
+            init(validArgs, savedState)
         }
     }
 

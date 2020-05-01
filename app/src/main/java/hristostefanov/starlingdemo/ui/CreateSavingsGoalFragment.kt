@@ -18,7 +18,7 @@ class CreateSavingsGoalFragment : Fragment() {
 
     private val viewModel: CreateSavingsGoalViewModel by viewModels {
         viewModelFactory { savedStateHandle ->
-            CreateSavingsGoalViewModel(args, savedStateHandle).also { sessionComponent().inject(it) }
+            sessionComponent().getCreateSavingsGoalViewModel().apply { init(args, savedStateHandle) }
         }
     }
 

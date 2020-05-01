@@ -8,13 +8,19 @@ import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
 import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 import javax.inject.Inject
 
 open class CreateSavingsGoalViewModel
+@Inject
 constructor(
-    private val args: CreateSavingsGoalFragmentArgs,
-    private val savedState: SavedStateHandle
+    private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
+    @NavigationChannel private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
+
+    private lateinit var args: CreateSavingsGoalFragmentArgs
+    private lateinit var savedState: SavedStateHandle
+    private var isInitialized = false
 
     companion object {
         internal const val NAME_KEY = "name"
@@ -26,21 +32,22 @@ constructor(
             }
     }
 
-    @Inject
-    internal lateinit var createSavingsGoalInteractor: CreateSavingsGoalInteractor
-
-    @Inject
-    @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
+    fun init(args: CreateSavingsGoalFragmentArgs, savedState: SavedStateHandle) {
+        if (isInitialized) throw IllegalStateException()
+        this.args = args
+        this.savedState = savedState
+        isInitialized = true
+    }
 
     open fun onNameChanged(name: String) {
         savedState.name = name
     }
 
-    open val createCommandEnabled: LiveData<Boolean> =
+    open val createCommandEnabled: LiveData<Boolean> by lazy {
         Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
             createSavingsGoalInteractor.validateName(name)
         }
+    }
 
 
     open fun onCreateCommand() {
