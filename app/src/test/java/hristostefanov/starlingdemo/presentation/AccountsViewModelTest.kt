@@ -62,14 +62,14 @@ class AccountsViewModelTest : BaseViewModelTest() {
     private val viewModel by lazy {
         AccountsViewModel(state).also {
             // manual field and method injection
-            it._calcRoundUpInteractor = calcRoundUpInteractor
-            it._listAccountsInteractor = listAccountsInteractor
-            it._locale = Locale.UK
-            it._stringSupplier = stringSupplier
-            it._amountFormatter = amountFormatter
+            it.calcRoundUpInteractor = calcRoundUpInteractor
+            it.listAccountsInteractor = listAccountsInteractor
+            it.locale = Locale.UK
+            it.stringSupplier = stringSupplier
+            it.amountFormatter = amountFormatter
             it.eventBus = eventBus
             it.navigationChannel = navigationChannel
-            it._tokenStore = tokenStore
+            it.tokenStore = tokenStore
             it.init()
         }
     }

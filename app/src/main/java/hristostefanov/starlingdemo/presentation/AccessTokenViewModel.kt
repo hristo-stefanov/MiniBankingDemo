@@ -8,11 +8,13 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
-class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
+class AccessTokenViewModel(private val state: SavedStateHandle) : ViewModel() {
     @Inject
-    internal lateinit var _tokenStore: TokenStore
+    internal lateinit var tokenStore: TokenStore
+
     @Inject @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
+
     @Inject
     internal lateinit var eventBus: EventBus
 
@@ -23,8 +25,8 @@ class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
         // SECURITY: do not save the token in SavedStateHandle, which is saved in the
         // "saved instance state" by ActivityManager service
         // this also requires EditText#saveEnabled = false !!!
-        if (_tokenStore.token != accessToken) {
-            _tokenStore.token = accessToken
+        if (tokenStore.token != accessToken) {
+            tokenStore.token = accessToken
             _acceptCommandEnabled.value = accessToken.isNotBlank()
         }
     }

@@ -10,13 +10,13 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 class CalcRoundUpInteractor @Inject constructor(
-    private val _repository: Repository,
-    private val _zoneId: ZoneId
+    private val repository: Repository,
+    private val zoneId: ZoneId
 ) {
     @Throws(ServiceException::class)
     suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
-        val zonedDateTime = sinceDate.atStartOfDay(_zoneId)
-        val transactions = _repository.findTransactions(accountId, zonedDateTime)
+        val zonedDateTime = sinceDate.atStartOfDay(zoneId)
+        val transactions = repository.findTransactions(accountId, zonedDateTime)
 
         val settledPaymentsAmounts = transactions
             .filter { it.amount.signum() == -1 && it.status == Status.SETTLED && it.source == Source.EXTERNAL }

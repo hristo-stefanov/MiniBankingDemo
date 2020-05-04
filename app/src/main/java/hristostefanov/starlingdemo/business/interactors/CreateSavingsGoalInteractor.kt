@@ -8,14 +8,14 @@ import java.util.*
 import javax.inject.Inject
 
 class CreateSavingsGoalInteractor @Inject constructor(
-    private val _repository: Repository,
+    private val repository: Repository,
     private val eventBus: EventBus
 ) {
     @Throws(ServiceException::class)
     suspend fun execute(name: String, accountId: String, currency: Currency) {
         if (!validateName(name))
             throw IllegalArgumentException()
-        _repository.createSavingsGoal(name, accountId, currency)
+        repository.createSavingsGoal(name, accountId, currency)
         eventBus.post(DataSourceChangedEvent())
     }
 
