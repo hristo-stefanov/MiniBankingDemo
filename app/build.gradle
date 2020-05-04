@@ -8,7 +8,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "hristostefanov.starlingdemo"
+        applicationId "hristostefanov.minibankingdemo"
         // set to 26(O) for the sake of Java 8 java.time package, to support older devices
         // Joda Time library can be used
         minSdkVersion 26
@@ -129,6 +129,6 @@ dependencies {
 
 kapt {
     arguments {
-        arg('eventBusIndex', 'hristostefanov.starlingdemo.util.EventBusIndex')
+        arg('eventBusIndex', 'hristostefanov.minibankingdemo.util.EventBusIndex')
     }
 }

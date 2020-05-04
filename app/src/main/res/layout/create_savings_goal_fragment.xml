@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel" />
+            type="hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

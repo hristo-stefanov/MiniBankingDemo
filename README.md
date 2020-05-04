@@ -1,5 +1,5 @@
-StarlingDemo
-============
+MiniBankingDemo
+===============
 Author: Hristo M. Stefanov
 
 This Android app is a demo and is not intended for actual use. It demos

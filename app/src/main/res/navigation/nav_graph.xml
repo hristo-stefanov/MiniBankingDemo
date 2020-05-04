@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/accessTokenDestination"
-        android:name="hristostefanov.starlingdemo.ui.AccessTokenFragment"
+        android:name="hristostefanov.minibankingdemo.ui.AccessTokenFragment"
         android:label="@string/access_token_title"
         tools:layout="@layout/access_token_fragment"/>
     <fragment
         android:id="@+id/accountsDestination"
-        android:name="hristostefanov.starlingdemo.ui.AccountsFragment"
+        android:name="hristostefanov.minibankingdemo.ui.AccountsFragment"
         android:label="Accounts"
         tools:layout="@layout/accounts_fragment">
         <action
@@ -21,7 +21,7 @@
     </fragment>
     <fragment
         android:id="@+id/savingsGoalsDestination"
-        android:name="hristostefanov.starlingdemo.ui.SavingsGoalsFragment"
+        android:name="hristostefanov.minibankingdemo.ui.SavingsGoalsFragment"
         android:label="Savings Goals"
         tools:layout="@layout/savings_goals_fragment">
         <action
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/createSavingsGoalDestination"
-        android:name="hristostefanov.starlingdemo.ui.CreateSavingsGoalFragment"
+        android:name="hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment"
         android:label="New Savings Goal"
         tools:layout="@layout/create_savings_goal_fragment" >
         <argument
@@ -54,12 +54,12 @@
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"
-        android:name="hristostefanov.starlingdemo.ui.TransferConfirmationFragment"
+        android:name="hristostefanov.minibankingdemo.ui.TransferConfirmationFragment"
         android:label="Confirm transfer"
         tools:layout="@layout/transfer_confirmation_fragment">
         <argument
             android:name="savingsGoal"
-            app:argType="hristostefanov.starlingdemo.business.entities.SavingsGoal" />
+            app:argType="hristostefanov.minibankingdemo.business.entities.SavingsGoal" />
         <argument
             android:name="roundUpAmount"
             app:argType="java.math.BigDecimal" />
@@ -81,7 +81,7 @@
 
     <dialog
         android:id="@+id/errorDialog"
-        android:name="hristostefanov.starlingdemo.ui.ErrorDialog">
+        android:name="hristostefanov.minibankingdemo.ui.ErrorDialog">
         <argument
             android:name="message"
             app:argType="string" />
