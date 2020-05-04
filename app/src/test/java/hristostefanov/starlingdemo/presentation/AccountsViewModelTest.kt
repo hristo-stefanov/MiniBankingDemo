@@ -28,8 +28,6 @@ import kotlin.coroutines.suspendCoroutine
 
 private const val TIMEOUT = 100L
 
-//@ExperimentalCoroutinesApi
-//@ObsoleteCoroutinesApi
 class AccountsViewModelTest : BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
@@ -103,7 +101,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `Interactions on DataSourceChangedEvent`() = runBlocking {
+    fun `Data source changed`() = runBlocking {
         viewModel.onDataSourceChanged(DataSourceChangedEvent())
 
         then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
@@ -113,14 +111,14 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `OnCleared interactions`() {
+    fun `View model cleared`() {
         viewModel.onCleared()
         then(eventBus).should().unregister(viewModel)
     }
 
 
     @Test
-    fun onTransferCommand() = runBlocking {
+    fun `Transfer command selected`() = runBlocking {
         // wait for the command to get enabled
         suspendCoroutine<Unit> {continuation ->
             viewModel.transferCommandEnabled.observeForever {
@@ -142,8 +140,8 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
 
-    @Test()
-    fun testFirstAccountIsSelectedByDefault() = runBlocking {
+    @Test
+    fun `First Account Is Selected By Default`() = runBlocking {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
         @Suppress("UNCHECKED_CAST")
         val observer = spy(Observer::class.java) as Observer<Int>
@@ -154,7 +152,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun testRestoringSelectedAccount() = runBlocking {
+    fun `Restoring Selected Account`() = runBlocking {
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
         state.accountId = account2.id
@@ -169,7 +167,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
 
     @Test
-    fun `Given RoundUpAmount is positive Then Transfer Command will be enabled`() {
+    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() {
         @Suppress("UNCHECKED_CAST")
         val observer = spy(Observer::class.java) as Observer<Boolean>
 
