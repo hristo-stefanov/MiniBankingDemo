@@ -5,11 +5,12 @@
     <string name="roundUpInfo">Round up amount since %s</string>
     <string name="transferInfo">You are about to transfer %s to %s</string>
     <string name="success">Success</string>
-    <string name="access_token">Access token</string>
+    <string name="access_token_hint">Access token</string>
     <string name="accept">Accept</string>
     <string name="transfer_to_savings_goal">Transfer to Savings Goal</string>
     <string name="name_hint">Name</string>
     <string name="create_savings_goal">Create Savings Goal</string>
     <string name="confirm">Confirm</string>
     <string name="logout">Logout</string>
+    <string name="access_token_title">Access token</string>
 </resources>

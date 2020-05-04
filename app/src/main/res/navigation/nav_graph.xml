@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/accessTokenDestination"
         android:name="hristostefanov.starlingdemo.ui.AccessTokenFragment"
-        android:label="Starling Sandbox Access"
+        android:label="@string/access_token_title"
         tools:layout="@layout/access_token_fragment"/>
     <fragment
         android:id="@+id/accountsDestination"
