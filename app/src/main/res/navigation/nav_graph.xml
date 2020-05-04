@@ -3,19 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/accessTokenDestination">
+    app:startDestination="@id/accountsDestination">
 
     <fragment
         android:id="@+id/accessTokenDestination"
         android:name="hristostefanov.starlingdemo.ui.AccessTokenFragment"
-        android:label="Starling Sandbox Access"
-        tools:layout="@layout/access_token_fragment">
-        <action
-            android:id="@+id/action_to_accountsDestination"
-            app:destination="@+id/accountsDestination"
-            app:popUpTo="@id/accessTokenDestination"
-            app:popUpToInclusive="true" />
-    </fragment>
+        android:label="@string/access_token_title"
+        tools:layout="@layout/access_token_fragment"/>
     <fragment
         android:id="@+id/accountsDestination"
         android:name="hristostefanov.starlingdemo.ui.AccountsFragment"
@@ -36,33 +30,54 @@
         <action
             android:id="@+id/action_to_transferConfirmationDestination"
             app:destination="@id/transferConfirmationDestination" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
+        <argument
+            android:name="roundUpAmount"
+            app:argType="java.math.BigDecimal" />
     </fragment>
     <fragment
         android:id="@+id/createSavingsGoalDestination"
         android:name="hristostefanov.starlingdemo.ui.CreateSavingsGoalFragment"
         android:label="New Savings Goal"
         tools:layout="@layout/create_savings_goal_fragment" >
-        <action
-            android:id="@+id/action_to_savingsGoalsDestination"
-            app:destination="@id/savingsGoalsDestination"
-            app:popUpTo="@id/savingsGoalsDestination"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"
         android:name="hristostefanov.starlingdemo.ui.TransferConfirmationFragment"
         android:label="Confirm transfer"
         tools:layout="@layout/transfer_confirmation_fragment">
-        <action
-            android:id="@+id/action_to_accountsDestination"
-            app:destination="@id/accountsDestination"
-            app:popUpTo="@id/accountsDestination"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="savingsGoal"
+            app:argType="hristostefanov.starlingdemo.business.entities.SavingsGoal" />
+        <argument
+            android:name="roundUpAmount"
+            app:argType="java.math.BigDecimal" />
+        <argument
+            android:name="accountCurrency"
+            app:argType="java.util.Currency" />
+        <argument
+            android:name="accountId"
+            app:argType="string" />
     </fragment>
 
     <action
         android:id="@+id/to_errorDialog"
         app:destination="@id/errorDialog" />
+
+    <action
+        android:id="@+id/to_accessTokenDestination"
+        app:destination="@id/accessTokenDestination" />
 
     <dialog
         android:id="@+id/errorDialog"

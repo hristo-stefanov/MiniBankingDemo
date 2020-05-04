@@ -2,26 +2,27 @@ package hristostefanov.starlingdemo.ui
 
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import hristostefanov.starlingdemo.App
+import androidx.fragment.app.viewModels
+import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.databinding.AccountsFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccountsViewModel
-import kotlinx.android.synthetic.main.accounts_fragment.*
 
 class AccountsFragment : Fragment() {
     private lateinit var binding: AccountsFragmentBinding
-    private lateinit var viewModel: AccountsViewModel
+
+    private val viewModel: AccountsViewModel by viewModels {
+        viewModelFactory { savedStateHandle ->
+            AccountsViewModel(savedStateHandle).also { sessionComponent().inject(it) }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         binding = AccountsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -29,24 +30,21 @@ class AccountsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModelFactory = (requireActivity().application as App).viewModelFactory
-        viewModel = ViewModelProvider(this, viewModelFactory)[AccountsViewModel::class.java]
-
         // needed for observing LiveData
         binding.lifecycleOwner = this
         binding.viewmodel = viewModel
+    }
 
-        transferButton.setOnClickListener {
-            viewModel.onTransferCommand()
-        }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.accounts_options_menu, menu)
+    }
 
-        // launch a lifecycle aware coroutine
-        lifecycleScope.launchWhenStarted {
-            // the terminating condition of the loop is the cancellation of the coroutine
-            while (true) {
-                val directions = viewModel.navigationChannel.receive()
-                findNavController().navigate(directions)
-            }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.logout) {
+            viewModel.onLogout()
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 }

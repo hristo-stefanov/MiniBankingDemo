@@ -1,16 +1,25 @@
 StarlingDemo
 ============
-
 Author: Hristo M. Stefanov
 
-This demo app for Android shows how to use the Starling bank public API to build
-a "Round up" feature.
+This Android app is a demo and is not intended for actual use. It demos
+using a banking REST API to implement a "Round up" feature with
+Kotlin coroutines and Jetpack Architecture Components.
 
-When you start the app, the first screen asks for an access
-token for a sandbox customer ([get from here](https://developer.starlingbank.com/sandbox/select)).
+It can be run against the Starling Bank's API sandbox environment using
+the `sandbox` build variant or against an embedded **mock service** by
+using the `debug` build variant (the default).
+
+
+When you start the app, the first screen asks for an access token.
+For the **mock service** (`debug` build variant) you can provide any string.  
+For a sandbox customer get it from ([here](https://developer.starlingbank.com/sandbox/select)).
+
 On the next screen you can select an account and transfer the calculated Round Up amount
 for a week to a Savings Goal. The app provides a function for creating new Savings Goals.
-The Starling sandbox provides Auto-simulator for auto populating customer's history with different transactions.
+
+NOTE: The Starling API sandbox provides Auto-simulator for auto populating customer's  
+history with different transactions.
 
 
 ## Opening the project in Android Studio
@@ -22,13 +31,8 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
-## Scope
-The keep the effort within reasonable limits, things that some could
-consider necessary are deliberately left out of scope.
-
-**Out of scope**:
+## Out of scope
 * Savings goals details like description, picture, target
-* UI polishing and theming
 * Progress/busy indicator
 * Swipe to refresh
 * Support for older devices
@@ -37,14 +41,13 @@ consider necessary are deliberately left out of scope.
 * User friendly error messages
 * Caching
 * Offline mode
-* and others :)
 
 ##  Testing
-Even though maximum test coverage was out of scope, for demo purposes
+Even though maximum test coverage is out of scope, for demo purposes
 the project includes 3 types of unit tests:
-* 8 unit tests of CalcRoundUpInteractor
-* 1 unit test of AccountsViewModel
-* 5 UI unit tests of CreateSavingsGoalFragment
+* unit tests for business logic (CalcRoundUpInteractorTest)
+* unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
+* UI unit tests (CreateSavingsGoalFragmentTest)
 
 ## Architecture
 The author aims to follow the ideas in the "*Clean architecture*" book by
@@ -55,5 +58,5 @@ Architectural decisions for patterns and techniques:
 * Single activity app
 * Data-binding (automatic)
 * Coroutines with structured concurrency
-* Dependency injection (automatic)
-* Shared state instead of shared view model
+* Dependency injection (Dagger 2)
+* EventBus for local broadcasting

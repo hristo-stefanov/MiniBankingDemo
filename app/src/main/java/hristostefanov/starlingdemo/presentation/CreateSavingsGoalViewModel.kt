@@ -1,52 +1,77 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
-import hristostefanov.starlingdemo.NavGraphXmlDirections
+import androidx.lifecycle.*
 import hristostefanov.starlingdemo.business.dependences.ServiceException
 import hristostefanov.starlingdemo.business.interactors.CreateSavingsGoalInteractor
+import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.starlingdemo.ui.CreateSavingsGoalFragmentDirections
-import kotlinx.coroutines.Dispatchers
+import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 import javax.inject.Inject
 
-class CreateSavingsGoalViewModel @Inject constructor(
+open class CreateSavingsGoalViewModel
+@Inject
+constructor(
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val sharedState: SharedState
+    @NavigationChannel private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
-    private var _name = ""
+    private lateinit var args: CreateSavingsGoalFragmentArgs
+    private lateinit var savedState: SavedStateHandle
+    private var isInitialized = false
 
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
+    companion object {
+        internal const val NAME_KEY = "name"
 
-    private val _createCommandEnabled = MutableLiveData(false)
-    val createCommandEnabled: LiveData<Boolean> = _createCommandEnabled
+        private var SavedStateHandle.name: String
+            get() = this[NAME_KEY] ?: ""
+            set(value) {
+                this[NAME_KEY] = value
+            }
+    }
 
-    fun onNameChanged(name: String) {
-        if (_name != name) {
-            _name = name
-            _createCommandEnabled.value = _name.isNotBlank()
+    fun init(args: CreateSavingsGoalFragmentArgs, savedState: SavedStateHandle) {
+        if (isInitialized) throw IllegalStateException()
+        this.args = args
+        this.savedState = savedState
+        isInitialized = true
+    }
+
+    open fun onNameChanged(name: String) {
+        savedState.name = name
+    }
+
+    open val createCommandEnabled: LiveData<Boolean> by lazy {
+        Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
+            createSavingsGoalInteractor.validateName(name)
         }
     }
 
-    fun onCreateCommand() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                createSavingsGoalInteractor.execute(
-                    _name,
-                    sharedState.accountId,
-                    sharedState.accountCurreny
-                )
-                _navigationChannel.send(CreateSavingsGoalFragmentDirections.actionToSavingsGoalsDestination())
-            } catch (e: ServiceException) {
-                e.localizedMessage?.also {
-                    _navigationChannel.send(NavGraphXmlDirections.toErrorDialog(it))
+
+    open fun onCreateCommand() {
+        savedState.name.also { name ->
+            if (createSavingsGoalInteractor.validateName(name)) {
+                viewModelScope.launch {
+                    try {
+                        createSavingsGoalInteractor.execute(
+                            name,
+                            args.accountId,
+                            args.accountCurrency
+                        )
+                        navigationChannel.send(Navigation.Backward)
+                    } catch (e: ServiceException) {
+                        e.localizedMessage?.also {
+                            navigationChannel.send(
+                                Navigation.Forward(
+                                    CreateSavingsGoalFragmentDirections.toErrorDialog(
+                                        it
+                                    )
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }

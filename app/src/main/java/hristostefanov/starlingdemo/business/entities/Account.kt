@@ -1,5 +1,6 @@
 package hristostefanov.starlingdemo.business.entities
 
+import java.io.Serializable
 import java.math.BigDecimal
 import java.util.*
 
@@ -9,4 +10,4 @@ data class Account(
     val categoryUid: String,
     val currency: Currency,
     val balance: BigDecimal
-)
+) : Serializable

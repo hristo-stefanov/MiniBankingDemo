@@ -1,15 +1,18 @@
 package hristostefanov.starlingdemo.util
 
+import android.app.Application
+import dagger.BindsInstance
 import dagger.Component
-import hristostefanov.starlingdemo.presentation.*
-import javax.inject.Singleton
+import hristostefanov.starlingdemo.ui.MainActivity
 
-@Singleton
-@Component(modules = [ProvidingModule::class, BindingModule::class])
+@ApplicationScope
+@Component(modules = [ApplicationModule::class])
 interface ApplicationComponent {
-    fun getMainViewModel(): AccountsViewModel
-    fun getSavingGoalsViewModel(): SavingsGoalsViewModel
-    fun createSavingsGoalViewModel(): CreateSavingsGoalViewModel
-    fun getTransferConfirmationViewModel(): TransferConfirmationViewModel
-    fun getAccessTokenViewModel(): AccessTokenViewModel
+    @Component.Factory
+    interface Factory {
+        fun create(@BindsInstance app: Application): ApplicationComponent
+    }
+
+    val sessionRegistry: SessionRegistry
+    fun inject(target: MainActivity)
 }

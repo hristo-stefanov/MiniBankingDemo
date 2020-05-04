@@ -1,0 +1,3 @@
+package hristostefanov.starlingdemo.presentation
+
+class AuthenticatedEvent

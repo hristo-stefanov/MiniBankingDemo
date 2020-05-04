@@ -2,7 +2,8 @@ package hristostefanov.starlingdemo.business
 
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.dependences.Repository
-import hristostefanov.starlingdemo.business.entities.Source.*
+import hristostefanov.starlingdemo.business.entities.Source.EXTERNAL
+import hristostefanov.starlingdemo.business.entities.Source.INTERNAL
 import hristostefanov.starlingdemo.business.entities.Status.SETTLED
 import hristostefanov.starlingdemo.business.entities.Status.UNSETTLED
 import hristostefanov.starlingdemo.business.entities.Transaction
@@ -13,26 +14,41 @@ import org.hamcrest.Matchers.comparesEqualTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.Month
 import java.time.ZoneId
 
 @ExperimentalCoroutinesApi
 class CalcRoundUpInteractorTest {
 
     private val repository = mock(Repository::class.java)
+
+    @Suppress("UNCHECKED_CAST")
     private val interactor by lazy {
-        CalcRoundUpInteractor(
-            repository
-        )
+        CalcRoundUpInteractor(repository, someZone)
     }
-    private val anyDate = LocalDate.now()
-    private val anyZone = ZoneId.systemDefault()
+
+    private val someDate = LocalDate.of(2020, Month.MARCH, 18)
+    private val someZone = ZoneId.of("EET")
+    private val someAccountId = "someId"
+
+
+    @Test
+    fun `Interacting with dependences`() = runBlockingTest {
+        given(repository.findTransactions(any(), any())).willReturn(emptyList())
+
+        interactor.execute(someAccountId, someDate)
+
+        then(repository).should().findTransactions(someAccountId, someDate.atStartOfDay(someZone))
+        then(repository).shouldHaveNoMoreInteractions()
+    }
 
     @Test
     fun `Specification example case`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-4.35".toBigDecimal(),
@@ -52,14 +68,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("1.58")))
     }
 
     @Test
     fun `Ignoring inbound transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 // the amount of inbound transactions is positive!
                 Transaction(
@@ -70,14 +86,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("0.00")))
     }
 
     @Test
     fun `Ignoring unsettled transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-1.3".toBigDecimal(),
@@ -87,14 +103,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("0.00")))
     }
 
     @Test
     fun `Ignoring internal transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-1.3".toBigDecimal(),
@@ -104,14 +120,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("0.00")))
     }
 
     @Test
     fun `Ignoring zero amount transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "0.00".toBigDecimal(),
@@ -121,14 +137,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("0.00")))
     }
 
     @Test
     fun `Max roundup`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-0.01".toBigDecimal(),
@@ -138,14 +154,14 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal("0.99")))
     }
 
     @Test()
     fun `No roundup`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(
+        given(repository.findTransactions(any(), any())).willReturn(
             listOf(
                 Transaction(
                     "-4.00".toBigDecimal(),
@@ -160,16 +176,16 @@ class CalcRoundUpInteractorTest {
             )
         )
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal.ZERO))
     }
 
     @Test()
     fun `No transactions`() = runBlockingTest {
-        given(repository.findTransactions(any(), any(), any())).willReturn(emptyList())
+        given(repository.findTransactions(any(), any())).willReturn(emptyList())
 
-        val result = interactor.execute("anyId", anyDate, anyZone)
+        val result = interactor.execute(someAccountId, someDate)
 
         assertThat(result, comparesEqualTo(BigDecimal.ZERO))
     }

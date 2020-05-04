@@ -5,17 +5,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import hristostefanov.starlingdemo.App
+import androidx.fragment.app.viewModels
 import hristostefanov.starlingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.starlingdemo.presentation.AccessTokenViewModel
+import kotlinx.android.synthetic.main.access_token_fragment.*
 
 class AccessTokenFragment : Fragment() {
     private lateinit var binding: AccessTokenFragmentBinding
-    private lateinit var viewModel: AccessTokenViewModel
+
+    private val viewModel: AccessTokenViewModel by viewModels {
+        viewModelFactory { savedStateHandle ->
+            AccessTokenViewModel(savedStateHandle).also { sessionComponent().inject(it) }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,19 +32,17 @@ class AccessTokenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModelFactory = (requireActivity().application as App).viewModelFactory
-        viewModel = ViewModelProvider(this, viewModelFactory)[AccessTokenViewModel::class.java]
-
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
 
-        // launch a lifecycle aware coroutine
-        lifecycleScope.launchWhenStarted {
-            // the terminating condition of the loop is the cancellation of the coroutine
-            while (true) {
-                val directions = viewModel.navigationChannel.receive()
-                findNavController().navigate(directions)
-            }
+        accessTokenEditText.requestFocus()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            requireActivity().finish()
         }
     }
 }
