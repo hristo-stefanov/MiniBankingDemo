@@ -1,3 +1,0 @@
-package hristostefanov.starlingdemo.business.interactors
-
-class DataSourceChangedEvent

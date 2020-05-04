@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='StarlingDemo'
+rootProject.name='MiniBankingDemo'

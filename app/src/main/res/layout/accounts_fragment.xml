@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="hristostefanov.starlingdemo.ui.AccountListConverter" />
+        <import type="hristostefanov.minibankingdemo.ui.AccountListConverter" />
 
         <variable
             name="viewmodel"
-            type="hristostefanov.starlingdemo.presentation.AccountsViewModel" />
+            type="hristostefanov.minibankingdemo.presentation.AccountsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
