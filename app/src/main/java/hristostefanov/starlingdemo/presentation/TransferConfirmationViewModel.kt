@@ -22,14 +22,14 @@ import javax.inject.Inject
 private const val NAVIGATION_DELAY_MS = 2000L
 
 class TransferConfirmationViewModel constructor(
-    private val _args: TransferConfirmationFragmentArgs
+    private val args: TransferConfirmationFragmentArgs
 ) : ViewModel() {
     @Inject
-    internal lateinit var _interactor: AddMoneyIntoGoalInteractor
+    internal lateinit var interactor: AddMoneyIntoGoalInteractor
     @Inject
-    internal lateinit var _stringSupplier: StringSupplier
+    internal lateinit var stringSupplier: StringSupplier
     @Inject
-    internal lateinit var _amountFormatter: AmountFormatter
+    internal lateinit var amountFormatter: AmountFormatter
     @Inject @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
@@ -41,25 +41,25 @@ class TransferConfirmationViewModel constructor(
 
     @Inject
     internal fun init() {
-        val amountFormatted = _amountFormatter.format(
-            _args.roundUpAmount,
-            _args.accountCurrency.currencyCode
+        val amountFormatted = amountFormatter.format(
+            args.roundUpAmount,
+            args.accountCurrency.currencyCode
         )
-        _info.value = _stringSupplier.get(R.string.transferInfo)
-             .format(amountFormatted, _args.savingsGoal.name)
+        _info.value = stringSupplier.get(R.string.transferInfo)
+             .format(amountFormatted, args.savingsGoal.name)
     }
 
     fun onConfirmCommand() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _interactor.execute(
-                    _args.accountId,
-                    _args.savingsGoal.id,
-                    _args.accountCurrency,
-                    _args.roundUpAmount
+                interactor.execute(
+                    args.accountId,
+                    args.savingsGoal.id,
+                    args.accountCurrency,
+                    args.roundUpAmount
                 )
 
-                _acknowledgementChannel.send(_stringSupplier.get(R.string.success))
+                _acknowledgementChannel.send(stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)
                 navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
             } catch (e: ServiceException) {

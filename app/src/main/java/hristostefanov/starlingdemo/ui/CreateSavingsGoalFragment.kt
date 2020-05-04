@@ -12,7 +12,7 @@ import hristostefanov.starlingdemo.databinding.CreateSavingsGoalFragmentBinding
 import hristostefanov.starlingdemo.presentation.CreateSavingsGoalViewModel
 
 class CreateSavingsGoalFragment : Fragment() {
-    private lateinit var _binding: CreateSavingsGoalFragmentBinding
+    private lateinit var binding: CreateSavingsGoalFragmentBinding
 
     private val args by navArgs<CreateSavingsGoalFragmentArgs>()
 
@@ -26,14 +26,14 @@ class CreateSavingsGoalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = CreateSavingsGoalFragmentBinding.inflate(inflater, container, false)
-        return _binding.root
+        binding = CreateSavingsGoalFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _binding.viewmodel = viewModel
-        _binding.lifecycleOwner = this // needed for observing LiveData
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this // needed for observing LiveData
     }
 }

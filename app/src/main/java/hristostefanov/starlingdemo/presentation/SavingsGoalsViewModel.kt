@@ -22,7 +22,7 @@ import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 class SavingsGoalsViewModel @Inject constructor(
-    private val _args: SavingsGoalsFragmentArgs
+    private val args: SavingsGoalsFragmentArgs
 ) : ViewModel() {
 
     @Inject
@@ -35,7 +35,7 @@ class SavingsGoalsViewModel @Inject constructor(
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
-    private var _goals: List<SavingsGoal> = emptyList()
+    private var goals: List<SavingsGoal> = emptyList()
 
     private val _list = MutableLiveData<List<DisplaySavingsGoal>>()
     val list: LiveData<List<DisplaySavingsGoal>> = _list
@@ -59,10 +59,10 @@ class SavingsGoalsViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             try {
-                _goals = withContext(Dispatchers.IO) {
-                    listSavingGoalsInteractor.execute(_args.accountId)
+                goals = withContext(Dispatchers.IO) {
+                    listSavingGoalsInteractor.execute(args.accountId)
                 }
-                _list.value = _goals.map { DisplaySavingsGoal(it.name) }
+                _list.value = goals.map { DisplaySavingsGoal(it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
                     navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
@@ -73,15 +73,15 @@ class SavingsGoalsViewModel @Inject constructor(
 
 
     fun onSavingsGoalClicked(position: Int) {
-        _goals.getOrNull(position)?.also {
+        goals.getOrNull(position)?.also {
             viewModelScope.launch {
                 navigationChannel.send(
                     Navigation.Forward(
                         SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
                             it,
-                            _args.roundUpAmount,
-                            _args.accountCurrency,
-                            _args.accountId
+                            args.roundUpAmount,
+                            args.accountCurrency,
+                            args.accountId
                         )
                     )
                 )
@@ -94,8 +94,8 @@ class SavingsGoalsViewModel @Inject constructor(
             navigationChannel.send(
                 Navigation.Forward(
                     SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
-                        _args.accountId,
-                        _args.accountCurrency
+                        args.accountId,
+                        args.accountCurrency
                     )
                 )
             )

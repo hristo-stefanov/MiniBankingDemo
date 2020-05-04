@@ -30,7 +30,7 @@ import java.util.*
 import javax.inject.Inject
 
 class AccountsViewModel constructor(
-    private val _state: SavedStateHandle
+    private val state: SavedStateHandle
 ) : ViewModel() {
 
     companion object {
@@ -44,19 +44,19 @@ class AccountsViewModel constructor(
     }
 
     @Inject
-    internal lateinit var _calcRoundUpInteractor: CalcRoundUpInteractor
+    internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
 
     @Inject
-    internal lateinit var _listAccountsInteractor: ListAccountsInteractor
+    internal lateinit var listAccountsInteractor: ListAccountsInteractor
 
     @Inject
-    internal lateinit var _locale: Locale
+    internal lateinit var locale: Locale
 
     @Inject
-    internal lateinit var _stringSupplier: StringSupplier
+    internal lateinit var stringSupplier: StringSupplier
 
     @Inject
-    internal lateinit var _amountFormatter: AmountFormatter
+    internal lateinit var amountFormatter: AmountFormatter
 
     @Inject
     internal lateinit var eventBus: EventBus
@@ -66,15 +66,15 @@ class AccountsViewModel constructor(
     internal lateinit var navigationChannel: Channel<Navigation>
 
     @Inject
-    internal lateinit var _tokenStore: TokenStore
+    internal lateinit var tokenStore: TokenStore
 
     @Inject
     internal lateinit var sessionRegistry: SessionRegistry
 
-    private val _roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
-    private var _accounts: List<Account> = emptyList()
-    private var _selectedAccount: Account? = null
-    private var _roundUpAmount: BigDecimal? = null
+    private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
+    private var accounts: List<Account> = emptyList()
+    private var selectedAccount: Account? = null
+    private var roundUpAmount: BigDecimal? = null
 
     private val _accountList = MutableLiveData<List<DisplayAccount>>(emptyList())
     val accountList: LiveData<List<DisplayAccount>> = _accountList
@@ -92,8 +92,8 @@ class AccountsViewModel constructor(
     val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
 
     fun onTransferCommand() {
-        _selectedAccount?.also { account ->
-            _roundUpAmount?.also { roundUpAmount ->
+        selectedAccount?.also { account ->
+            roundUpAmount?.also { roundUpAmount ->
                 viewModelScope.launch {
                     navigationChannel.send(
                         Navigation.Forward(
@@ -110,9 +110,9 @@ class AccountsViewModel constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val newAccountId = _accounts.getOrNull(position)?.id
-        if (newAccountId != _state.accountId) {
-            _state.accountId = newAccountId
+        val newAccountId = accounts.getOrNull(position)?.id
+        if (newAccountId != state.accountId) {
+            state.accountId = newAccountId
             viewModelScope.launch {
                 updateStateDependentOnSelectedAccount()
             }
@@ -141,7 +141,7 @@ class AccountsViewModel constructor(
     }
 
     private fun load() {
-        if (_tokenStore.token.isBlank()) {
+        if (tokenStore.token.isBlank()) {
             viewModelScope.launch {
                 navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
             }
@@ -150,16 +150,16 @@ class AccountsViewModel constructor(
 
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                .withLocale(_locale)
-        val sinceDateFormatted = _roundUpSinceDate.format(formatter)
+                .withLocale(locale)
+        val sinceDateFormatted = roundUpSinceDate.format(formatter)
 
         _roundUpInfo.value =
-            _stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
+            stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
 
         viewModelScope.launch {
-            _accounts = withContext(Dispatchers.IO) {
+            accounts = withContext(Dispatchers.IO) {
                 try {
-                    _listAccountsInteractor.execute()
+                    listAccountsInteractor.execute()
                 } catch (e: ServiceException) {
                     e.message?.also {
                         navigationChannel.send(
@@ -173,8 +173,8 @@ class AccountsViewModel constructor(
             }
 
             // map Account to DisplayAccount
-            _accountList.value = _accounts.map {
-                val displayBalance = _amountFormatter.format(
+            _accountList.value = accounts.map {
+                val displayBalance = amountFormatter.format(
                     it.balance,
                     it.currency.currencyCode
                 )
@@ -187,16 +187,16 @@ class AccountsViewModel constructor(
 
     @MainThread
     private suspend fun updateStateDependentOnSelectedAccount() {
-        _selectedAccount = _accounts.find { it.id == _state.accountId } ?: _accounts.getOrNull(0)
+        selectedAccount = accounts.find { it.id == state.accountId } ?: accounts.getOrNull(0)
 
-        _selectedAccountPosition.value = _accounts.indexOf(_selectedAccount)
+        _selectedAccountPosition.value = accounts.indexOf(selectedAccount)
 
-        _roundUpAmount = _selectedAccount?.let { account ->
+        roundUpAmount = selectedAccount?.let { account ->
             withContext(Dispatchers.IO) {
                 try {
-                    _calcRoundUpInteractor.execute(
+                    calcRoundUpInteractor.execute(
                         account.id,
-                        _roundUpSinceDate
+                        roundUpSinceDate
                     )
                 } catch (e: ServiceException) {
                     e.message?.also {
@@ -211,20 +211,20 @@ class AccountsViewModel constructor(
             }
         }
 
-        _roundUpAmountText.value = _roundUpAmount?.let { roundUpAmount ->
-            _selectedAccount?.let { selectedAccount ->
-                _amountFormatter.format(
+        _roundUpAmountText.value = roundUpAmount?.let { roundUpAmount ->
+            selectedAccount?.let { selectedAccount ->
+                amountFormatter.format(
                     roundUpAmount,
                     selectedAccount.currency.currencyCode
                 )
             }
-        } ?: _stringSupplier.get(R.string.no_account)
+        } ?: stringSupplier.get(R.string.no_account)
 
-        _transferCommandEnabled.value = _roundUpAmount?.signum() == 1 // if positive
+        _transferCommandEnabled.value = roundUpAmount?.signum() == 1 // if positive
     }
 
     fun onLogout() {
-        _tokenStore.token = ""
+        tokenStore.token = ""
         sessionRegistry.newSession()
         // restart to get deps from the new session
         viewModelScope.launch {

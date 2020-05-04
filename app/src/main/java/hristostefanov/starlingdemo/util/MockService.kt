@@ -8,7 +8,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.mock.BehaviorDelegate
 
-class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
+class MockService(private val delegate: BehaviorDelegate<Service>): Service {
     override suspend fun getAccounts(): Accounts {
         val accounts = Accounts(
             listOf(
@@ -22,7 +22,7 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
                     defaultCategory = "dd731fc8-9778-46de-ac3f-4137f757134e")
             )
         )
-        return _delegate.returningResponse(accounts).getAccounts()
+        return delegate.returningResponse(accounts).getAccounts()
     }
 
     override suspend fun getBalance(accountUid: String): BalanceV2 {
@@ -31,7 +31,7 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
             "51d2978e-0b99-4c54-a9f4-02ab890477cd" -> BalanceV2(effectiveBalance = CurrencyAndAmount("EUR", 67890))
             else -> throw AssertionError()
         }
-        return _delegate.returningResponse(balance).getBalance(accountUid)
+        return delegate.returningResponse(balance).getBalance(accountUid)
     }
 
     override suspend fun getIdentifiers(accountUid: String): AccountIdentifiers {
@@ -40,7 +40,7 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
             "51d2978e-0b99-4c54-a9f4-02ab890477cd" -> AccountIdentifiers(accountIdentifier = "08133217")
             else -> throw AssertionError()
         }
-        return _delegate.returningResponse(identifiers).getIdentifiers(accountUid)
+        return delegate.returningResponse(identifiers).getIdentifiers(accountUid)
     }
 
     override suspend fun getFeedItemsSince(
@@ -66,7 +66,7 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
             ))
             else -> throw AssertionError()
         }
-        return _delegate.returningResponse(wrapper).getFeedItemsSince(accountUid, categoryUid, changesSince)
+        return delegate.returningResponse(wrapper).getFeedItemsSince(accountUid, categoryUid, changesSince)
     }
 
     override suspend fun getSavingsGoals(accountUid: String): SavingsGoalsV2 {
@@ -75,12 +75,12 @@ class MockService(private val _delegate: BehaviorDelegate<Service>): Service {
             "51d2978e-0b99-4c54-a9f4-02ab890477cd" -> SavingsGoalsV2(listOf(SavingsGoalV2(savingsGoalUid = "e63eb455-4a7e-45f8-a2ab-9e390e5ca9cb", name = "Exotic vacation")))
             else -> throw AssertionError()
         }
-        return _delegate.returningResponse(savingsGoals).getSavingsGoals(accountUid)
+        return delegate.returningResponse(savingsGoals).getSavingsGoals(accountUid)
     }
 
     override suspend fun createSavingsGoal(accountUid: String, request: SavingsGoalRequestV2) {
         if (request.name == "Pass") {
-            _delegate.returningResponse(Unit).createSavingsGoal(accountUid, request)
+            delegate.returningResponse(Unit).createSavingsGoal(accountUid, request)
         } else {
             val errorResponse = """
             {

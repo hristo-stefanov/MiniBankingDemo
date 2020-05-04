@@ -15,17 +15,17 @@ import java.util.*
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
-    private val _service: Service,
-    private val _gson: Gson
+    private val service: Service,
+    private val gson: Gson
 ) : Repository {
 
     @Throws(ServiceException::class)
     override suspend fun findAllAccounts(): List<Account> {
         try {
-            return _service.getAccounts().accounts?.mapNotNull { account ->
+            return service.getAccounts().accounts?.mapNotNull { account ->
                 account.accountUid?.let { accountUid ->
-                    val accountNum = _service.getIdentifiers(accountUid).accountIdentifier
-                    val effectiveBalance = _service.getBalance(accountUid).effectiveBalance
+                    val accountNum = service.getIdentifiers(accountUid).accountIdentifier
+                    val effectiveBalance = service.getBalance(accountUid).effectiveBalance
                     if (
                         accountNum != null
                         && effectiveBalance != null
@@ -49,7 +49,7 @@ class RepositoryImpl @Inject constructor(
                 }
             } ?: emptyList()
         } catch (e: Exception) {
-            throw e.toServiceException(_gson)
+            throw e.toServiceException(gson)
         }
     }
 
@@ -64,11 +64,11 @@ class RepositoryImpl @Inject constructor(
 
         try {
             val account =
-                _service.getAccounts().accounts?.firstOrNull { it.accountUid == accountId }
+                service.getAccounts().accounts?.firstOrNull { it.accountUid == accountId }
             return if (account?.currency != null && account.defaultCategory != null) {
                 val decimalPlaces = Currency.getInstance(account.currency).defaultFractionDigits
 
-                _service.getFeedItemsSince(accountId, account.defaultCategory, isoDateTime)
+                service.getFeedItemsSince(accountId, account.defaultCategory, isoDateTime)
                     .feedItems
                     ?.map { it.toTransaction(decimalPlaces) }
                     ?: emptyList()
@@ -76,26 +76,26 @@ class RepositoryImpl @Inject constructor(
                 emptyList()
             }
         } catch (e: Exception) {
-            throw e.toServiceException(_gson)
+            throw e.toServiceException(gson)
         }
     }
 
     @Throws(ServiceException::class)
     override suspend fun findSavingGoals(accountId: String): List<SavingsGoal> {
         try {
-            return _service.getSavingsGoals(accountId)
+            return service.getSavingsGoals(accountId)
                 .savingsGoalList.mapNotNull { it.toSavingGoal() }
         } catch (e: Exception) {
-            throw e.toServiceException(_gson)
+            throw e.toServiceException(gson)
         }
     }
 
     @Throws(ServiceException::class)
     override suspend fun createSavingsGoal(name: String, accountId: String, currency: Currency) {
         try {
-            _service.createSavingsGoal(accountId, SavingsGoalRequestV2(name, currency.currencyCode))
+            service.createSavingsGoal(accountId, SavingsGoalRequestV2(name, currency.currencyCode))
         } catch (e: java.lang.Exception) {
-            throw e.toServiceException(_gson)
+            throw e.toServiceException(gson)
         }
     }
 
@@ -109,7 +109,7 @@ class RepositoryImpl @Inject constructor(
     ) {
         val minorUnits = amount.scaleByPowerOfTen(currency.defaultFractionDigits).longValueExact()
         val request = TopUpRequestV2(CurrencyAndAmount(currency.currencyCode, minorUnits))
-        _service.addMoneyIntoSavingsGoal(accountId, savingsGoalId, transferId.toString(), request)
+        service.addMoneyIntoSavingsGoal(accountId, savingsGoalId, transferId.toString(), request)
     }
 }
 
