@@ -1,0 +1,3 @@
+package hristostefanov.minibankingdemo.business.interactors
+
+class DataSourceChangedEvent
