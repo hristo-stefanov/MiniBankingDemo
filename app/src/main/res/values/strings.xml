@@ -11,5 +11,5 @@
     <string name="name_hint">Name</string>
     <string name="create_savings_goal">Create Savings Goal</string>
     <string name="confirm">Confirm</string>
-    <string name="use_mock_service"><u>Use mock service</u></string>
+    <string name="logout">Logout</string>
 </resources>

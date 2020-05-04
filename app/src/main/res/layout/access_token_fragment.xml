@@ -13,9 +13,12 @@
         android:layout_height="match_parent"
         tools:context=".ui.AccessTokenFragment">
 
+<!--        SECURITY: saveEnabled="false" to avoid saving the token in the "saved instance state"
+            by ActivityManager service -->
         <!--suppress AndroidUnknownAttribute -->
         <EditText
             android:id="@+id/accessTokenEditText"
+            android:saveEnabled="false"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
@@ -39,23 +42,11 @@
             android:enabled="@{viewmodel.acceptCommandEnabled}"
             android:onClick="@{() -> viewmodel.onAcceptCommand()}"
             android:text="@string/accept"
-            app:layout_constraintBottom_toTopOf="@+id/useMockServiceTextView"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/accessTokenEditText" />
 
-        <TextView
-            android:id="@+id/useMockServiceTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:onClick="@{() -> viewmodel.onUseMockService()}"
-            android:text="@string/use_mock_service"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/acceptButton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

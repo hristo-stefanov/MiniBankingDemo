@@ -1,44 +1,38 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
-import hristostefanov.starlingdemo.ui.AccessTokenFragmentDirections
+import androidx.lifecycle.*
+import hristostefanov.starlingdemo.presentation.dependences.TokenStore
+import hristostefanov.starlingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
-class AccessTokenViewModel @Inject constructor(
-    private val _sharedState: SharedState
-) : ViewModel() {
+class AccessTokenViewModel(private val _state: SavedStateHandle) : ViewModel() {
+    @Inject
+    internal lateinit var _tokenStore: TokenStore
+    @Inject @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
+    @Inject
+    internal lateinit var eventBus: EventBus
 
-    private val _navigationChannel = Channel<NavDirections>()
-    val navigationChannel: ReceiveChannel<NavDirections> = _navigationChannel
-
-    private val _acceptCommandEnabled = MutableLiveData<Boolean>(false)
+    private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
 
     fun onAccessTokenChanged(accessToken: String) {
-        if (_sharedState.accessToken != accessToken) {
-            _sharedState.accessToken = accessToken
-            _acceptCommandEnabled.value = _sharedState.accessToken.isNotBlank()
+        // SECURITY: do not save the token in SavedStateHandle, which is saved in the
+        // "saved instance state" by ActivityManager service
+        // this also requires EditText#saveEnabled = false !!!
+        if (_tokenStore.token != accessToken) {
+            _tokenStore.token = accessToken
+            _acceptCommandEnabled.value = accessToken.isNotBlank()
         }
     }
 
     fun onAcceptCommand() {
-        _sharedState.isMockService = false
+        eventBus.post(AuthenticatedEvent())
         viewModelScope.launch {
-            _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
-        }
-    }
-
-    fun onUseMockService() {
-        _sharedState.isMockService = true
-        viewModelScope.launch {
-            _navigationChannel.send(AccessTokenFragmentDirections.actionToAccountsDestination())
+            navigationChannel.send(Navigation.Backward)
         }
     }
 }

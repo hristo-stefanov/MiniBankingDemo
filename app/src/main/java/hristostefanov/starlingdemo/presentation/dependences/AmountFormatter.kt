@@ -4,5 +4,5 @@ import java.math.BigDecimal
 import java.util.*
 
 interface AmountFormatter {
-    fun format(amount: BigDecimal, currencyCode: String, locale: Locale): String
+    fun format(amount: BigDecimal, currencyCode: String): String
 }

@@ -10,13 +10,10 @@ import hristostefanov.starlingdemo.data.models.*
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-// Do not scope to allow changing the access token and switch between mock and real service
 class RepositoryImpl @Inject constructor(
     private val _service: Service,
     private val _gson: Gson
@@ -59,11 +56,11 @@ class RepositoryImpl @Inject constructor(
     @Throws(ServiceException::class)
     override suspend fun findTransactions(
         accountId: String,
-        sinceDate: LocalDate,
-        zoneId: ZoneId
+        since: ZonedDateTime
     ): List<Transaction> {
-        // ISO-8601
-        val isoDateTime = sinceDate.atStartOfDay(zoneId).toOffsetDateTime().toString()
+
+        // to ISO-8601
+        val isoDateTime = since.toOffsetDateTime().toString()
 
         try {
             val account =
@@ -94,9 +91,9 @@ class RepositoryImpl @Inject constructor(
     }
 
     @Throws(ServiceException::class)
-    override suspend fun createSavingsGoal(name: String, accountId: String, currency: String) {
+    override suspend fun createSavingsGoal(name: String, accountId: String, currency: Currency) {
         try {
-            _service.createSavingsGoal(accountId, SavingsGoalRequestV2(name, currency))
+            _service.createSavingsGoal(accountId, SavingsGoalRequestV2(name, currency.currencyCode))
         } catch (e: java.lang.Exception) {
             throw e.toServiceException(_gson)
         }

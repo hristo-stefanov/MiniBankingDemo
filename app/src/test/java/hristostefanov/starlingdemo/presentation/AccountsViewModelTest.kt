@@ -1,98 +1,178 @@
 package hristostefanov.starlingdemo.presentation
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import hristostefanov.starlingdemo.R
 import hristostefanov.starlingdemo.any
 import hristostefanov.starlingdemo.business.entities.Account
 import hristostefanov.starlingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.starlingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.starlingdemo.business.interactors.ListAccountsInteractor
+import hristostefanov.starlingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.starlingdemo.presentation.dependences.AmountFormatter
+import hristostefanov.starlingdemo.presentation.dependences.TokenStore
+import hristostefanov.starlingdemo.ui.AccountsFragmentDirections
 import hristostefanov.starlingdemo.util.StringSupplier
-import kotlinx.coroutines.*
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Test
-
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
+import org.greenrobot.eventbus.EventBus
 import org.junit.Before
-import org.junit.Rule
+import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.timeout
+import org.mockito.Mockito.*
 import java.time.LocalDate
-import java.time.ZoneId
 import java.util.*
-import javax.inject.Provider
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private const val TIMEOUT = 100L
 
-@ExperimentalCoroutinesApi
-@ObsoleteCoroutinesApi
-class AccountsViewModelTest {
-
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-
-    private val sharedState = SharedState()
+class AccountsViewModelTest : BaseViewModelTest() {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
-    private val localeProvider: Provider<*> = mock(Provider::class.java)
-    private val zoneIdProvider: Provider<*> = mock(Provider::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
+    private val tokenStore = mock(TokenStore::class.java)
+
+    private val eventBus = spy(EventBus::class.java)
+    @Suppress("UNCHECKED_CAST")
+    private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
 
     private val account1 = Account(
-        "1",
-        "111",
+        "1", "111",
         "cat1",
         Currency.getInstance("GBP"),
         "100".toBigDecimal()
     )
 
+    private val account2 = Account(
+        "2",
+        "222",
+        "cat2",
+        Currency.getInstance("EUR"),
+        "200".toBigDecimal()
+    )
+
+    private val quarter = "0.25".toBigDecimal()
+
+    private val state = SavedStateHandle()
+
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
-        AccountsViewModel(
-            sharedState,
-            calcRoundUpInteractor,
-            listAccountsInteractor,
-            localeProvider as Provider<Locale>,
-            stringSupplier,
-            amountFormatter,
-            zoneIdProvider as Provider<ZoneId>
+        AccountsViewModel(state).also {
+            // manual field and method injection
+            it._calcRoundUpInteractor = calcRoundUpInteractor
+            it._listAccountsInteractor = listAccountsInteractor
+            it._locale = Locale.UK
+            it._stringSupplier = stringSupplier
+            it._amountFormatter = amountFormatter
+            it.eventBus = eventBus
+            it.navigationChannel = navigationChannel
+            it._tokenStore = tokenStore
+            it.init()
+        }
+    }
+
+    @Before
+    fun beforeEach() = runBlocking {
+        given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
+        given(stringSupplier.get(R.string.no_account)).willReturn("No account")
+        given(amountFormatter.format(any(), any())).willReturn("")
+        given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
+        given(tokenStore.token).willReturn("token")
+        Unit
+    }
+
+
+    @Test
+    fun `Initial interactions`() = runBlocking {
+        viewModel // instantiate
+
+        then(eventBus).should().register(viewModel)
+        then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
+        then(listAccountsInteractor).shouldHaveNoMoreInteractions()
+        then(calcRoundUpInteractor).should(timeout(TIMEOUT))
+            .execute(account1.id, LocalDate.now().minusWeeks(1))
+        then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
+
+        Unit
+    }
+
+    @Test
+    fun `Data source changed`() = runBlocking {
+        viewModel.onDataSourceChanged(DataSourceChangedEvent())
+
+        then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
+        then(calcRoundUpInteractor).should(timeout(TIMEOUT).times(2))
+            .execute(account1.id, LocalDate.now().minusWeeks(1))
+        Unit
+    }
+
+    @Test
+    fun `View model cleared`() {
+        viewModel.onCleared()
+        then(eventBus).should().unregister(viewModel)
+    }
+
+
+    @Test
+    fun `Transfer command selected`() = runBlocking {
+        // wait for the command to get enabled
+        suspendCoroutine<Unit> {continuation ->
+            viewModel.transferCommandEnabled.observeForever {
+                if (it)
+                    continuation.resume(Unit)
+            }
+        }
+
+        viewModel.onTransferCommand()
+
+        then(navigationChannel).should(timeout(TIMEOUT)).send(
+            Navigation.Forward(
+                AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                    account1.id,
+                    account1.currency, quarter
+                )
+            )
         )
     }
 
 
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
+    @Test
+    fun `First Account Is Selected By Default`() = runBlocking {
+        given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
+        @Suppress("UNCHECKED_CAST")
+        val observer = spy(Observer::class.java) as Observer<Int>
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-        mainThreadSurrogate.close()
+        viewModel.selectedAccountPosition.observeForever(observer)
+
+        then(observer).should(timeout(TIMEOUT)).onChanged(0)
     }
 
     @Test
-    fun testInit() = runBlocking {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-        given(localeProvider.get()).willReturn(Locale.UK)
-        given(zoneIdProvider.get()).willReturn(ZoneId.of("GMT"))
-        given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
-        given(amountFormatter.format(any(), any(), any())).willReturn("")
+    fun `Restoring Selected Account`() = runBlocking {
+        val accounts = listOf(account1, account2)
+        given(listAccountsInteractor.execute()).willReturn(accounts)
+        state.accountId = account2.id
+        @Suppress("UNCHECKED_CAST")
+        val observer = spy(Observer::class.java) as Observer<Int>
 
-        viewModel // instantiate
+        viewModel.selectedAccountPosition.observeForever(observer)
 
-        then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
-        then(listAccountsInteractor).shouldHaveNoMoreInteractions()
-        then(calcRoundUpInteractor).should(timeout(TIMEOUT))
-            .execute(account1.id, LocalDate.now().minusWeeks(1), ZoneId.of("GMT"))
-        then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
+        then(observer).should(timeout(TIMEOUT)).onChanged(accounts.indexOf(account2))
+    }
 
-        Unit
+
+
+    @Test
+    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() {
+        @Suppress("UNCHECKED_CAST")
+        val observer = spy(Observer::class.java) as Observer<Boolean>
+
+        viewModel.transferCommandEnabled.observeForever(observer)
+
+        then(observer).should(timeout(TIMEOUT)).onChanged(true)
     }
 }
