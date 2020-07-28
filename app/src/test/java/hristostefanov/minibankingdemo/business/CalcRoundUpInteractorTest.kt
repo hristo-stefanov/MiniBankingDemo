@@ -10,8 +10,8 @@ import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.comparesEqualTo
-import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then

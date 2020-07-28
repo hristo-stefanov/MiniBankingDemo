@@ -68,7 +68,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
 
-    // ??
+    // for lifecycleScope extension property
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0'
     // for viewModelScope extension property
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
@@ -117,7 +117,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:3.3.3"
 
     // Using the "inline" edition of "dexmaker" by LinkedIn, allows mocking final classes
-    // on Android P (9) or later. However v.2.25.0 and 2.25.1 do work with
+    // on Android P (9) or later. However v.2.25.0 and 2.25.1 do not work with
     // com.android.tools.build:gradle: 3.6.x (but worked with 3.5.x)
     // For this reason we use dexmaker-mockito instead of dexmaker-mockito-inline
     // and make the classes and members being mocked `open` until the issue is resolved.
