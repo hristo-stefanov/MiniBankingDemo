@@ -1,5 +1,6 @@
-package hristostefanov.minibankingdemo.ui
+package hristostefanov.minibankingdemo
 
+import android.os.Build
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,8 +15,9 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
+import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
+import hristostefanov.minibankingdemo.ui.UIUnitTestRegistry
 import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Test
@@ -23,8 +25,13 @@ import org.junit.runner.RunWith
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+// TODO ./gradlew :app:testDebugUnitTest --tests "hristostefanov.minibankingdemo.CreateSavingsGoalFragmentTest"
 @RunWith(AndroidJUnit4::class)
+//@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class CreateSavingsGoalFragmentTest {
 
     private val viewModel = mock(CreateSavingsGoalViewModel::class.java)
@@ -51,7 +58,7 @@ class CreateSavingsGoalFragmentTest {
 
         launchFragment()
 
-        then(viewModel).should().createCommandEnabled
+//        then(viewModel).should().createCommandEnabled
         onView(withId(R.id.createSavingsGoalButton)).check(matches(isEnabled()))
     }
 
@@ -61,7 +68,7 @@ class CreateSavingsGoalFragmentTest {
 
         launchFragment()
 
-        then(viewModel).should().createCommandEnabled
+//        then(viewModel).should().createCommandEnabled
         onView(withId(R.id.createSavingsGoalButton)).check(matches(not(isEnabled())))
     }
 
@@ -76,6 +83,8 @@ class CreateSavingsGoalFragmentTest {
     }
 
     @Test
+    @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")
+    // TODO in the exception pay attention to the button size, it must be too big
     fun buttonClicked() {
         given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
         launchFragment()
