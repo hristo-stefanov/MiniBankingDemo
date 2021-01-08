@@ -13,6 +13,10 @@ import org.junit.Rule
 import java.lang.Thread.sleep
 
 open class BaseViewModelTest {
+    // NOTE: needed for proper testing of Architecture Components -
+    // makes background tasks execute synchronously.
+    // More importantly, provides TaskExecutor#isMainThread implementation which always return `true`
+    // thus avoiding exceptions in LiveData's observe* methods.
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
