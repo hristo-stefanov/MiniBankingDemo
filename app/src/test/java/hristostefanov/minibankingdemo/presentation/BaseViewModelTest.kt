@@ -3,8 +3,7 @@ package hristostefanov.minibankingdemo.presentation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -20,25 +19,31 @@ open class BaseViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @ObsoleteCoroutinesApi
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    // NOTE: newSingleThreadContext() is marked with @ObsoleteCoroutinesApi, so
+    // from the docs, it looks like TestCoroutineDispatcher is the preferred means.
+    // See https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-test/
+    @ExperimentalCoroutinesApi
+    private val testDispatcher = TestCoroutineDispatcher()
 
     @ExperimentalCoroutinesApi
-    @ObsoleteCoroutinesApi
     @Before
     fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
+        Dispatchers.setMain(testDispatcher)
     }
 
     @ExperimentalCoroutinesApi
-    @ObsoleteCoroutinesApi
     @After
     fun tearDown() {
         Dispatchers.resetMain()
 
+        // TODO still needed with TestCoroutineDispatcher?
+        // To get rid of the exceptions in the output, might need to run the tests as androidTest
+        // and possibly with @UiThreadTest annotation.
+
         // workaround of a race-condition issue that randomly causes exceptions in tests
         sleep(2)
 
-        mainThreadSurrogate.close()
+        testDispatcher.cleanupTestCoroutines()
     }
 }
