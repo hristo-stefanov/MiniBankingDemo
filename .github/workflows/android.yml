@@ -59,3 +59,19 @@ jobs:
       run: |
         rm -f ~/.gradle/caches/modules-2/modules-2.lock
         rm -f ~/.gradle/caches/modules-2/gc.properties
+
+# Related Tasks
+# * Creating a status badge - Select the workflow from Actions > All Workflows and
+#  click ... on the right, select spefic branch or default branch
+
+# Consider
+# https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
+
+# References
+# https://docs.github.com/en/actions/learn-github-actions/introduction-to-github-actions
+# https://docs.github.com/en/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# https://github.com/marketplace?type=actions
+# https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
+# https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+#
+# https://developer.android.com/studio/build/building-cmdline
