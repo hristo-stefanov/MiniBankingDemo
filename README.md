@@ -1,3 +1,5 @@
+[![Android CI](https://github.com/hristo-stefanov/MiniBankingDemo/actions/workflows/android.yml/badge.svg)](https://github.com/hristo-stefanov/MiniBankingDemo/actions/workflows/android.yml)
+
 MiniBankingDemo
 ===============
 Author: Hristo M. Stefanov
