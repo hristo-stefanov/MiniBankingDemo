@@ -18,11 +18,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // this app does not support the production environment
-//            buildConfigField("String", "SERVICE_BASE_URL", '"https://api.starlingbank.com"')
+            // this app does not support the production environment for the time being
+            buildConfigField("String", "SERVICE_BASE_URL", '"N/A"')
         }
 
         debug {
@@ -58,8 +59,8 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     // explicitly referenced for keeping up with security updates and
@@ -67,22 +68,22 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.2.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.2.2'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
-    implementation 'com.squareup.retrofit2:retrofit-mock:2.7.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit-mock:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2`'
 
     // for lifecycleScope extension property
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0'
     // for viewModelScope extension property
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0-alpha02"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0-alpha06"
 
-    implementation 'com.google.dagger:dagger:2.27'
+    implementation 'com.google.dagger:dagger:2.28'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt 'com.google.dagger:dagger-compiler:2.27'
+    kapt 'com.google.dagger:dagger-compiler:2.28'
 
     def nav_version = "2.3.5"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
@@ -93,11 +94,11 @@ dependencies {
     kapt "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
 
     // for EncryptedSharedPreferences
-    implementation 'androidx.security:security-crypto:1.0.0-rc01'
+    implementation 'androidx.security:security-crypto:1.1.0-alpha02'
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
 
     // hamcrest-1.3 is a transitive dependency of junit 4, and cannot be upgraded to hamcrest 2.2
     // hamcrest library is needed for org.hamcrest.Matchers.comparesEqualTo
@@ -125,8 +126,12 @@ dependencies {
     testImplementation 'androidx.test:rules:1.3.0'
     testImplementation "androidx.navigation:navigation-testing:$nav_version"
 
-    // NOTE: debugImplementation is used here so that the empty activity that FragmentScenario relies on is accessible by the test target process
-    debugImplementation 'androidx.fragment:fragment-testing:1.3.2'
+    // NOTE: "the library code goes into your application's APK instead of test APK
+    // when you build your application in debug build type.
+    // (Debug build type is used for instrumentation test by default)"
+    // https://issuetracker.google.com/issues/122321150?pli=1
+    // https://developer.android.com/guide/fragments/test#configure
+    debugImplementation 'androidx.fragment:fragment-testing:1.3.4'
 }
 
 kapt {

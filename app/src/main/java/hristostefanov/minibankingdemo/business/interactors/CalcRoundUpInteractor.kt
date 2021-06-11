@@ -25,13 +25,13 @@ class CalcRoundUpInteractor @Inject constructor(
         return settledPaymentsAmounts
             // get the fractional part
             .map { it.remainder(BigDecimal.ONE) }
-            // consider only greater than zero factional parts
-            .filter { it.compareTo(BigDecimal.ZERO) == 1 }
+            // consider only greater than zero fractional parts (zero's complement to 1 is 1)
+            .filter { it.signum() == 1 }
             // get the complement to 1
             .map { BigDecimal.ONE.minus(it) }
             // accumulate the complements
             // NOTE unlike #reduce, #fold allows empty collection by getting the initial value
             // as argument instead of using the first element of the collection
-            .fold(BigDecimal.ZERO) { acc, bigDecimal -> acc.add(bigDecimal) }
+            .fold(BigDecimal.ZERO) { acc, item -> acc.add(item) }
     }
 }
