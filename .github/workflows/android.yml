@@ -40,3 +40,22 @@ jobs:
       # Make sure the branch code can produce final deliverables (APKs) by merging manifest files,
       # other resources etc.
       run: bash ./gradlew assemble
+
+    - name: Run tests (unit tests + Espresso tests on Robolectric)
+      # NOTE: because of the fragment-testing library, only the debug build type
+      # can be used. Other build types fail to build with the test source set.
+      # see app/build.gradle
+      run: bash ./gradlew testDebug --stacktrace
+
+    - name: Upload Test Reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: Test reports
+        path: app/build/reports/tests/
+
+    - name: Cleanup Gradle Cache
+      # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
+      # Restoring these files from a GitHub Actions cache might cause problems for future builds.
+      run: |
+        rm -f ~/.gradle/caches/modules-2/modules-2.lock
+        rm -f ~/.gradle/caches/modules-2/gc.properties
