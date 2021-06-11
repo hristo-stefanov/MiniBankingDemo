@@ -42,7 +42,7 @@ open class BaseViewModelTest {
         // and possibly with @UiThreadTest annotation.
 
         // workaround of a race-condition issue that randomly causes exceptions in tests
-        sleep(2)
+        sleep(10)
 
         testDispatcher.cleanupTestCoroutines()
     }

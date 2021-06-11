@@ -93,10 +93,11 @@ class CreateSavingsGoalFragmentTest {
     private fun launchFragment() {
         // launch the fragment in isolation - in empty activity
         val fragmentScenario = launchFragmentInContainer<CreateSavingsGoalFragment>()
-        fragmentScenario.onFragment(object : FragmentScenario.FragmentAction<CreateSavingsGoalFragment> {
-            override fun perform(fragment: CreateSavingsGoalFragment) {
-                Navigation.setViewNavController(fragment.requireView(), navController)
-            }
-        })
+        fragmentScenario.onFragment { fragment ->
+            Navigation.setViewNavController(
+                fragment.requireView(),
+                navController
+            )
+        }
     }
 }
