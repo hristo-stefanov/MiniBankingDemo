@@ -62,7 +62,7 @@ class SavingsGoalsViewModel @Inject constructor(
                 goals = withContext(Dispatchers.IO) {
                     listSavingGoalsInteractor.execute(args.accountId)
                 }
-                _list.value = goals.map { DisplaySavingsGoal(it.name) }
+                _list.value = goals.map { DisplaySavingsGoal(it.id, it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
                     navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
@@ -72,21 +72,23 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
 
-    fun onSavingsGoalClicked(position: Int) {
-        goals.getOrNull(position)?.also {
-            viewModelScope.launch {
-                navigationChannel.send(
-                    Navigation.Forward(
-                        SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
-                            it,
-                            args.roundUpAmount,
-                            args.accountCurrency,
-                            args.accountId
+    fun onSavingsGoalClicked(savingsGoalId: String) {
+        goals
+            .find { it.id == savingsGoalId }
+            ?.also {
+                viewModelScope.launch {
+                    navigationChannel.send(
+                        Navigation.Forward(
+                            SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                                it,
+                                args.roundUpAmount,
+                                args.accountCurrency,
+                                args.accountId
+                            )
                         )
                     )
-                )
+                }
             }
-        }
     }
 
     fun onAddSavingsGoalCommand() {

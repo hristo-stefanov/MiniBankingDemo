@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
@@ -52,6 +51,10 @@ android {
             // needed when running local unit tests with Robolectric
             includeAndroidResources = true
         }
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }
 
