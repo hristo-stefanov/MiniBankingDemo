@@ -32,15 +32,17 @@ constructor(
             }
     }
 
+    // lazy to avoid initializing before savedState is provided by the init() method
+    // exposing MutableLiveData to allow two-way data binding
+    val name: MutableLiveData<String> by lazy {
+        savedState.getLiveData<String>(NAME_KEY)
+    }
+
     fun init(args: CreateSavingsGoalFragmentArgs, savedState: SavedStateHandle) {
         if (isInitialized) throw IllegalStateException()
         this.args = args
         this.savedState = savedState
         isInitialized = true
-    }
-
-    open fun onNameChanged(name: String) {
-        savedState.name = name
     }
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {

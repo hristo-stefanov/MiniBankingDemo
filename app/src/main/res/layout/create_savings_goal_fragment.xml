@@ -24,7 +24,7 @@
             android:layout_marginEnd="8dp"
             android:ems="10"
             android:hint="@string/name_hint"
-            android:afterTextChanged="@{(sequence) -> viewmodel.onNameChanged(sequence.toString())}"
+            android:text="@={viewmodel.name}"
             android:inputType="textPersonName"
             app:layout_constraintBottom_toTopOf="@+id/createSavingsGoalButton"
             app:layout_constraintEnd_toEndOf="parent"
