@@ -36,11 +36,13 @@ class SavingsGoalsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val adapter = SavingsGoalsRecyclerViewAdapter {
+            viewModel.onSavingsGoalClicked(it.id)
+        }
+        binding.savingsGoalsRecyclerView.adapter = adapter
+
         viewModel.list.observe(viewLifecycleOwner, { list ->
-            binding.savingsGoalsRecyclerView.adapter =
-                SavingsGoalsRecyclerViewAdapter(list){
-                    viewModel.onSavingsGoalClicked(it.id)
-                }
+            adapter.submitList(list)
         })
     }
 }
