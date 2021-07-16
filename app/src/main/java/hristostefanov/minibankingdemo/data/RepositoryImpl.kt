@@ -19,6 +19,8 @@ class RepositoryImpl @Inject constructor(
     private val gson: Gson
 ) : Repository {
 
+    // NOTE: Service is marked as @AnyThread so we don't need to care about main-safety in this class
+
     @Throws(ServiceException::class)
     override suspend fun findAllAccounts(): List<Account> {
         try {

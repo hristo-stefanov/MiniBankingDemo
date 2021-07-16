@@ -1,8 +1,10 @@
 package hristostefanov.minibankingdemo.data.dependences
 
+import androidx.annotation.AnyThread
 import hristostefanov.minibankingdemo.data.models.*
 import retrofit2.http.*
 
+@AnyThread // the design contract is that the implementation must be main-safe
 interface Service {
     @GET("/api/v2/accounts")
     suspend fun getAccounts(): Accounts

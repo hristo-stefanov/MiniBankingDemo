@@ -12,10 +12,8 @@ import hristostefanov.minibankingdemo.business.interactors.ListSavingGoalsIntera
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -59,9 +57,7 @@ class SavingsGoalsViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             try {
-                goals = withContext(Dispatchers.IO) {
-                    listSavingGoalsInteractor.execute(args.accountId)
-                }
+                goals = listSavingGoalsInteractor.execute(args.accountId)
                 _list.value = goals.map { DisplaySavingsGoal(it.id, it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {
