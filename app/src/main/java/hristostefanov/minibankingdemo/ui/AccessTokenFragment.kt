@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import hristostefanov.minibankingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
-import kotlinx.android.synthetic.main.access_token_fragment.*
 
 class AccessTokenFragment : Fragment() {
     private lateinit var binding: AccessTokenFragmentBinding
@@ -35,7 +34,7 @@ class AccessTokenFragment : Fragment() {
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
 
-        accessTokenEditText.requestFocus()
+        binding.accessTokenEditText.requestFocus()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="account"
+            type="hristostefanov.minibankingdemo.presentation.DisplayAccount" />
+    </data>
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,6 +24,7 @@
         app:layout_constraintEnd_toStartOf="@+id/accountNumTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        android:text="@{account.currency}"
         tools:text="GBP" />
 
     <TextView
@@ -30,6 +37,7 @@
         app:layout_constraintEnd_toStartOf="@+id/balanceTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/currencyTextView"
+        android:text="@{account.number}"
         tools:text="123456" />
 
     <TextView
@@ -45,5 +53,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/accountNumTextView"
         app:layout_constraintTop_toTopOf="parent"
+        android:text="@{account.balance}"
         tools:text="L1,234.56" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

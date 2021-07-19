@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo
 
 import android.os.Build
-import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,6 +25,7 @@ import org.junit.runner.RunWith
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -73,11 +73,12 @@ class CreateSavingsGoalFragmentTest {
     @Test
     fun nameTextPassed() {
         given(viewModel.createCommandEnabled).willReturn(MutableLiveData(false))
+        given(viewModel.name).willReturn(spy(MutableLiveData("")))
         launchFragment()
 
         onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
 
-        then(viewModel).should().onNameChanged("a")
+        then(viewModel.name).should().value = "a"
     }
 
     @Test

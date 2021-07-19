@@ -1,27 +1,28 @@
 package hristostefanov.minibankingdemo.ui
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import hristostefanov.minibankingdemo.R
+import androidx.databinding.DataBindingUtil
+import hristostefanov.minibankingdemo.databinding.AccountItemBinding
 import hristostefanov.minibankingdemo.presentation.DisplayAccount
-import kotlinx.android.synthetic.main.account_item.view.*
 
 class AccountListAdapter(private val list: List<DisplayAccount>): BaseAdapter() {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view =  convertView
-            ?: (parent.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
-                .inflate(R.layout.account_item, parent, false)
+        val layoutInflater = LayoutInflater.from(parent.context)
 
-        val account = list[position]
-        view.accountNumTextView.text = account.number
-        view.currencyTextView.text = account.currency
-        view.balanceTextView.text = account.balance
-
-        return view
+        val binding: AccountItemBinding = convertView?.let {
+            // https://developer.android.com/topic/libraries/data-binding/generated-binding
+            // It turns out if a view is associated with a binding as with #inflate below,
+            // the binding cannot be changed by using #bind, but the binding variables
+            // must be changed instead to reflect the association with a new data item
+            DataBindingUtil.getBinding<AccountItemBinding>(it)
+        } ?: AccountItemBinding.inflate(layoutInflater, parent, false)
+        binding.account = list[position]
+        binding.executePendingBindings()
+        return binding.root
     }
 
     // this method is used for Spinner pop-up window

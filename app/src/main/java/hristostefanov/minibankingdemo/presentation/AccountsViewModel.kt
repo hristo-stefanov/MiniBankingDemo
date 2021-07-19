@@ -15,10 +15,8 @@ import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -157,19 +155,17 @@ class AccountsViewModel constructor(
             stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
 
         viewModelScope.launch {
-            accounts = withContext(Dispatchers.IO) {
-                try {
-                    listAccountsInteractor.execute()
-                } catch (e: ServiceException) {
-                    e.message?.also {
-                        navigationChannel.send(
-                            Navigation.Forward(
-                                NavGraphXmlDirections.toErrorDialog(it)
-                            )
+            accounts = try {
+                listAccountsInteractor.execute()
+            } catch (e: ServiceException) {
+                e.message?.also {
+                    navigationChannel.send(
+                        Navigation.Forward(
+                            NavGraphXmlDirections.toErrorDialog(it)
                         )
-                    }
-                    emptyList<Account>()
+                    )
                 }
+                emptyList<Account>()
             }
 
             // map Account to DisplayAccount
@@ -192,22 +188,20 @@ class AccountsViewModel constructor(
         _selectedAccountPosition.value = accounts.indexOf(selectedAccount)
 
         roundUpAmount = selectedAccount?.let { account ->
-            withContext(Dispatchers.IO) {
-                try {
-                    calcRoundUpInteractor.execute(
-                        account.id,
-                        roundUpSinceDate
-                    )
-                } catch (e: ServiceException) {
-                    e.message?.also {
-                        navigationChannel.send(
-                            Navigation.Forward(
-                                NavGraphXmlDirections.toErrorDialog(it)
-                            )
+            try {
+                calcRoundUpInteractor.execute(
+                    account.id,
+                    roundUpSinceDate
+                )
+            } catch (e: ServiceException) {
+                e.message?.also {
+                    navigationChannel.send(
+                        Navigation.Forward(
+                            NavGraphXmlDirections.toErrorDialog(it)
                         )
-                    }
-                    null
+                    )
                 }
+                null
             }
         }
 

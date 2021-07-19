@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="2dp"
-    android:layout_margin="8dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="item"
+            type="hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal" />
+        <variable
+            name="onClick"
+            type="java.util.function.Consumer&lt;hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal&gt;" />
+    </data>
+
+    <androidx.cardview.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="2dp">
+
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:onClick="@{() -> onClick.accept(item)}"
+            android:text="@{item.name}"
             tools:text="Name" />
-</androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -48,7 +48,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `WHEN name changes THEN name is saved`() = runBlocking {
-        viewModelUnderTest.onNameChanged(validGoalName)
+        viewModelUnderTest.name.value = validGoalName
 
         assertThat(savedState[NAME_KEY], `is`(validGoalName))
     }
@@ -81,7 +81,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         given(createSavingsGoalsIterator.validateName(any())).willReturn(false).willReturn(true)
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
-        viewModelUnderTest.onNameChanged(validGoalName)
+        viewModelUnderTest.name.value = validGoalName
 
         then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
         then(commandEnabledObserver).should().onChanged(false)
@@ -95,7 +95,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true).willReturn(false)
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
-        viewModelUnderTest.onNameChanged(invalidGoalName)
+        viewModelUnderTest.name.value = invalidGoalName
 
         then(createSavingsGoalsIterator).should().validateName(validGoalName)
         then(commandEnabledObserver).should().onChanged(true)
@@ -106,7 +106,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `GIVEN name is valid WHEN executing Create command THEN will interact`() = runBlocking {
-        viewModelUnderTest.onNameChanged(validGoalName)
+        viewModelUnderTest.name.value = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
         viewModelUnderTest.onCreateCommand()
@@ -118,7 +118,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Test
     fun `GIVEN name is invalid WHEN executing Create command THEN will not interact`() {
-        viewModelUnderTest.onNameChanged(invalidGoalName)
+        viewModelUnderTest.name.value = invalidGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(false)
 
         viewModelUnderTest.onCreateCommand()

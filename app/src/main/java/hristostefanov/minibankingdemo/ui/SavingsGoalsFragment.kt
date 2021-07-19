@@ -7,16 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
-import hristostefanov.minibankingdemo.R
+import hristostefanov.minibankingdemo.databinding.SavingsGoalsFragmentBinding
 import hristostefanov.minibankingdemo.presentation.SavingsGoalsViewModel
-import kotlinx.android.synthetic.main.savings_goals_fragment.*
 
 class SavingsGoalsFragment : Fragment() {
 
     private val args: SavingsGoalsFragmentArgs by navArgs()
+
+    private lateinit var binding: SavingsGoalsFragmentBinding
 
     private val viewModel: SavingsGoalsViewModel by viewModels {
         viewModelFactory {
@@ -27,26 +26,23 @@ class SavingsGoalsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.savings_goals_fragment, container, false)
+    ): View {
+        binding = SavingsGoalsFragmentBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        savingsGoalsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        viewModel.list.observe(viewLifecycleOwner, Observer {
-            savingsGoalsRecyclerView.adapter =
-                SavingsGoalsRecyclerViewAdapter(it, ::onSavingsGoalClicked)
-        })
-
-        addSavingsGoalButton.setOnClickListener {
-            viewModel.onAddSavingsGoalCommand()
+        val adapter = SavingsGoalsRecyclerViewAdapter {
+            viewModel.onSavingsGoalClicked(it.id)
         }
-    }
+        binding.savingsGoalsRecyclerView.adapter = adapter
 
-    private fun onSavingsGoalClicked(position: Int) {
-        viewModel.onSavingsGoalClicked(position)
+        viewModel.list.observe(viewLifecycleOwner, { list ->
+            adapter.submitList(list)
+        })
     }
 }
