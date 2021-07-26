@@ -33,20 +33,8 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
-## Out of scope
-* Savings goals details like description, picture, target
-* Progress/busy indicator
-* Swipe to refresh
-* Support for older devices
-* Maximum test coverage
-* Optimizations
-* User friendly error messages
-* Caching
-* Offline mode
-
 ##  Testing
-Even though maximum test coverage is out of scope, for demo purposes
-the project includes 3 types of unit tests:
+The project includes 3 types of unit tests:
 * unit tests for business logic (CalcRoundUpInteractorTest)
 * unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
