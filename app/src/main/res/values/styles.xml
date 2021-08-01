@@ -1,7 +1,19 @@
 <resources>
 
+    <!-- NOTE: https://github.com/material-components/material-components-android/blob/master/docs/getting-started.md
+     "Using a Material Components theme enables a custom view inflater which replaces default
+      components with their Material counterparts. Currently, this only replaces
+      <Button> and <AutoCompleteTextView> XML components with <MaterialButton> and
+      <MaterialAutoCompleteTextView>, respectively" -->
+
+    <!-- NOTE: https://material.io/blog/migrate-android-material-components
+    "Like AppCompat, MDC will replace some framework widgets with MDC equivalents at inflation time.
+     This makes it possible to ship new features and bugfixes without having to swap all your
+      declarations for a new type."
+    -->
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
