@@ -43,9 +43,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    dataBinding {
-        enabled = true
-    }
     testOptions {
         unitTests {
             // needed when running local unit tests with Robolectric
@@ -55,6 +52,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
 }
 
@@ -97,7 +95,7 @@ dependencies {
     kapt "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
 
     // for EncryptedSharedPreferences
-    implementation 'androidx.security:security-crypto:1.1.0-alpha02'
+    implementation 'androidx.security:security-crypto:1.1.0-alpha03'
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

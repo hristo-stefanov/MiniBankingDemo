@@ -39,8 +39,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenStarted {
             // the terminating condition of the loop is the cancellation of the coroutine
             while (true) {
-                val navigation = navigationChannel.receive()
-                when (navigation) {
+                when (val navigation = navigationChannel.receive()) {
                     is Navigation.Forward -> navController.navigate(navigation.navDirections)
                     is Navigation.Backward -> navController.popBackStack()
                     is Navigation.Restart -> {
