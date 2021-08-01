@@ -50,7 +50,7 @@ class CreateSavingsGoalFragmentTest {
         }
     }
 
-    @Test()
+    @Test
     fun buttonEnabled() {
         given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
 

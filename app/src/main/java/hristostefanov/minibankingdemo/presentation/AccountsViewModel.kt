@@ -165,7 +165,7 @@ class AccountsViewModel constructor(
                         )
                     )
                 }
-                emptyList<Account>()
+                emptyList()
             }
 
             // map Account to DisplayAccount

@@ -3,7 +3,7 @@
     <string name="error_dialog_title">Error</string>
     <string name="no_account">No account</string>
     <string name="roundUpInfo">Round up amount since %s</string>
-    <string name="transferInfo">You are about to transfer %s to %s</string>
+    <string name="transferInfo">You are about to transfer %1s to %2s</string>
     <string name="success">Success</string>
     <string name="access_token_hint">Access token</string>
     <string name="accept">Accept</string>

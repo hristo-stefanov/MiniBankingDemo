@@ -159,7 +159,7 @@ class CalcRoundUpInteractorTest {
         assertThat(result, comparesEqualTo(BigDecimal("0.99")))
     }
 
-    @Test()
+    @Test
     fun `No roundup`() = runBlockingTest {
         given(repository.findTransactions(any(), any())).willReturn(
             listOf(
@@ -181,7 +181,7 @@ class CalcRoundUpInteractorTest {
         assertThat(result, comparesEqualTo(BigDecimal.ZERO))
     }
 
-    @Test()
+    @Test
     fun `No transactions`() = runBlockingTest {
         given(repository.findTransactions(any(), any())).willReturn(emptyList())
 
