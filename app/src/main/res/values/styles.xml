@@ -23,6 +23,19 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorOnSecondary">@android:color/white</item>
+
+        <!-- This is a more fine-grained approach to styling buttons than
+        using `shapeAppearanceSmallComponent` -->
+        <item name="materialButtonStyle">@style/CustomButton</item>
+    </style>
+
+    <style name="RoundCorner">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="CustomButton" parent="Widget.MaterialComponents.Button">
+        <item name="shapeAppearanceOverlay">@style/RoundCorner</item>
     </style>
 
 </resources>
