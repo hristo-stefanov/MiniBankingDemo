@@ -52,6 +52,7 @@
             android:adapter="@{AccountListConverter.toAdapter(viewmodel.accountList)}"
             android:onItemSelected="@{(parent,view, position,id) -> viewmodel.onAccountSelectionChanged(position)}"
             android:selectedItemPosition="@{viewmodel.selectedAccountPosition}"
+            app:popupTheme="@style/ThemeOverlay.MiniBankingDemo.SpinnerPopup"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
