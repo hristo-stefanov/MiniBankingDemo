@@ -15,4 +15,11 @@
         using `shapeAppearanceSmallComponent` -->
         <item name="materialButtonStyle">@style/CustomButton</item>
     </style>
+
+
+<!--    Should be used with Spinner's app:popupTheme-->
+    <style name="ThemeOverlay.MiniBankingDemo.SpinnerPopup" parent="ThemeOverlay.AppCompat.Light" />
+
+<!--    Should be used with Toolbars' app:popupTheme -->
+    <style name="ThemeOverlay.MiniBankingDemo.OverflowMenu" parent="ThemeOverlay.MaterialComponents.Light" />
 </resources>
