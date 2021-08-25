@@ -132,6 +132,10 @@ dependencies {
     testImplementation 'androidx.test:rules:1.4.0'
     testImplementation "androidx.navigation:navigation-testing:$nav_version"
 
+    // using the non-java8 edition to use annotated methods instead of lambdas
+    testImplementation 'io.cucumber:cucumber-java:6.10.4'
+    testImplementation 'io.cucumber:cucumber-junit:6.10.4'
+
     // NOTE: "the library code goes into your application's APK instead of test APK
     // when you build your application in debug build type.
     // (Debug build type is used for instrumentation test by default)"
