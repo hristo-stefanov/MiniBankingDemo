@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo;
+package hristostefanov.minibankingdemo.cucumber;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
