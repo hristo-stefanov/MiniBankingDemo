@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.cucumber
 
+import hristostefanov.minibankingdemo.cucumber.di.DaggerFakeApplicationComponent
 import io.cucumber.core.backend.ObjectFactory
 import io.cucumber.core.exception.CucumberException
 
@@ -11,6 +12,7 @@ class CustomObjectFactory: ObjectFactory {
         return true
     }
 
+    // Copied from DefaultJavaObjectFactory
     override fun <T> getInstance(type: Class<T>): T? {
         var instance = type.cast(instances[type])
         if (instance == null) {
@@ -20,11 +22,13 @@ class CustomObjectFactory: ObjectFactory {
     }
 
     override fun start() {
+        TestComponentRegistry.applicationComponent = DaggerFakeApplicationComponent.create()
     }
 
     override fun stop() {
     }
 
+    // Copied from DefaultJavaObjectFactory
     private fun <T> cacheNewInstance(type: Class<T>): T {
         return try {
             val constructor = type.getConstructor()
