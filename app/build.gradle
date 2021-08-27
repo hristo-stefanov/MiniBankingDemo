@@ -86,7 +86,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.4.0-alpha02"
 
     implementation 'com.google.dagger:dagger:2.35.1'
-//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt 'com.google.dagger:dagger-compiler:2.35.1'
 
     def nav_version = "2.3.5"
@@ -133,6 +132,9 @@ dependencies {
     // using the non-java8 edition to use annotated methods instead of lambdas
     testImplementation 'io.cucumber:cucumber-java:6.10.4'
     testImplementation 'io.cucumber:cucumber-junit:6.10.4'
+
+    testImplementation 'com.google.dagger:dagger:2.35.1'
+    kaptTest 'com.google.dagger:dagger-compiler:2.35.1'
 
     // NOTE: "the library code goes into your application's APK instead of test APK
     // when you build your application in debug build type.
