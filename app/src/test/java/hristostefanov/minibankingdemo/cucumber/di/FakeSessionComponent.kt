@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.cucumber.di
 
 import dagger.Subcomponent
-import hristostefanov.minibankingdemo.cucumber.StepDefinitions
+import features.RoundUpSteps
 import hristostefanov.minibankingdemo.util.SessionScope
 
 @SessionScope
@@ -13,5 +13,5 @@ interface FakeSessionComponent {
         fun create(): FakeSessionComponent
     }
 
-    fun inject(target: StepDefinitions)
+    fun inject(target: RoundUpSteps)
 }
