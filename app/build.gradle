@@ -131,8 +131,7 @@ dependencies {
     testImplementation 'androidx.test:rules:1.4.0'
     testImplementation "androidx.navigation:navigation-testing:$nav_version"
 
-    // using the non-java8 edition to use annotated methods instead of lambdas
-    testImplementation 'io.cucumber:cucumber-java:6.10.4'
+    testImplementation 'io.cucumber:cucumber-java8:6.10.4'
     testImplementation 'io.cucumber:cucumber-junit:6.10.4'
 
     testImplementation 'com.google.dagger:dagger:2.35.1'
