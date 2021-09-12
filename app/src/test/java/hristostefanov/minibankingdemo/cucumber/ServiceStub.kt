@@ -8,7 +8,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.mock.BehaviorDelegate
 
-class MockService2(private val delegate: BehaviorDelegate<Service>): Service {
+class ServiceStub(private val delegate: BehaviorDelegate<Service>): Service {
 
     var accounts: List<AccountV2> = emptyList()
     var balancePerAccountMap: Map<String, BalanceV2> = emptyMap()
