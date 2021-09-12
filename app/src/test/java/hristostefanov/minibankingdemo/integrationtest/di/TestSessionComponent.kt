@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.cucumber.di
+package hristostefanov.minibankingdemo.integrationtest.di
 
 import dagger.Subcomponent
 import features.RoundUpSteps

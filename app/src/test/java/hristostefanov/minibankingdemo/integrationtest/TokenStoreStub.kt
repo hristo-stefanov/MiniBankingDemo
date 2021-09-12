@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.cucumber
+package hristostefanov.minibankingdemo.integrationtest
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import javax.inject.Inject

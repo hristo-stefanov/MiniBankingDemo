@@ -1,8 +1,9 @@
-package hristostefanov.minibankingdemo.cucumber
+package hristostefanov.minibankingdemo.integrationtest.cucumber
 
+import hristostefanov.minibankingdemo.integrationtest.TestApp
 import io.cucumber.core.backend.ObjectFactory
 import io.cucumber.core.exception.CucumberException
-
+// NOTE: registered in META-INF/services/io.cucumber.core.backend.ObjectFactory
 class CustomObjectFactory: ObjectFactory {
 
     private val instances = mutableMapOf<Class<*>,Any>()
