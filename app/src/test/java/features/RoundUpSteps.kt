@@ -30,7 +30,15 @@ class RoundUpSteps : En {
     init {
         TestComponentRegistry.applicationComponent.getSessionRegistry().sessionComponent.inject(this)
 
-        Given("the following transactions in my {string}") { accountId: String, dataTable: DataTable ->
+        Given("I have an account {string} in {string}") { accountId: String, currency: String ->
+            service.accounts = listOf(
+                AccountV2(
+                    accountUid = accountId, defaultCategory = "", currency = currency
+                )
+            )
+        }
+
+        And("the following transactions in my account {string}") { accountId: String, dataTable: DataTable ->
             val list: MutableList<Double> = dataTable.asList(Double::class.java)
             val feedItems = list.map {
                 FeedItem(
@@ -40,8 +48,6 @@ class RoundUpSteps : En {
                 )
             }
 
-            service.accounts =
-                listOf(AccountV2(accountUid = accountId, defaultCategory = "", currency = "GBP"))
             service.feedItemsToAccountId = mapOf(accountId to feedItems)
         }
 
@@ -54,6 +60,5 @@ class RoundUpSteps : En {
         Then("I will be asked to save {double}") { double: Double ->
             assertThat(result.toDouble(), Matchers.`is`(double))
         }
-
     }
 }
