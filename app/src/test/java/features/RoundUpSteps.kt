@@ -1,7 +1,7 @@
 package features
 
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.cucumber.MockService2
+import hristostefanov.minibankingdemo.cucumber.ServiceStub
 import hristostefanov.minibankingdemo.cucumber.TestComponentRegistry
 import hristostefanov.minibankingdemo.data.models.AccountV2
 import hristostefanov.minibankingdemo.data.models.CurrencyAndAmount
@@ -22,7 +22,7 @@ class RoundUpSteps : En {
     private lateinit var result: BigDecimal
 
     @Inject
-    lateinit var service: MockService2
+    lateinit var service: ServiceStub
 
     @Inject
     lateinit var interactor: CalcRoundUpInteractor

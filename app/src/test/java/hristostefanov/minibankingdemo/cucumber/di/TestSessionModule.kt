@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.cucumber.MockService2
+import hristostefanov.minibankingdemo.cucumber.ServiceStub
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -18,7 +18,7 @@ import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
 @Module
-abstract class FakeSessionModule {
+abstract class TestSessionModule {
     companion object {
         @SessionScope
         @Provides
@@ -32,14 +32,14 @@ abstract class FakeSessionModule {
 
             return Retrofit.Builder()
                 .client(client)
-                .baseUrl("https://fake")
+                .baseUrl("https://test")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
 
         @SessionScope
         @Provides
-        fun provideService(retrofit: Retrofit): MockService2 {
+        fun provideService(retrofit: Retrofit): ServiceStub {
             val behavior = NetworkBehavior.create().apply {
                 setErrorPercent(0)
                 setFailurePercent(0)
@@ -51,7 +51,7 @@ abstract class FakeSessionModule {
                 .build()
 
             val delegate = mockRetrofit.create(Service::class.java)
-            return MockService2(delegate)
+            return ServiceStub(delegate)
         }
     }
 
@@ -62,5 +62,5 @@ abstract class FakeSessionModule {
 
     @SessionScope
     @Binds
-    abstract fun bindService(service: MockService2): Service
+    abstract fun bindService(service: ServiceStub): Service
 }

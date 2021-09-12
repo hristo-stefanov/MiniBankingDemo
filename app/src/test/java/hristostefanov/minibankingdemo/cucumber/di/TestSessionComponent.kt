@@ -5,12 +5,12 @@ import features.RoundUpSteps
 import hristostefanov.minibankingdemo.util.SessionScope
 
 @SessionScope
-@Subcomponent(modules = [FakeSessionModule::class])
-interface FakeSessionComponent {
+@Subcomponent(modules = [TestSessionModule::class])
+interface TestSessionComponent {
     // NOTE: required even if trivial
     @Subcomponent.Factory
     interface Factory {
-        fun create(): FakeSessionComponent
+        fun create(): TestSessionComponent
     }
 
     fun inject(target: RoundUpSteps)

@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.cucumber
 
-import hristostefanov.minibankingdemo.cucumber.di.FakeApplicationComponent
+import hristostefanov.minibankingdemo.cucumber.di.TestApplicationComponent
 
 object TestComponentRegistry {
-    lateinit var applicationComponent: FakeApplicationComponent
+    lateinit var applicationComponent: TestApplicationComponent
 }

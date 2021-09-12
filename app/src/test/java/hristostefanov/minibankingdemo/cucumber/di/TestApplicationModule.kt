@@ -4,14 +4,14 @@ import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import hristostefanov.minibankingdemo.cucumber.FakeTokenStore
+import hristostefanov.minibankingdemo.cucumber.TokenStoreStub
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.ApplicationScope
 import java.time.ZoneId
 import java.util.*
 
-@Module(subcomponents = [FakeSessionComponent::class])
-abstract class FakeApplicationModule {
+@Module(subcomponents = [TestSessionComponent::class])
+abstract class TestApplicationModule {
 
     companion object {
         @Provides
@@ -26,5 +26,5 @@ abstract class FakeApplicationModule {
 
     @ApplicationScope
     @Binds
-    abstract fun bindTokenStore(tokenStore: FakeTokenStore): TokenStore
+    abstract fun bindTokenStore(tokenStore: TokenStoreStub): TokenStore
 }
