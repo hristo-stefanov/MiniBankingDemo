@@ -1,4 +1,4 @@
-package features
+package hristostefanov.minibankingdemo.integrationtest.steps
 
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.integrationtest.ServiceStub

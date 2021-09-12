@@ -10,6 +10,6 @@ import org.junit.runner.RunWith
 // NOTE: it's not clear what "pretty" plugin does, but normally goes together
 // with the "html" plugin. Perhaps, it improves the generated html code.
 @CucumberOptions( features = ["src/test"],
-    glue = ["features"],
+    glue = ["hristostefanov.minibankingdemo.integrationtest.steps"],
     plugin = ["pretty", "html:build/reports/tests/cucumber.html"])
 class RunCucumberTest
