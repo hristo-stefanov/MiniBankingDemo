@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.cucumber
 
-import hristostefanov.minibankingdemo.cucumber.di.DaggerTestApplicationComponent
 import io.cucumber.core.backend.ObjectFactory
 import io.cucumber.core.exception.CucumberException
 
@@ -22,7 +21,7 @@ class CustomObjectFactory: ObjectFactory {
     }
 
     override fun start() {
-        TestComponentRegistry.applicationComponent = DaggerTestApplicationComponent.create()
+        TestApp.newComponent()
     }
 
     override fun stop() {
