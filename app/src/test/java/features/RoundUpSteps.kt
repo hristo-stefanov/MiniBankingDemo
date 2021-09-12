@@ -1,8 +1,8 @@
 package features
 
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.cucumber.ServiceStub
-import hristostefanov.minibankingdemo.cucumber.TestApp
+import hristostefanov.minibankingdemo.integrationtest.ServiceStub
+import hristostefanov.minibankingdemo.integrationtest.TestApp
 import hristostefanov.minibankingdemo.data.models.AccountV2
 import hristostefanov.minibankingdemo.data.models.CurrencyAndAmount
 import hristostefanov.minibankingdemo.data.models.FeedItem

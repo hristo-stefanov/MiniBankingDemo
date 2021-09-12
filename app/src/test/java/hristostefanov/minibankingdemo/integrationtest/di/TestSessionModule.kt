@@ -1,10 +1,10 @@
-package hristostefanov.minibankingdemo.cucumber.di
+package hristostefanov.minibankingdemo.integrationtest.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.cucumber.ServiceStub
+import hristostefanov.minibankingdemo.integrationtest.ServiceStub
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore

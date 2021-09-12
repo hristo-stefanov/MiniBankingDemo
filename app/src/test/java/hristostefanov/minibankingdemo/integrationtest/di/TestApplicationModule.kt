@@ -1,10 +1,10 @@
-package hristostefanov.minibankingdemo.cucumber.di
+package hristostefanov.minibankingdemo.integrationtest.di
 
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import hristostefanov.minibankingdemo.cucumber.TokenStoreStub
+import hristostefanov.minibankingdemo.integrationtest.TokenStoreStub
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.ApplicationScope
 import java.time.ZoneId

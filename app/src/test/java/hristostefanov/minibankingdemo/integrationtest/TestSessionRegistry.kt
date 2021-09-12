@@ -1,6 +1,6 @@
-package hristostefanov.minibankingdemo.cucumber
+package hristostefanov.minibankingdemo.integrationtest
 
-import hristostefanov.minibankingdemo.cucumber.di.TestSessionComponent
+import hristostefanov.minibankingdemo.integrationtest.di.TestSessionComponent
 import hristostefanov.minibankingdemo.util.ApplicationScope
 import javax.inject.Inject
 

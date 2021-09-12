@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.cucumber
+package hristostefanov.minibankingdemo.integrationtest
 
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.data.models.*
