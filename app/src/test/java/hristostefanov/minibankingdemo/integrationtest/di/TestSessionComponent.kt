@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.integrationtest.di
 
 import dagger.Subcomponent
-import features.RoundUpSteps
+import hristostefanov.minibankingdemo.integrationtest.steps.RoundUpSteps
 import hristostefanov.minibankingdemo.util.SessionScope
 
 @SessionScope
