@@ -1,28 +1,22 @@
 package hristostefanov.minibankingdemo.integrationtest.steps
 
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.integrationtest.ServiceStub
 import hristostefanov.minibankingdemo.integrationtest.TestApp
-import hristostefanov.minibankingdemo.data.models.AccountV2
-import hristostefanov.minibankingdemo.data.models.CurrencyAndAmount
-import hristostefanov.minibankingdemo.data.models.FeedItem
+import hristostefanov.minibankingdemo.integrationtest.TestAutomation
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import java.math.BigDecimal
-import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 
+private const val ACCOUNT_NUM = "12345678"
 
 class RoundUpSteps : En {
     private lateinit var result: BigDecimal
 
     @Inject
-    lateinit var service: ServiceStub
+    lateinit var automation: TestAutomation
 
     @Inject
     lateinit var interactor: CalcRoundUpInteractor
@@ -30,35 +24,18 @@ class RoundUpSteps : En {
     init {
         TestApp.component.getSessionRegistry().sessionComponent.inject(this)
 
-        Given("I have an account {string} in {string}") { accountId: String, currency: String ->
-            service.accounts = listOf(
-                AccountV2(
-                    accountUid = accountId, defaultCategory = "", currency = currency
-                )
-            )
+        Given("the following transactions in an account") { dataTable: DataTable ->
+            val list: MutableList<BigDecimal> = dataTable.asList(BigDecimal::class.java)
+
+            automation.createAccount(ACCOUNT_NUM, "GBP", list)
         }
 
-        And("the following transactions in my account {string}") { accountId: String, dataTable: DataTable ->
-            val list: MutableList<Double> = dataTable.asList(Double::class.java)
-            val feedItems = list.map {
-                FeedItem(
-                    direction = if (it >= 0) "IN" else "OUT",
-                    amount = CurrencyAndAmount("GBP", (it * 100.0).roundToLong().absoluteValue),
-                    status = "SETTLED"
-                )
-            }
-
-            service.feedItemsToAccountId = mapOf(accountId to feedItems)
+        When("the round up amount is calculated") {
+            result = automation.calculateRoundUp(ACCOUNT_NUM)
         }
 
-        When("I access {string}") { accountId: String ->
-            runBlocking {
-                result = interactor.execute(accountId, LocalDate.now())
-            }
-        }
-
-        Then("I will be asked to save {double}") { double: Double ->
-            assertThat(result.toDouble(), Matchers.`is`(double))
+        Then("the result will be {bigdecimal}") { expected: BigDecimal ->
+            assertThat(result, Matchers.`is`(expected))
         }
     }
 }
