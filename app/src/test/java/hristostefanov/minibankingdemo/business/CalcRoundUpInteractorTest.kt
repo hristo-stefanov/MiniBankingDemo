@@ -47,33 +47,6 @@ class CalcRoundUpInteractorTest {
     }
 
     @Test
-    fun `Specification example case`() = runBlockingTest {
-        given(repository.findTransactions(any(), any())).willReturn(
-            listOf(
-                Transaction(
-                    "-4.35".toBigDecimal(),
-                    SETTLED,
-                    EXTERNAL
-                ),
-                Transaction(
-                    "-5.20".toBigDecimal(),
-                    SETTLED,
-                    EXTERNAL
-                ),
-                Transaction(
-                    "-0.87".toBigDecimal(),
-                    SETTLED,
-                    EXTERNAL
-                )
-            )
-        )
-
-        val result = interactor.execute(someAccountId, someDate)
-
-        assertThat(result, comparesEqualTo(BigDecimal("1.58")))
-    }
-
-    @Test
     fun `Ignoring inbound transactions`() = runBlockingTest {
         given(repository.findTransactions(any(), any())).willReturn(
             listOf(
