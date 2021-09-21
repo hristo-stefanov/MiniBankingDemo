@@ -7,6 +7,8 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.integrationtest.ServiceStub
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
+import hristostefanov.minibankingdemo.integrationtest.TestAutomation
+import hristostefanov.minibankingdemo.integrationtest.ServiceStubTestAutomation
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.SessionScope
 import okhttp3.Interceptor
@@ -63,4 +65,8 @@ abstract class TestSessionModule {
     @SessionScope
     @Binds
     abstract fun bindService(service: ServiceStub): Service
+
+    @SessionScope
+    @Binds
+    abstract fun bindTestAutomation(impl: ServiceStubTestAutomation): TestAutomation
 }

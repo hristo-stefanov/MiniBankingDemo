@@ -1,10 +1,9 @@
-Feature: Round-up
+Feature: Calculate a Round-up amount for an account
 
-  Scenario: Example1
-    Given I have an account "12345678" in "GBP"
-    And the following transactions in my account "12345678"
+  Scenario: Example
+    Given the following transactions in an account
       |-4.35|
       |-5.20|
       |-0.87|
-    When I access "12345678"
-    Then I will be asked to save 1.58
+    When the round up amount is calculated
+    Then the result will be 1.58
