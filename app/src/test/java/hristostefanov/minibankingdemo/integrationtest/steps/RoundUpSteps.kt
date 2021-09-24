@@ -6,7 +6,7 @@ import hristostefanov.minibankingdemo.integrationtest.TestAutomation
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.`is`
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class RoundUpSteps : En {
         }
 
         Then("the result will be {bigdecimal}") { expected: BigDecimal ->
-            assertThat(result, Matchers.`is`(expected))
+            assertThat(result, `is`(expected))
         }
     }
 }
