@@ -57,6 +57,10 @@ class ServiceStubTestAutomation @Inject constructor(
         }
     }
 
+    override fun login() {
+        tokenStore.token = "token"
+    }
+
     override fun createAccount(number: String, currency: String, transactions: List<BigDecimal>) {
         val feedItems = mutableListOf<FeedItem>()
         transactions.forEach { amount ->
