@@ -1,39 +1,54 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
+import hristostefanov.minibankingdemo.CoroutinesTestRule
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
-import hristostefanov.minibankingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.StringSupplier
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.greenrobot.eventbus.EventBus
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.*
 import java.time.LocalDate
 import java.util.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 private const val TIMEOUT = 100L
 
-class AccountsViewModelTest : BaseViewModelTest() {
+@ExperimentalCoroutinesApi
+class AccountsViewModelTest {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
+
+    @get:Rule
+    val coroutineTestRule = CoroutinesTestRule()
+
+    // NOTE: needed for proper testing of Architecture Components -
+    // makes background tasks execute synchronously.
+    // More importantly, provides TaskExecutor#isMainThread implementation which always return `true`
+    // thus avoiding exceptions in LiveData's observe* methods.
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
 
     private val eventBus = spy(EventBus::class.java)
     @Suppress("UNCHECKED_CAST")
@@ -87,7 +102,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
 
     @Test
-    fun `Initial interactions`() = runBlocking {
+    fun `Initial interactions`() = coroutineTestRule.testDispatcher.runBlockingTest {
         viewModel // instantiate
 
         then(eventBus).should().register(viewModel)
@@ -101,7 +116,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `Data source changed`() = runBlocking {
+    fun `Data source changed`() = coroutineTestRule.testDispatcher.runBlockingTest {
         viewModel.onDataSourceChanged(DataSourceChangedEvent())
 
         then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
@@ -118,14 +133,9 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
 
     @Test
-    fun `Transfer command selected`() = runBlocking {
+    fun `Transfer command selected`() = coroutineTestRule.testDispatcher.runBlockingTest {
         // wait for the command to get enabled
-        suspendCoroutine<Unit> {continuation ->
-            viewModel.transferCommandEnabled.observeForever {
-                if (it)
-                    continuation.resume(Unit)
-            }
-        }
+        viewModel.transferCommandEnabled.first()
 
         viewModel.onTransferCommand()
 
@@ -141,38 +151,30 @@ class AccountsViewModelTest : BaseViewModelTest() {
 
 
     @Test
-    fun `First Account Is Selected By Default`() = runBlocking {
+    fun `First Account Is Selected By Default`() = coroutineTestRule.testDispatcher.runBlockingTest {
         given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Int>
 
-        viewModel.selectedAccountPosition.observeForever(observer)
+        val position = viewModel.selectedAccountPosition.first()
 
-        then(observer).should(timeout(TIMEOUT)).onChanged(0)
+        assertThat(position).isEqualTo(0)
     }
 
     @Test
-    fun `Restoring Selected Account`() = runBlocking {
+    fun `Restoring Selected Account`() = coroutineTestRule.testDispatcher.runBlockingTest {
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
-        state.accountId = account2.id
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Int>
+        state[ACCOUNT_ID_KEY] = account2.id
 
-        viewModel.selectedAccountPosition.observeForever(observer)
+        val position = viewModel.selectedAccountPosition.first()
 
-        then(observer).should(timeout(TIMEOUT)).onChanged(accounts.indexOf(account2))
+        assertThat(position).isEqualTo(accounts.indexOf(account2))
     }
 
 
-
     @Test
-    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() {
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Boolean>
+    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() = coroutineTestRule.testDispatcher.runBlockingTest {
+        val isEnabled = viewModel.transferCommandEnabled.first()
 
-        viewModel.transferCommandEnabled.observeForever(observer)
-
-        then(observer).should(timeout(TIMEOUT)).onChanged(true)
+        assertThat(isEnabled).isTrue()
     }
 }

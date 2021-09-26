@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.annotation.MainThread
 import androidx.lifecycle.*
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
@@ -28,21 +27,13 @@ import java.time.format.FormatStyle
 import java.util.*
 import javax.inject.Inject
 
+const val ACCOUNT_ID_KEY = "accountId"
+
 class AccountsViewModel constructor(
     private val state: SavedStateHandle
 ) : ViewModel() {
 
-    companion object {
-        private const val ACCOUNT_ID_KEY = "accountId"
-
-        var SavedStateHandle.accountId: String?
-            get() = this[ACCOUNT_ID_KEY]
-            set(value) {
-                this[ACCOUNT_ID_KEY] = value
-            }
-    }
-
-    private val accountIdFlow: Flow<String> = state.getLiveData<String>(ACCOUNT_ID_KEY).asFlow()
+    private val savedAccountIdFlow: Flow<String?> = state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
 
     @Inject
     internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
@@ -80,17 +71,17 @@ class AccountsViewModel constructor(
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList
 
-    private val _selectedAccountPosition = MutableStateFlow(0)
+    private val _selectedAccountPosition = MutableStateFlow(-1)
     val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition
 
     private val _roundUpAmountText = MutableStateFlow("")
     val roundUpAmountText: StateFlow<String> = _roundUpAmountText
 
-    private val _roundUpInfo = MutableLiveData("")
-    val roundUpInfo: LiveData<String> = _roundUpInfo
+    private val _roundUpInfo = MutableStateFlow("")
+    val roundUpInfo: StateFlow<String> = _roundUpInfo
 
-    private val _transferCommandEnabled = MutableLiveData(false)
-    val transferCommandEnabled: LiveData<Boolean> = _transferCommandEnabled
+    private val _transferCommandEnabled = MutableStateFlow(false)
+    val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled
 
     fun onTransferCommand() {
         selectedAccount?.also { account ->
@@ -111,10 +102,8 @@ class AccountsViewModel constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val newAccountId = accounts.value.getOrNull(position)?.id
-        if (newAccountId != state.accountId) {
-            state.accountId = newAccountId
-        }
+        val accountId = accounts.value.getOrNull(position)?.id
+        state[ACCOUNT_ID_KEY] = accountId
     }
 
     @Inject
@@ -138,22 +127,20 @@ class AccountsViewModel constructor(
             }
             .launchIn(viewModelScope)
 
-        accountIdFlow
-            .map { accountId: String ->
-                val accounts = listAccountsInteractor.execute()
-                val selectedAccount = accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
-                accounts.indexOf(selectedAccount)
-            }
+
+        combine(savedAccountIdFlow, accounts) { accountId: String?, accounts: List<Account> ->
+            val selectedAccount = accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
+            accounts.indexOf(selectedAccount)
+        }
             .onEach {
                 _selectedAccountPosition.value = it
-            }.launchIn(viewModelScope)
-
-
-        val selectedAccountFlow: Flow<Account?> = accountIdFlow
-            .map { accountId: String ->
-                val accounts = listAccountsInteractor.execute()
-                accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
             }
+            .launchIn(viewModelScope)
+
+        // TODO called twice
+        val selectedAccountFlow = combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
+            accounts.getOrNull(position)
+        }.distinctUntilChanged()
 
         val roundUpAmountFlow: Flow<BigDecimal?> = selectedAccountFlow
             .map { account ->
