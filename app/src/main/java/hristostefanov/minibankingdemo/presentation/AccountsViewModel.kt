@@ -16,6 +16,7 @@ import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -40,6 +41,8 @@ class AccountsViewModel constructor(
                 this[ACCOUNT_ID_KEY] = value
             }
     }
+
+    private val accountIdFlow: Flow<String> = state.getLiveData<String>(ACCOUNT_ID_KEY).asFlow()
 
     @Inject
     internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
@@ -70,18 +73,18 @@ class AccountsViewModel constructor(
     internal lateinit var sessionRegistry: SessionRegistry
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
-    private var accounts: List<Account> = emptyList()
+    private var accounts = MutableStateFlow<List<Account>>(emptyList())
     private var selectedAccount: Account? = null
     private var roundUpAmount: BigDecimal? = null
 
-    private val _accountList = MutableLiveData<List<DisplayAccount>>(emptyList())
-    val accountList: LiveData<List<DisplayAccount>> = _accountList
+    private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
+    val accountList: StateFlow<List<DisplayAccount>> = _accountList
 
-    private val _selectedAccountPosition = MutableLiveData(0)
-    val selectedAccountPosition: LiveData<Int> = _selectedAccountPosition
+    private val _selectedAccountPosition = MutableStateFlow(0)
+    val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition
 
-    private val _roundUpAmountText = MutableLiveData("")
-    val roundUpAmountText: LiveData<String> = _roundUpAmountText
+    private val _roundUpAmountText = MutableStateFlow("")
+    val roundUpAmountText: StateFlow<String> = _roundUpAmountText
 
     private val _roundUpInfo = MutableLiveData("")
     val roundUpInfo: LiveData<String> = _roundUpInfo
@@ -108,12 +111,9 @@ class AccountsViewModel constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val newAccountId = accounts.getOrNull(position)?.id
+        val newAccountId = accounts.value.getOrNull(position)?.id
         if (newAccountId != state.accountId) {
             state.accountId = newAccountId
-            viewModelScope.launch {
-                updateStateDependentOnSelectedAccount()
-            }
         }
     }
 
@@ -121,6 +121,84 @@ class AccountsViewModel constructor(
     fun init() {
         load()
         eventBus.register(this)
+
+        // map Account to DisplayAccount
+        accounts
+            .map {
+                it.map { account ->
+                    val displayBalance = amountFormatter.format(
+                        account.balance,
+                        account.currency.currencyCode
+                    )
+                    DisplayAccount(account.accountNum, account.currency.currencyCode, displayBalance)
+                }
+            }
+            .onEach {
+                _accountList.value = it
+            }
+            .launchIn(viewModelScope)
+
+        accountIdFlow
+            .map { accountId: String ->
+                val accounts = listAccountsInteractor.execute()
+                val selectedAccount = accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
+                accounts.indexOf(selectedAccount)
+            }
+            .onEach {
+                _selectedAccountPosition.value = it
+            }.launchIn(viewModelScope)
+
+
+        val selectedAccountFlow: Flow<Account?> = accountIdFlow
+            .map { accountId: String ->
+                val accounts = listAccountsInteractor.execute()
+                accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
+            }
+
+        val roundUpAmountFlow: Flow<BigDecimal?> = selectedAccountFlow
+            .map { account ->
+                account?.let {
+                    calcRoundUpInteractor.execute(it.id, roundUpSinceDate)
+                }
+            }
+            .catch { exception ->
+                exception.message?.also {
+                    navigationChannel.send(
+                        Navigation.Forward(
+                            NavGraphXmlDirections.toErrorDialog(it)
+                        )
+                    )
+                }
+                emit(null)
+            }
+
+        combine(
+            selectedAccountFlow,
+            roundUpAmountFlow
+        ) { account: Account?, roundUpAmount: BigDecimal? ->
+            if (account != null && roundUpAmount != null) {
+                amountFormatter.format(
+                    roundUpAmount,
+                    account.currency.currencyCode
+                )
+            } else {
+                stringSupplier.get(R.string.no_account)
+            }
+        }
+            .onEach {
+                _roundUpAmountText.value = it
+            }
+            .launchIn(viewModelScope)
+
+
+        roundUpAmountFlow
+            .map {
+                it?.signum() == 1 // if positive
+            }
+            .onEach {
+                _transferCommandEnabled.value = it
+            }
+            .launchIn(viewModelScope)
     }
 
     public override fun onCleared() {
@@ -155,7 +233,7 @@ class AccountsViewModel constructor(
             stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
 
         viewModelScope.launch {
-            accounts = try {
+            accounts.value = try {
                 listAccountsInteractor.execute()
             } catch (e: ServiceException) {
                 e.message?.also {
@@ -167,54 +245,7 @@ class AccountsViewModel constructor(
                 }
                 emptyList()
             }
-
-            // map Account to DisplayAccount
-            _accountList.value = accounts.map {
-                val displayBalance = amountFormatter.format(
-                    it.balance,
-                    it.currency.currencyCode
-                )
-                DisplayAccount(it.accountNum, it.currency.currencyCode, displayBalance)
-            }
-
-            updateStateDependentOnSelectedAccount()
         }
-    }
-
-    @MainThread
-    private suspend fun updateStateDependentOnSelectedAccount() {
-        selectedAccount = accounts.find { it.id == state.accountId } ?: accounts.getOrNull(0)
-
-        _selectedAccountPosition.value = accounts.indexOf(selectedAccount)
-
-        roundUpAmount = selectedAccount?.let { account ->
-            try {
-                calcRoundUpInteractor.execute(
-                    account.id,
-                    roundUpSinceDate
-                )
-            } catch (e: ServiceException) {
-                e.message?.also {
-                    navigationChannel.send(
-                        Navigation.Forward(
-                            NavGraphXmlDirections.toErrorDialog(it)
-                        )
-                    )
-                }
-                null
-            }
-        }
-
-        _roundUpAmountText.value = roundUpAmount?.let { roundUpAmount ->
-            selectedAccount?.let { selectedAccount ->
-                amountFormatter.format(
-                    roundUpAmount,
-                    selectedAccount.currency.currencyCode
-                )
-            }
-        } ?: stringSupplier.get(R.string.no_account)
-
-        _transferCommandEnabled.value = roundUpAmount?.signum() == 1 // if positive
     }
 
     fun onLogout() {
