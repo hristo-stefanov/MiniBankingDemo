@@ -33,7 +33,8 @@ class AccountsViewModel constructor(
     private val state: SavedStateHandle
 ) : ViewModel() {
 
-    private val savedAccountIdFlow: Flow<String?> = state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
+    private val savedAccountIdFlow: Flow<String?> =
+        state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
 
     @Inject
     internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
@@ -65,8 +66,7 @@ class AccountsViewModel constructor(
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
-    private var selectedAccount: Account? = null
-    private var roundUpAmount: BigDecimal? = null
+    private val roundUpAmountFlow = MutableStateFlow<BigDecimal?>(null)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList
@@ -83,22 +83,34 @@ class AccountsViewModel constructor(
     private val _transferCommandEnabled = MutableStateFlow(false)
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled
 
+    private val selectedAccountFlow: Flow<Account?> =
+        combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
+            accounts.getOrNull(position)
+        }.distinctUntilChanged()
+
     fun onTransferCommand() {
-        selectedAccount?.also { account ->
-            roundUpAmount?.also { roundUpAmount ->
-                viewModelScope.launch {
-                    navigationChannel.send(
-                        Navigation.Forward(
-                            AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                                account.id,
-                                account.currency,
-                                roundUpAmount
-                            )
-                        )
+        combine(
+            selectedAccountFlow,
+            roundUpAmountFlow
+        ) { account: Account?, roundUpAmount: BigDecimal? ->
+            if (account != null && roundUpAmount != null) {
+                Navigation.Forward(
+                    AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                        account.id,
+                        account.currency,
+                        roundUpAmount
                     )
-                }
+                )
+            } else {
+                null
             }
         }
+            .take(1)
+            .filterNotNull()
+            .onEach {
+                navigationChannel.send(it)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onAccountSelectionChanged(position: Int) {
@@ -119,7 +131,11 @@ class AccountsViewModel constructor(
                         account.balance,
                         account.currency.currencyCode
                     )
-                    DisplayAccount(account.accountNum, account.currency.currencyCode, displayBalance)
+                    DisplayAccount(
+                        account.accountNum,
+                        account.currency.currencyCode,
+                        displayBalance
+                    )
                 }
             }
             .onEach {
@@ -137,12 +153,7 @@ class AccountsViewModel constructor(
             }
             .launchIn(viewModelScope)
 
-        // TODO called twice
-        val selectedAccountFlow = combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
-            accounts.getOrNull(position)
-        }.distinctUntilChanged()
-
-        val roundUpAmountFlow: Flow<BigDecimal?> = selectedAccountFlow
+        selectedAccountFlow
             .map { account ->
                 account?.let {
                     calcRoundUpInteractor.execute(it.id, roundUpSinceDate)
@@ -158,6 +169,10 @@ class AccountsViewModel constructor(
                 }
                 emit(null)
             }
+            .onEach {
+                roundUpAmountFlow.value = it
+            }
+            .launchIn(viewModelScope)
 
         combine(
             selectedAccountFlow,
