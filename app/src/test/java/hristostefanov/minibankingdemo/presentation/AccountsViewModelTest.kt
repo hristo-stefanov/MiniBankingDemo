@@ -16,7 +16,6 @@ import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.greenrobot.eventbus.EventBus
@@ -51,6 +50,7 @@ class AccountsViewModelTest {
 
 
     private val eventBus = spy(EventBus::class.java)
+
     @Suppress("UNCHECKED_CAST")
     private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
 
@@ -70,6 +70,7 @@ class AccountsViewModelTest {
     )
 
     private val quarter = "0.25".toBigDecimal()
+    private val half = "0.5".toBigDecimal()
 
     private val state = SavedStateHandle()
 
@@ -90,17 +91,16 @@ class AccountsViewModelTest {
     }
 
     @Before
-    fun beforeEach() = runBlocking {
+    fun beforeEach() = coroutineTestRule.testDispatcher.runBlockingTest {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(amountFormatter.format(any(), any())).willReturn("")
         given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         given(tokenStore.token).willReturn("token")
-        Unit
     }
 
-
+    // TODO collaboration (interaction) based test vs state based test
     @Test
     fun `Initial interactions`() = coroutineTestRule.testDispatcher.runBlockingTest {
         viewModel // instantiate
@@ -111,19 +111,24 @@ class AccountsViewModelTest {
         then(calcRoundUpInteractor).should(timeout(TIMEOUT))
             .execute(account1.id, LocalDate.now().minusWeeks(1))
         then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
-
-        Unit
     }
 
     @Test
-    fun `Data source changed`() = coroutineTestRule.testDispatcher.runBlockingTest {
-        viewModel.onDataSourceChanged(DataSourceChangedEvent())
+    fun `Should update outputs when data source changes`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            // get the first data source set
+            viewModel
 
-        then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
-        then(calcRoundUpInteractor).should(timeout(TIMEOUT).times(2))
-            .execute(account1.id, LocalDate.now().minusWeeks(1))
-        Unit
-    }
+            // provide a second data source set
+            given(calcRoundUpInteractor.execute(any(), any())).willReturn(half)
+            given(listAccountsInteractor.execute()).willReturn(listOf(account2))
+            given(amountFormatter.format(half, "EUR")).willReturn("€0.50")
+
+            viewModel.onDataSourceChanged(DataSourceChangedEvent())
+
+            assertThat(viewModel.accountList.value[0].number).isEqualTo("222")
+            assertThat(viewModel.roundUpAmountText.value).isEqualTo("€0.50")
+        }
 
     @Test
     fun `View model cleared`() {
@@ -151,13 +156,14 @@ class AccountsViewModelTest {
 
 
     @Test
-    fun `First Account Is Selected By Default`() = coroutineTestRule.testDispatcher.runBlockingTest {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
+    fun `First Account Is Selected By Default`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
 
-        val position = viewModel.selectedAccountPosition.first()
+            val position = viewModel.selectedAccountPosition.first()
 
-        assertThat(position).isEqualTo(0)
-    }
+            assertThat(position).isEqualTo(0)
+        }
 
     @Test
     fun `Restoring Selected Account`() = coroutineTestRule.testDispatcher.runBlockingTest {
@@ -172,9 +178,10 @@ class AccountsViewModelTest {
 
 
     @Test
-    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() = coroutineTestRule.testDispatcher.runBlockingTest {
-        val isEnabled = viewModel.transferCommandEnabled.first()
+    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            val isEnabled = viewModel.transferCommandEnabled.first()
 
-        assertThat(isEnabled).isTrue()
-    }
+            assertThat(isEnabled).isTrue()
+        }
 }
