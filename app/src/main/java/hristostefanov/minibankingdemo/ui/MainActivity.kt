@@ -2,7 +2,9 @@ package hristostefanov.minibankingdemo.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
@@ -13,6 +15,9 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -35,32 +40,37 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        // launch a lifecycle aware coroutine
-        lifecycleScope.launchWhenStarted {
-            // the terminating condition of the loop is the cancellation of the coroutine
-            while (true) {
-                when (val navigation = navigationChannel.receive()) {
-                    is Navigation.Forward -> navController.navigate(navigation.navDirections)
-                    is Navigation.Backward -> navController.popBackStack()
-                    is Navigation.Restart -> {
-                        // this way is better than restarting the Activity which may cause
-                        // race condition for consuming the navigation emission
-                        navController.navigate(R.id.accountsDestination, null, navOptions {
-                            popUpTo(R.id.accountsDestination) {
-                                inclusive = true
-                            }
-                        })
-                    }
-                    is Navigation.BackTo -> navController.popBackStack(
-                        navigation.destinationId,
-                        false
-                    )
-                    is Navigation.Before -> navController.popBackStack(
-                        navigation.destinationId,
-                        true
-                    )
+        lifecycleScope.launch {
+            navigationChannel
+                .receiveAsFlow()
+                .flowWithLifecycle(lifecycle)
+                .collect { navigation ->
+                    onNavigation(navigation, navController)
                 }
+        }
+    }
+
+    private fun onNavigation(navigation: Navigation, navController: NavController) {
+        when (navigation) {
+            is Navigation.Forward -> navController.navigate(navigation.navDirections)
+            is Navigation.Backward -> navController.popBackStack()
+            is Navigation.Restart -> {
+                // this way is better than restarting the Activity which may cause
+                // race condition for consuming the navigation emission
+                navController.navigate(R.id.accountsDestination, null, navOptions {
+                    popUpTo(R.id.accountsDestination) {
+                        inclusive = true
+                    }
+                })
             }
+            is Navigation.BackTo -> navController.popBackStack(
+                navigation.destinationId,
+                false
+            )
+            is Navigation.Before -> navController.popBackStack(
+                navigation.destinationId,
+                true
+            )
         }
     }
 

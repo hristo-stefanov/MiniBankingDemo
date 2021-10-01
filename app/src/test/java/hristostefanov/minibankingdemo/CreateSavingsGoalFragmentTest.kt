@@ -44,7 +44,7 @@ class CreateSavingsGoalFragmentTest {
         // make the fragment use the mock view model
         UIUnitTestRegistry.viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return viewModel as T
             }
         }
