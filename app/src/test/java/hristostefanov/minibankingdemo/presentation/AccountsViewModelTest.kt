@@ -1,41 +1,54 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
+import hristostefanov.minibankingdemo.CoroutinesTestRule
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
-import hristostefanov.minibankingdemo.presentation.AccountsViewModel.Companion.accountId
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.StringSupplier
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.greenrobot.eventbus.EventBus
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import java.time.LocalDate
 import java.util.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-private const val TIMEOUT = 100L
-
-class AccountsViewModelTest : BaseViewModelTest() {
+@ExperimentalCoroutinesApi
+class AccountsViewModelTest {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
 
+    @get:Rule
+    val coroutineTestRule = CoroutinesTestRule()
+
+    // NOTE: needed for proper testing of Architecture Components -
+    // makes background tasks execute synchronously.
+    // More importantly, provides TaskExecutor#isMainThread implementation which always return `true`
+    // thus avoiding exceptions in LiveData's observe* methods.
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
     private val eventBus = spy(EventBus::class.java)
+
     @Suppress("UNCHECKED_CAST")
     private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
 
@@ -55,6 +68,7 @@ class AccountsViewModelTest : BaseViewModelTest() {
     )
 
     private val quarter = "0.25".toBigDecimal()
+    private val half = "0.5".toBigDecimal()
 
     private val state = SavedStateHandle()
 
@@ -75,40 +89,43 @@ class AccountsViewModelTest : BaseViewModelTest() {
     }
 
     @Before
-    fun beforeEach() = runBlocking {
+    fun beforeEach() = coroutineTestRule.testDispatcher.runBlockingTest {
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(amountFormatter.format(any(), any())).willReturn("")
         given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
         given(tokenStore.token).willReturn("token")
-        Unit
     }
 
-
     @Test
-    fun `Initial interactions`() = runBlocking {
+    fun `Initial interactions`() = coroutineTestRule.testDispatcher.runBlockingTest {
         viewModel // instantiate
 
         then(eventBus).should().register(viewModel)
-        then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
+        then(listAccountsInteractor).should().execute()
         then(listAccountsInteractor).shouldHaveNoMoreInteractions()
-        then(calcRoundUpInteractor).should(timeout(TIMEOUT))
+        then(calcRoundUpInteractor).should()
             .execute(account1.id, LocalDate.now().minusWeeks(1))
         then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
-
-        Unit
     }
 
     @Test
-    fun `Data source changed`() = runBlocking {
-        viewModel.onDataSourceChanged(DataSourceChangedEvent())
+    fun `Should update outputs when data source changes`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            // get the first data source set
+            viewModel
 
-        then(listAccountsInteractor).should(timeout(TIMEOUT).times(2)).execute()
-        then(calcRoundUpInteractor).should(timeout(TIMEOUT).times(2))
-            .execute(account1.id, LocalDate.now().minusWeeks(1))
-        Unit
-    }
+            // provide a second data source set
+            given(calcRoundUpInteractor.execute(any(), any())).willReturn(half)
+            given(listAccountsInteractor.execute()).willReturn(listOf(account2))
+            given(amountFormatter.format(half, "EUR")).willReturn("€0.50")
+
+            viewModel.onDataSourceChanged(DataSourceChangedEvent())
+
+            assertThat(viewModel.accountList.value[0].number).isEqualTo("222")
+            assertThat(viewModel.roundUpAmountText.value).isEqualTo("€0.50")
+        }
 
     @Test
     fun `View model cleared`() {
@@ -116,20 +133,14 @@ class AccountsViewModelTest : BaseViewModelTest() {
         then(eventBus).should().unregister(viewModel)
     }
 
-
     @Test
-    fun `Transfer command selected`() = runBlocking {
+    fun `Transfer command selected`() = coroutineTestRule.testDispatcher.runBlockingTest {
         // wait for the command to get enabled
-        suspendCoroutine<Unit> {continuation ->
-            viewModel.transferCommandEnabled.observeForever {
-                if (it)
-                    continuation.resume(Unit)
-            }
-        }
+        viewModel.transferCommandEnabled.first()
 
         viewModel.onTransferCommand()
 
-        then(navigationChannel).should(timeout(TIMEOUT)).send(
+        then(navigationChannel).should().send(
             Navigation.Forward(
                 AccountsFragmentDirections.actionToSavingsGoalsDestination(
                     account1.id,
@@ -139,40 +150,33 @@ class AccountsViewModelTest : BaseViewModelTest() {
         )
     }
 
+    @Test
+    fun `First Account should be selected by default`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
+
+            val position = viewModel.selectedAccountPosition.first()
+
+            assertThat(position).isEqualTo(0)
+        }
 
     @Test
-    fun `First Account Is Selected By Default`() = runBlocking {
-        given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Int>
-
-        viewModel.selectedAccountPosition.observeForever(observer)
-
-        then(observer).should(timeout(TIMEOUT)).onChanged(0)
-    }
-
-    @Test
-    fun `Restoring Selected Account`() = runBlocking {
+    fun `Should restore Account selection`() = coroutineTestRule.testDispatcher.runBlockingTest {
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
-        state.accountId = account2.id
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Int>
+        state[ACCOUNT_ID_KEY] = account2.id
 
-        viewModel.selectedAccountPosition.observeForever(observer)
+        val position = viewModel.selectedAccountPosition.first()
 
-        then(observer).should(timeout(TIMEOUT)).onChanged(accounts.indexOf(account2))
+        assertThat(position).isEqualTo(accounts.indexOf(account2))
     }
-
 
 
     @Test
-    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() {
-        @Suppress("UNCHECKED_CAST")
-        val observer = spy(Observer::class.java) as Observer<Boolean>
+    fun `Transfer Command should be enabled when RoundUpAmount is positive`() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            val isEnabled = viewModel.transferCommandEnabled.first()
 
-        viewModel.transferCommandEnabled.observeForever(observer)
-
-        then(observer).should(timeout(TIMEOUT)).onChanged(true)
-    }
+            assertThat(isEnabled).isTrue()
+        }
 }
