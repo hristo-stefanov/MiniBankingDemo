@@ -24,11 +24,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import java.time.LocalDate
 import java.util.*
-
-private const val TIMEOUT = 100L
 
 @ExperimentalCoroutinesApi
 class AccountsViewModelTest {
@@ -47,7 +46,6 @@ class AccountsViewModelTest {
     // thus avoiding exceptions in LiveData's observe* methods.
     @get:Rule
     val rule = InstantTaskExecutorRule()
-
 
     private val eventBus = spy(EventBus::class.java)
 
@@ -100,15 +98,14 @@ class AccountsViewModelTest {
         given(tokenStore.token).willReturn("token")
     }
 
-    // TODO collaboration (interaction) based test vs state based test
     @Test
     fun `Initial interactions`() = coroutineTestRule.testDispatcher.runBlockingTest {
         viewModel // instantiate
 
         then(eventBus).should().register(viewModel)
-        then(listAccountsInteractor).should(timeout(TIMEOUT)).execute()
+        then(listAccountsInteractor).should().execute()
         then(listAccountsInteractor).shouldHaveNoMoreInteractions()
-        then(calcRoundUpInteractor).should(timeout(TIMEOUT))
+        then(calcRoundUpInteractor).should()
             .execute(account1.id, LocalDate.now().minusWeeks(1))
         then(calcRoundUpInteractor).shouldHaveNoMoreInteractions()
     }
@@ -136,7 +133,6 @@ class AccountsViewModelTest {
         then(eventBus).should().unregister(viewModel)
     }
 
-
     @Test
     fun `Transfer command selected`() = coroutineTestRule.testDispatcher.runBlockingTest {
         // wait for the command to get enabled
@@ -144,7 +140,7 @@ class AccountsViewModelTest {
 
         viewModel.onTransferCommand()
 
-        then(navigationChannel).should(timeout(TIMEOUT)).send(
+        then(navigationChannel).should().send(
             Navigation.Forward(
                 AccountsFragmentDirections.actionToSavingsGoalsDestination(
                     account1.id,
@@ -154,9 +150,8 @@ class AccountsViewModelTest {
         )
     }
 
-
     @Test
-    fun `First Account Is Selected By Default`() =
+    fun `First Account should be selected by default`() =
         coroutineTestRule.testDispatcher.runBlockingTest {
             given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
 
@@ -166,7 +161,7 @@ class AccountsViewModelTest {
         }
 
     @Test
-    fun `Restoring Selected Account`() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Should restore Account selection`() = coroutineTestRule.testDispatcher.runBlockingTest {
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
         state[ACCOUNT_ID_KEY] = account2.id
@@ -178,7 +173,7 @@ class AccountsViewModelTest {
 
 
     @Test
-    fun `GIVEN RoundUpAmount is positive THEN Transfer Command will be enabled`() =
+    fun `Transfer Command should be enabled when RoundUpAmount is positive`() =
         coroutineTestRule.testDispatcher.runBlockingTest {
             val isEnabled = viewModel.transferCommandEnabled.first()
 
