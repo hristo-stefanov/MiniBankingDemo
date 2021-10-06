@@ -3,9 +3,7 @@ package hristostefanov.minibankingdemo.integrationtest
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
-import hristostefanov.minibankingdemo.data.models.AccountV2
-import hristostefanov.minibankingdemo.data.models.CurrencyAndAmount
-import hristostefanov.minibankingdemo.data.models.FeedItem
+import hristostefanov.minibankingdemo.data.models.*
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
@@ -38,7 +36,8 @@ class ServiceStubTestAutomation @Inject constructor(
     }
 
     override fun theCalculatedRoundUpIsOne() {
-        createAccount("1", "GBP", listOf(-0.4.toBigDecimal(), -0.6.toBigDecimal()))
+        // NOTE: using two decimal places because the scale of BigDecimal is used when converting to minorUnits
+        createAccount("1", "GBP", listOf("-0.40".toBigDecimal(), "-0.60".toBigDecimal()))
     }
 
     override fun openAccountScreen(): AccountsViewModel {
@@ -77,5 +76,10 @@ class ServiceStubTestAutomation @Inject constructor(
             )
         )
         serviceStub.feedItemsToAccountId = mapOf(number to feedItems)
+        serviceStub.accountIdentifierByAccountId += number to AccountIdentifiers(number)
+        serviceStub.balancePerAccountMap += number to BalanceV2(effectiveBalance = CurrencyAndAmount(
+            currency = currency,
+            minorUnits = 0
+        ))
     }
 }

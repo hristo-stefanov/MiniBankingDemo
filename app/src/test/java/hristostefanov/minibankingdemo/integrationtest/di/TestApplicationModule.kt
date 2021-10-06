@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import hristostefanov.minibankingdemo.integrationtest.TestAmountFormatter
 import hristostefanov.minibankingdemo.integrationtest.TokenStoreStub
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
@@ -46,5 +47,5 @@ abstract class TestApplicationModule {
     abstract fun bindTokenStore(tokenStore: TokenStoreStub): TokenStore
 
     @Binds
-    abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
+    abstract fun bindAmountFormatter(amountFormatter: TestAmountFormatter): AmountFormatter
 }
