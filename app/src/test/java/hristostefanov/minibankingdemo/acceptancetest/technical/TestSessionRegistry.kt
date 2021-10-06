@@ -1,6 +1,6 @@
-package hristostefanov.minibankingdemo.integrationtest
+package hristostefanov.minibankingdemo.acceptancetest.technical
 
-import hristostefanov.minibankingdemo.integrationtest.di.TestSessionComponent
+import hristostefanov.minibankingdemo.acceptancetest.technical.di.TestSessionComponent
 import hristostefanov.minibankingdemo.util.ApplicationScope
 import javax.inject.Inject
 

@@ -1,6 +1,7 @@
-package hristostefanov.minibankingdemo.integrationtest
+package hristostefanov.minibankingdemo.acceptancetest.technical
 
 import androidx.lifecycle.SavedStateHandle
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.TestAutomation
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.data.models.*

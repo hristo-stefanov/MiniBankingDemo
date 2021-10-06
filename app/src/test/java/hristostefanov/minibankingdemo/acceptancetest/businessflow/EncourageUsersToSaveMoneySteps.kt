@@ -1,12 +1,9 @@
-package hristostefanov.minibankingdemo.integrationtest.steps
+package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.integrationtest.TestApp
-import hristostefanov.minibankingdemo.integrationtest.TestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
-import io.cucumber.datatable.DataTable
 import io.cucumber.java.After
 import io.cucumber.java.Before
-import io.cucumber.java.PendingException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher

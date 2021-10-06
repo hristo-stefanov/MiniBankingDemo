@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.integrationtest
+package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import java.math.BigDecimal

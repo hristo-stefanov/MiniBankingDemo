@@ -1,11 +1,11 @@
-package hristostefanov.minibankingdemo.integrationtest.di
+package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import hristostefanov.minibankingdemo.integrationtest.TestAmountFormatter
-import hristostefanov.minibankingdemo.integrationtest.TokenStoreStub
+import hristostefanov.minibankingdemo.acceptancetest.technical.TestAmountFormatter
+import hristostefanov.minibankingdemo.acceptancetest.technical.TokenStoreStub
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore

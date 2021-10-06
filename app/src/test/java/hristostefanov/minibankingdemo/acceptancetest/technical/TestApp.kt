@@ -1,7 +1,7 @@
-package hristostefanov.minibankingdemo.integrationtest
+package hristostefanov.minibankingdemo.acceptancetest.technical
 
-import hristostefanov.minibankingdemo.integrationtest.di.DaggerTestApplicationComponent
-import hristostefanov.minibankingdemo.integrationtest.di.TestApplicationComponent
+import hristostefanov.minibankingdemo.acceptancetest.technical.di.DaggerTestApplicationComponent
+import hristostefanov.minibankingdemo.acceptancetest.technical.di.TestApplicationComponent
 // TODO see https://developer.android.com/training/dependency-injection/dagger-android#dagger-end-to-end-tests
 object TestApp {
     private var _component: TestApplicationComponent = DaggerTestApplicationComponent.create()

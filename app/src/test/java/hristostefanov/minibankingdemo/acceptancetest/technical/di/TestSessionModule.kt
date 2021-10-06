@@ -1,14 +1,14 @@
-package hristostefanov.minibankingdemo.integrationtest.di
+package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.integrationtest.ServiceStub
+import hristostefanov.minibankingdemo.acceptancetest.technical.ServiceStub
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
-import hristostefanov.minibankingdemo.integrationtest.TestAutomation
-import hristostefanov.minibankingdemo.integrationtest.ServiceStubTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.TestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.ServiceStubTestAutomation
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.SessionScope
 import okhttp3.Interceptor

@@ -1,8 +1,7 @@
-package hristostefanov.minibankingdemo.integrationtest.steps
+package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.integrationtest.TestApp
-import hristostefanov.minibankingdemo.integrationtest.TestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

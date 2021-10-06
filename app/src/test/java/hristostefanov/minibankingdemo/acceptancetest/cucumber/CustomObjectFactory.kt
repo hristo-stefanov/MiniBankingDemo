@@ -1,6 +1,6 @@
-package hristostefanov.minibankingdemo.integrationtest.cucumber
+package hristostefanov.minibankingdemo.acceptancetest.cucumber
 
-import hristostefanov.minibankingdemo.integrationtest.TestApp
+import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.core.backend.ObjectFactory
 import io.cucumber.core.exception.CucumberException
 // NOTE: registered in META-INF/services/io.cucumber.core.backend.ObjectFactory

@@ -1,7 +1,7 @@
-package hristostefanov.minibankingdemo.integrationtest.di
+package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
 import dagger.Component
-import hristostefanov.minibankingdemo.integrationtest.TestSessionRegistry
+import hristostefanov.minibankingdemo.acceptancetest.technical.TestSessionRegistry
 import hristostefanov.minibankingdemo.util.ApplicationScope
 
 @ApplicationScope

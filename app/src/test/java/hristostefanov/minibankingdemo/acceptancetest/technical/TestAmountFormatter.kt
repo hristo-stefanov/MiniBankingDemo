@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.integrationtest
+package hristostefanov.minibankingdemo.acceptancetest.technical
 
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import java.math.BigDecimal

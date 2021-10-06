@@ -1,8 +1,8 @@
-package hristostefanov.minibankingdemo.integrationtest.di
+package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
 import dagger.Subcomponent
-import hristostefanov.minibankingdemo.integrationtest.steps.EncourageUsersToSaveMoneySteps
-import hristostefanov.minibankingdemo.integrationtest.steps.RoundUpSteps
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.EncourageUsersToSaveMoneySteps
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.RoundUpSteps
 import hristostefanov.minibankingdemo.util.SessionScope
 
 @SessionScope
