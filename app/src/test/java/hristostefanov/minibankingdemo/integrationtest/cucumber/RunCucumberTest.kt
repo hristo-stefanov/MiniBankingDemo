@@ -21,12 +21,8 @@ import org.junit.runner.RunWith
 )
 class RunCucumberTest {
 
-
-    // NOTE: needed for proper testing of Architecture Components -
-// makes background tasks execute synchronously.
-// More importantly, provides TaskExecutor#isMainThread implementation which always return `true`
-// thus avoiding exceptions in LiveData's observe* methods.
-
+    // Provides TaskExecutor#isMainThread implementation which always return `true`
+    // thus avoiding exceptions in LiveData's observe* methods when running local tests.
     companion object {
         @JvmStatic
         @get:ClassRule
