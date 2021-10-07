@@ -23,22 +23,8 @@ class EncourageUsersToSaveMoneySteps {
 
     private lateinit var accountsViewModel: AccountsViewModel
 
-    @ExperimentalCoroutinesApi
-    private val testDispatcher = TestCoroutineDispatcher()
-
     init {
         TestApp.component.getSessionRegistry().sessionComponent.inject(this)
-    }
-
-    @Before
-    fun beforeEachScenario() {
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    @After
-    fun afterEachScenario() {
-        Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 
     @Given("the calculated round-up for my account is {double}")
