@@ -5,9 +5,10 @@ import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import javax.inject.Inject
 
-class ListAccountsInteractor @Inject constructor(private val repository: Repository) {
+class ListAccountsInteractor @Inject constructor(private val repository: Repository) :
+    IListAccountsInteractor {
     @Throws(ServiceException::class)
-    suspend fun execute(): List<Account> {
+    override suspend fun execute(): List<Account> {
         return repository.findAllAccounts()
     }
 }

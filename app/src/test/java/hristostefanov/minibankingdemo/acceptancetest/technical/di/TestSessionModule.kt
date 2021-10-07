@@ -3,12 +3,18 @@ package hristostefanov.minibankingdemo.acceptancetest.technical.di
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.acceptancetest.technical.ServiceStub
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
-import hristostefanov.minibankingdemo.acceptancetest.businessflow.TestAutomation
-import hristostefanov.minibankingdemo.acceptancetest.technical.ServiceStubTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.PresentationTestAutomationImpl
+import hristostefanov.minibankingdemo.acceptancetest.technical.BusinessRulesTestAutomationImpl
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.ICalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.IListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.SessionScope
 import okhttp3.Interceptor
@@ -68,5 +74,17 @@ abstract class TestSessionModule {
 
     @SessionScope
     @Binds
-    abstract fun bindTestAutomation(impl: ServiceStubTestAutomation): TestAutomation
+    abstract fun bindBusinessRulesTestAutomation(impl: BusinessRulesTestAutomationImpl): BusinessRulesTestAutomation
+
+    @SessionScope
+    @Binds
+    abstract fun bindPresentationTestAutomation(impl: PresentationTestAutomationImpl): PresentationTestAutomation
+
+    @SessionScope
+    @Binds
+    abstract fun bindCalcRoundupInteractor(impl: CalcRoundUpInteractor): ICalcRoundUpInteractor
+
+    @SessionScope
+    @Binds
+    abstract fun bindListAccountsInteractor(impl: ListAccountsInteractor): IListAccountsInteractor
 }

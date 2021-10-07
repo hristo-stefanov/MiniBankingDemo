@@ -12,9 +12,9 @@ import javax.inject.Inject
 class CalcRoundUpInteractor @Inject constructor(
     private val repository: Repository,
     private val zoneId: ZoneId
-) {
+) : ICalcRoundUpInteractor {
     @Throws(ServiceException::class)
-    suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
+    override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
         val zonedDateTime = sinceDate.atStartOfDay(zoneId)
         val transactions = repository.findTransactions(accountId, zonedDateTime)
 

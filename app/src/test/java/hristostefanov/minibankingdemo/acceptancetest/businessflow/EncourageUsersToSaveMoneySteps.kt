@@ -2,24 +2,17 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
-import io.cucumber.java.After
-import io.cucumber.java.Before
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import javax.inject.Inject
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import javax.inject.Inject
 
 
 class EncourageUsersToSaveMoneySteps {
     @Inject
-    lateinit var automation: TestAutomation
+    lateinit var automation: PresentationTestAutomation
 
     private lateinit var accountsViewModel: AccountsViewModel
 

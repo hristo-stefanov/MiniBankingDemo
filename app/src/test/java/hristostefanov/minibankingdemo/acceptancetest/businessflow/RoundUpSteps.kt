@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
+import hristostefanov.minibankingdemo.acceptancetest.technical.BusinessRulesTestAutomationImpl
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.datatable.DataTable
@@ -18,7 +19,7 @@ class RoundUpSteps {
     private lateinit var result: BigDecimal
 
     @Inject
-    lateinit var automation: TestAutomation
+    lateinit var automation: BusinessRulesTestAutomation
 
     @Inject
     lateinit var interactor: CalcRoundUpInteractor

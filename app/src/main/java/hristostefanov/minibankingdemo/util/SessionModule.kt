@@ -5,6 +5,10 @@ import dagger.Module
 import dagger.Provides
 import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.business.dependences.Repository
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.ICalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.IListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -64,4 +68,12 @@ abstract class SessionModule {
     @SessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
+
+    @SessionScope
+    @Binds
+    abstract fun bindCalcRoundupInteractor(impl: CalcRoundUpInteractor): ICalcRoundUpInteractor
+
+    @SessionScope
+    @Binds
+    abstract fun bindListAccountsInteractor(impl: ListAccountsInteractor): IListAccountsInteractor
 }
