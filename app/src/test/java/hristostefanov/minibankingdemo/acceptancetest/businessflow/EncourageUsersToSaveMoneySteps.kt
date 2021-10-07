@@ -21,9 +21,9 @@ class EncourageUsersToSaveMoneySteps {
     }
 
     @Given("the calculated round-up for my account is {double}")
-    fun the_calculated_round_up_for_my_account_is(double1: Double?) {
+    fun the_calculated_round_up_for_my_account_is(amount: Double) {
         automation.login()
-        automation.theCalculatedRoundUpIsOne()
+        automation.theCalculatedRoundUpIs(amount.toBigDecimal())
     }
 
     @When("I view this account")

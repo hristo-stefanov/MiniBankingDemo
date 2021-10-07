@@ -5,7 +5,7 @@ import java.math.BigDecimal
 
 interface PresentationTestAutomation {
     fun login()
-    fun theCalculatedRoundUpIsOne()
+    fun theCalculatedRoundUpIs(amount: BigDecimal)
     fun openAccountScreen(): AccountsViewModel
 }
 
