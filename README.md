@@ -33,9 +33,9 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
-##  Testing
+##  Test suite
 The project includes various types of tests:
-* BDD-style scenarios (EncourageUsersToSaveMoney.feature and RoundUp.feature)
+* BDD-style acceptance tests (EncourageUsersToSaveMoney.feature and RoundUp.feature)
 * Unit tests for business logic (CalcRoundUpInteractorTest)
 * Unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
