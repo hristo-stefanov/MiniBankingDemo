@@ -3,7 +3,7 @@ package hristostefanov.minibankingdemo.acceptancetest.technical
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.*
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -24,7 +24,7 @@ class BusinessRulesTestAutomationImpl
     private lateinit var repository: Repository
 
     private val calcRoundUpInteractor by lazy {
-        CalcRoundUpInteractor(repository, zoneId)
+        CalcRoundUpInteractorImpl(repository, zoneId)
     }
 
     override fun calculateRoundUp(accountNumber: String): BigDecimal {

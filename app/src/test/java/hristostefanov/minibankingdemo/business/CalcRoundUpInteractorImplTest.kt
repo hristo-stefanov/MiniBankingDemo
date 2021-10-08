@@ -7,7 +7,7 @@ import hristostefanov.minibankingdemo.business.entities.Source.INTERNAL
 import hristostefanov.minibankingdemo.business.entities.Status.SETTLED
 import hristostefanov.minibankingdemo.business.entities.Status.UNSETTLED
 import hristostefanov.minibankingdemo.business.entities.Transaction
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,13 +22,13 @@ import java.time.Month
 import java.time.ZoneId
 
 @ExperimentalCoroutinesApi
-class CalcRoundUpInteractorTest {
+class CalcRoundUpInteractorImplTest {
 
     private val repository = mock(Repository::class.java)
 
     @Suppress("UNCHECKED_CAST")
     private val interactor by lazy {
-        CalcRoundUpInteractor(repository, someZone)
+        CalcRoundUpInteractorImpl(repository, someZone)
     }
 
     private val someDate = LocalDate.of(2020, Month.MARCH, 18)

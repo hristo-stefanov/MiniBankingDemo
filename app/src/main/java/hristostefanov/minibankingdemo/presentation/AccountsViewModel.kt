@@ -6,8 +6,8 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.business.interactors.ICalcRoundUpInteractor
-import hristostefanov.minibankingdemo.business.interactors.IListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
@@ -37,10 +37,10 @@ class AccountsViewModel constructor(
         state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
 
     @Inject
-    internal lateinit var calcRoundUpInteractor: ICalcRoundUpInteractor
+    internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
 
     @Inject
-    internal lateinit var listAccountsInteractor: IListAccountsInteractor
+    internal lateinit var listAccountsInteractor: ListAccountsInteractor
 
     @Inject
     internal lateinit var locale: Locale

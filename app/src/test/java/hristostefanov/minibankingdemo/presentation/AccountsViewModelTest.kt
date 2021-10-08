@@ -6,9 +6,9 @@ import hristostefanov.minibankingdemo.CoroutinesTestRule
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractorImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
@@ -31,8 +31,8 @@ import java.util.*
 
 @ExperimentalCoroutinesApi
 class AccountsViewModelTest {
-    private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
-    private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
+    private val calcRoundUpInteractor = mock(CalcRoundUpInteractorImpl::class.java)
+    private val listAccountsInteractor = mock(ListAccountsInteractorImpl::class.java)
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)

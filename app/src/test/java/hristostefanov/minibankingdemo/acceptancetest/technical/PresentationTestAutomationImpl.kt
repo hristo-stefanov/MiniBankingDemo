@@ -3,8 +3,7 @@ package hristostefanov.minibankingdemo.acceptancetest.technical
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.ICalcRoundUpInteractor
-import hristostefanov.minibankingdemo.business.interactors.IListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
@@ -28,15 +27,15 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val tokenStore: TokenStore
 ) : PresentationTestAutomation {
 
-    private lateinit var listAccountsInteractor: IListAccountsInteractor
-    private lateinit var calcRoundUpInteractor: ICalcRoundUpInteractor
+    private lateinit var listAccountsInteractor: ListAccountsInteractor
+    private lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
 
     override fun login() {
         tokenStore.token = "token"
     }
 
     override fun calculatedRoundUpIs(amount: BigDecimal) {
-        listAccountsInteractor = object : IListAccountsInteractor {
+        listAccountsInteractor = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 return listOf(Account(
                     "1",
@@ -48,7 +47,7 @@ class PresentationTestAutomationImpl @Inject constructor(
             }
         }
 
-        calcRoundUpInteractor = object : ICalcRoundUpInteractor {
+        calcRoundUpInteractor = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 return amount
             }
