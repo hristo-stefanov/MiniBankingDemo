@@ -35,7 +35,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         tokenStore.token = "token"
     }
 
-    override fun theCalculatedRoundUpIs(amount: BigDecimal) {
+    override fun calculatedRoundUpIs(amount: BigDecimal) {
         listAccountsInteractor = object : IListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 return listOf(Account(
