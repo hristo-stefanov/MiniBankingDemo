@@ -33,10 +33,11 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
-##  Testing
-The project includes 3 types of unit tests:
-* unit tests for business logic (CalcRoundUpInteractorTest)
-* unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
+##  Test suite
+The project includes various types of tests:
+* BDD-style acceptance tests (EncourageUsersToSaveMoney.feature and RoundUp.feature)
+* Unit tests for business logic (CalcRoundUpInteractorTest)
+* Unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
 
 ## Architecture
@@ -44,9 +45,8 @@ The author aims to follow the ideas in the "*Clean architecture*" book by
 Robert C. Martin.
 
 Architectural decisions for patterns and techniques:
-* MVVM
+* MVVM with data-binding
 * Single activity app
-* Data-binding (automatic)
-* Coroutines with structured concurrency
+* Coroutines and Flow
 * Dependency injection (Dagger 2)
 * EventBus for local broadcasting

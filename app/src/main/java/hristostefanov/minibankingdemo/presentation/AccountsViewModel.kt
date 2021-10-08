@@ -5,8 +5,8 @@ import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
