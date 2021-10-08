@@ -1,41 +1,70 @@
 package hristostefanov.minibankingdemo.acceptancetest.technical
 
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
+import hristostefanov.minibankingdemo.business.dependences.Repository
+import hristostefanov.minibankingdemo.business.entities.*
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.data.models.*
 import kotlinx.coroutines.runBlocking
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 import javax.inject.Inject
 
 class BusinessRulesTestAutomationImpl @Inject constructor(
-    private val serviceStub: ServiceStub,
-    private val calcRoundUpInteractor: CalcRoundUpInteractor,
+    private val zoneId: ZoneId,
 ): BusinessRulesTestAutomation {
+
+    private lateinit var repository: Repository
+
+    private val calcRoundUpInteractor by lazy {
+        CalcRoundUpInteractor(repository, zoneId)
+    }
+
     override fun calculateRoundUp(accountNumber: String): BigDecimal {
-        return runBlocking { calcRoundUpInteractor.execute(accountNumber, LocalDate.now()) }
+        // TODO pass test dispatcher or make this function suspend
+        return runBlocking {
+            calcRoundUpInteractor.execute(accountNumber, LocalDate.now())
+        }
     }
 
     override fun createAccount(number: String, currency: String, transactions: List<BigDecimal>) {
-        val feedItems = mutableListOf<FeedItem>()
-        transactions.forEach { amount ->
-            val feedItem = FeedItem(
-                direction = if (amount.signum() >= 0) "IN" else "OUT",
-                amount = CurrencyAndAmount(currency, amount.abs().unscaledValue().toLong()),
-                status = "SETTLED"
-            )
-            feedItems.add(feedItem)
+        repository = object : Repository {
+            override suspend fun findAllAccounts(): List<Account> {
+                return listOf(Account(number, number, "", Currency.getInstance(currency), "0.00".toBigDecimal()))
+            }
+
+            override suspend fun findTransactions(
+                accountId: String,
+                since: ZonedDateTime
+            ): List<Transaction> {
+                return transactions.map { amount ->
+                    Transaction(amount, Status.SETTLED, Source.EXTERNAL)
+                }
+            }
+
+            override suspend fun findSavingGoals(accountId: String): List<SavingsGoal> {
+                throw AssertionError()
+            }
+
+            override suspend fun createSavingsGoal(
+                name: String,
+                accountId: String,
+                currency: Currency
+            ) {
+                throw AssertionError()
+            }
+
+            override suspend fun addMoneyIntoSavingsGoal(
+                accountId: String,
+                savingsGoalId: String,
+                currency: Currency,
+                amount: BigDecimal,
+                transferId: UUID
+            ) {
+                throw AssertionError()
+            }
         }
-        serviceStub.accounts = serviceStub.accounts + listOf(
-            AccountV2(
-                accountUid = number, defaultCategory = "", currency = currency
-            )
-        )
-        serviceStub.feedItemsToAccountId = mapOf(number to feedItems)
-        serviceStub.accountIdentifierByAccountId += number to AccountIdentifiers(number)
-        serviceStub.balancePerAccountMap += number to BalanceV2(effectiveBalance = CurrencyAndAmount(
-            currency = currency,
-            minorUnits = 0
-        ))
     }
 }

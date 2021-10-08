@@ -34,9 +34,6 @@ abstract class TestApplicationModule {
         fun provideZoneId(): ZoneId = ZoneId.systemDefault()
 
         @Provides
-        fun provideGson() = Gson()
-
-        @Provides
         fun provideStringSupplier(): StringSupplier = object : StringSupplier {
             override fun get(resId: Int): String = ""
         }

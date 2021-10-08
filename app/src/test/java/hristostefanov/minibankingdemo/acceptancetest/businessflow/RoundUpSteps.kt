@@ -1,7 +1,5 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.acceptancetest.technical.BusinessRulesTestAutomationImpl
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -20,9 +18,6 @@ class RoundUpSteps {
 
     @Inject
     lateinit var automation: BusinessRulesTestAutomation
-
-    @Inject
-    lateinit var interactor: CalcRoundUpInteractor
 
     init {
         TestApp.component.getSessionRegistry().sessionComponent.inject(this)
