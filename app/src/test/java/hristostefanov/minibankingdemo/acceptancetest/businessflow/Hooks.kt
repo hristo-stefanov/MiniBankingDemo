@@ -8,10 +8,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class Hooks {
-    @ExperimentalCoroutinesApi
-    private val testDispatcher = TestCoroutineDispatcher()
+    @Inject
+    internal lateinit var testDispatcher: TestCoroutineDispatcher
+
+    init {
+        TestApp.component.inject(this)
+    }
 
     @Before
     fun beforeEachScenario() {
@@ -24,5 +30,4 @@ class Hooks {
         Dispatchers.resetMain()
         testDispatcher.cleanupTestCoroutines()
     }
-
 }

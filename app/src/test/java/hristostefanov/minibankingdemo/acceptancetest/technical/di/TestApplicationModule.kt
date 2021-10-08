@@ -11,6 +11,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
@@ -37,6 +38,9 @@ abstract class TestApplicationModule {
         fun provideStringSupplier(): StringSupplier = object : StringSupplier {
             override fun get(resId: Int): String = ""
         }
+
+        @Provides
+        fun provideTestDispatcher() = TestCoroutineDispatcher()
     }
 
     @ApplicationScope

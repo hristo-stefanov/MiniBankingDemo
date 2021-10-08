@@ -4,7 +4,9 @@ import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesT
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.*
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -12,8 +14,11 @@ import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
 
-class BusinessRulesTestAutomationImpl @Inject constructor(
+@OptIn(ExperimentalCoroutinesApi::class)
+class BusinessRulesTestAutomationImpl
+@Inject constructor(
     private val zoneId: ZoneId,
+    private val testDispatcher: TestCoroutineDispatcher
 ): BusinessRulesTestAutomation {
 
     private lateinit var repository: Repository
@@ -23,8 +28,7 @@ class BusinessRulesTestAutomationImpl @Inject constructor(
     }
 
     override fun calculateRoundUp(accountNumber: String): BigDecimal {
-        // TODO pass test dispatcher or make this function suspend
-        return runBlocking {
+        return runBlocking(testDispatcher) {
             calcRoundUpInteractor.execute(accountNumber, LocalDate.now())
         }
     }
