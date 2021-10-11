@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -13,6 +14,7 @@ import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
 
+@DisableInstallInCheck
 @Module(subcomponents = [SessionComponent::class])
 abstract class ApplicationModule {
 
