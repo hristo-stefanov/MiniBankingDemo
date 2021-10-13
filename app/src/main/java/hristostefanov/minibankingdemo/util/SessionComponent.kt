@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.util
 
 import dagger.Subcomponent
+import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.presentation.*
 
 @SessionScope
@@ -11,10 +12,9 @@ interface SessionComponent {
         fun create(): SessionComponent
     }
 
-    fun inject(target: AccessTokenViewModel)
-    fun inject(target: AccountsViewModel)
-    fun inject(target: TransferConfirmationViewModel)
-    fun inject(target: SavingsGoalsViewModel)
-
-    fun getCreateSavingsGoalViewModel(): CreateSavingsGoalViewModel
+    val calcRoundUpInteractor: CalcRoundUpInteractor
+    val listAccountsInteractor: ListAccountsInteractor
+    val listSavingGoalInteractor: ListSavingGoalsInteractor
+    val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
+    val createSavingGoalsInteractor: CreateSavingsGoalInteractor
 }

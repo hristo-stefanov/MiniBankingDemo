@@ -3,9 +3,9 @@ package hristostefanov.minibankingdemo.acceptancetest.technical.di
 import dagger.Component
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.Hooks
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestSessionRegistry
-import hristostefanov.minibankingdemo.util.ApplicationScope
+import javax.inject.Singleton
 
-@ApplicationScope
+@Singleton
 @Component(modules = [TestApplicationModule::class])
 interface TestApplicationComponent {
     fun getSessionRegistry(): TestSessionRegistry

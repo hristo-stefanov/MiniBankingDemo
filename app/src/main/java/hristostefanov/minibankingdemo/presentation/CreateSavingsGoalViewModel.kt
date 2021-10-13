@@ -1,26 +1,27 @@
 package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
-open class CreateSavingsGoalViewModel
-@Inject
-constructor(
-    private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    @NavigationChannel private val navigationChannel: Channel<Navigation>
+@HiltViewModel
+open class CreateSavingsGoalViewModel @Inject constructor(
+    private val savedState: SavedStateHandle,
+    private val sessionRegistry: SessionRegistry,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
-    private lateinit var args: CreateSavingsGoalFragmentArgs
-    private lateinit var savedState: SavedStateHandle
-    private var isInitialized = false
+    private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
+    // TODO look for other options to inject the viewmodel from SessionComponent directly, see https://dagger.dev/hilt/view-model.html
+    private val createSavingsGoalInteractor = sessionRegistry.sessionComponent.createSavingGoalsInteractor
 
     companion object {
         internal const val NAME_KEY = "name"
@@ -36,13 +37,6 @@ constructor(
     // exposing MutableLiveData to allow two-way data binding
     val name: MutableLiveData<String> by lazy {
         savedState.getLiveData(NAME_KEY)
-    }
-
-    fun init(args: CreateSavingsGoalFragmentArgs, savedState: SavedStateHandle) {
-        if (isInitialized) throw IllegalStateException()
-        this.args = args
-        this.savedState = savedState
-        isInitialized = true
     }
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {

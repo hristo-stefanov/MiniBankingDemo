@@ -5,7 +5,8 @@ import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.migration.DisableInstallInCheck
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -13,17 +14,18 @@ import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
+import javax.inject.Singleton
 
-@DisableInstallInCheck
+@InstallIn(SingletonComponent::class)
 @Module(subcomponents = [SessionComponent::class])
 abstract class ApplicationModule {
 
     companion object {
-        @ApplicationScope
+        @Singleton
         @Provides
         fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
-        @ApplicationScope
+        @Singleton
         @Provides @NavigationChannel
         fun provideNavigationChannel(): Channel<Navigation> = Channel()
 
@@ -43,7 +45,7 @@ abstract class ApplicationModule {
         }
 
         @Provides
-        @ApplicationScope
+        @Singleton
         fun provideTokenStore(application: Application): TokenStore {
             return TokenStoreImpl(application)
         }

@@ -89,7 +89,8 @@ dependencies {
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-compiler:2.38.1"
 
-    def nav_version = "2.3.5"
+    // 2.4.0-alpha10 allows creating safe args from SaveStateHandle
+    def nav_version = "2.4.0-alpha10"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 

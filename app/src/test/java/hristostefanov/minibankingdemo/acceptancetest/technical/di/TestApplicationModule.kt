@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
-import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -10,23 +9,26 @@ import hristostefanov.minibankingdemo.acceptancetest.technical.TokenStoreStub
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.util.*
+import hristostefanov.minibankingdemo.util.EventBusIndex
+import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
+import javax.inject.Singleton
 
 @DisableInstallInCheck
 @Module(subcomponents = [TestSessionComponent::class])
 abstract class TestApplicationModule {
 
     companion object {
-        @ApplicationScope
+        @Singleton
         @Provides
         fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
-        @ApplicationScope
+        @Singleton
         @Provides @NavigationChannel
         fun provideNavigationChannel(): Channel<Navigation> = Channel()
 
@@ -45,7 +47,7 @@ abstract class TestApplicationModule {
         fun provideTestDispatcher() = TestCoroutineDispatcher()
     }
 
-    @ApplicationScope
+    @Singleton
     @Binds
     abstract fun bindTokenStore(tokenStore: TokenStoreStub): TokenStore
 

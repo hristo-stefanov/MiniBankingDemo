@@ -8,11 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
 import hristostefanov.minibankingdemo.App
 
-fun Fragment.sessionComponent() = (requireContext().applicationContext as App)
-    .applicationComponent
-    .sessionRegistry
-    .sessionComponent
-
+// TODO consider UI testing
 fun Fragment.viewModelFactory(block: (handle: SavedStateHandle) -> ViewModel): ViewModelProvider.Factory {
     return UIUnitTestRegistry.viewModelFactory ?: ViewModelFactory(this, block)
 }

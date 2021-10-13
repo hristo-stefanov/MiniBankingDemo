@@ -10,7 +10,7 @@ import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import hristostefanov.minibankingdemo.App
+import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -30,8 +31,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        (application as App).applicationComponent.inject(this)
 
         // needed to hide the Up button on the ActionBar for top-level destinations
         val topLevelDestinationIds = setOf(R.id.accessTokenDestination, R.id.accountsDestination)
