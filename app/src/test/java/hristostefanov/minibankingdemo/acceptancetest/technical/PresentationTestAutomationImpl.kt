@@ -3,16 +3,18 @@ package hristostefanov.minibankingdemo.acceptancetest.technical
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
+import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.util.ISessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.SessionComponent
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
+import java.lang.AssertionError
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -24,11 +26,32 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val tokenStore: TokenStore
+    private val tokenStore: TokenStore,
 ) : PresentationTestAutomation {
 
     private lateinit var listAccountsInteractor: ListAccountsInteractor
     private lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
+
+    private val sessionComponent = object : SessionComponent {
+        override val calcRoundUpInteractor: CalcRoundUpInteractor
+            get() = this@PresentationTestAutomationImpl.calcRoundUpInteractor
+        override val listAccountsInteractor: ListAccountsInteractor
+            get() = this@PresentationTestAutomationImpl.listAccountsInteractor
+        override val listSavingGoalInteractor: ListSavingGoalsInteractor
+            get() = throw AssertionError()
+        override val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
+            get() = throw AssertionError()
+        override val createSavingGoalsInteractor: CreateSavingsGoalInteractor
+            get() = throw AssertionError()
+    }
+
+    private val sessionRegistry = object: ISessionRegistry {
+        override var sessionComponent: SessionComponent = this@PresentationTestAutomationImpl.sessionComponent
+
+        override fun newSession() {
+            throw AssertionError()
+        }
+    }
 
     override fun login() {
         tokenStore.token = "token"
@@ -56,17 +79,15 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     override fun openAccountScreen(): AccountsViewModel {
         val state = SavedStateHandle()
-        return AccountsViewModel(state).also {
-            // manual field and method injection
-            it.calcRoundUpInteractor = calcRoundUpInteractor
-            it.listAccountsInteractor = listAccountsInteractor
-            it.locale = Locale.UK
-            it.stringSupplier = stringSupplier
-            it.amountFormatter = amountFormatter
-            it.eventBus = eventBus
-            it.navigationChannel = navigationChannel
-            it.tokenStore = tokenStore
-            it.init()
-        }
+        return AccountsViewModel(
+            state,
+            Locale.UK,
+            stringSupplier,
+            amountFormatter,
+            eventBus,
+            navigationChannel,
+            tokenStore,
+            sessionRegistry
+        )
     }
 }

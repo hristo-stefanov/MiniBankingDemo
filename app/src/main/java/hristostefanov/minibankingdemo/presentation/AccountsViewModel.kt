@@ -10,8 +10,8 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
+import hristostefanov.minibankingdemo.util.ISessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -38,7 +38,7 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
-    private val sessionRegistry: SessionRegistry,
+    private val sessionRegistry: ISessionRegistry,
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =

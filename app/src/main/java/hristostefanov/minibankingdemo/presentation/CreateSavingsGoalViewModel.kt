@@ -5,8 +5,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
+import hristostefanov.minibankingdemo.util.ISessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.SessionRegistry
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
-    private val sessionRegistry: SessionRegistry,
+    private val sessionRegistry: ISessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {

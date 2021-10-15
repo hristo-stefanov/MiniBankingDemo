@@ -8,8 +8,8 @@ import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
+import hristostefanov.minibankingdemo.util.ISessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.SessionRegistry
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    sessionRegistry: SessionRegistry,
+    sessionRegistry: ISessionRegistry,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>

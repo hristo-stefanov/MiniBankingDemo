@@ -1,17 +1,17 @@
 package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
+import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
-import hristostefanov.minibankingdemo.acceptancetest.technical.TestAmountFormatter
-import hristostefanov.minibankingdemo.acceptancetest.technical.TokenStoreStub
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.*
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.util.EventBusIndex
-import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.StringSupplier
+import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.greenrobot.eventbus.EventBus
@@ -45,6 +45,9 @@ abstract class TestApplicationModule {
 
         @Provides
         fun provideTestDispatcher() = TestCoroutineDispatcher()
+
+        @Provides
+        fun provideGson() = Gson()
     }
 
     @Singleton
@@ -53,4 +56,16 @@ abstract class TestApplicationModule {
 
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: TestAmountFormatter): AmountFormatter
+
+    @Binds
+    abstract fun bind(impl: TestSessionRegistry): ISessionRegistry
+
+    @Singleton
+    @Binds
+    abstract fun bindBusinessRulesTestAutomation(impl: BusinessRulesTestAutomationImpl): BusinessRulesTestAutomation
+
+    @Singleton
+    @Binds
+    abstract fun bindPresentationTestAutomation(impl: PresentationTestAutomationImpl): PresentationTestAutomation
+
 }
