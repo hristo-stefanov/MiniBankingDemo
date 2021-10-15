@@ -4,13 +4,13 @@ import dagger.Component
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.EncourageUsersToSaveMoneySteps
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.Hooks
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.RoundUpSteps
-import hristostefanov.minibankingdemo.acceptancetest.technical.TestSessionRegistry
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [TestApplicationModule::class])
 interface TestApplicationComponent {
-    fun getSessionRegistry(): TestSessionRegistry
+    fun getSessionRegistry(): SessionRegistry
 
     fun inject(hooks: Hooks)
     fun inject(target: RoundUpSteps)
