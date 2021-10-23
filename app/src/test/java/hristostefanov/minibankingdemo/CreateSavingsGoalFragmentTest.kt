@@ -1,10 +1,7 @@
 package hristostefanov.minibankingdemo
 
 import android.os.Build
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.os.Bundle
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
@@ -12,91 +9,120 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isEnabled
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import dagger.hilt.android.testing.BindValue
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
-import hristostefanov.minibankingdemo.ui.UIUnitTestRegistry
+import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnit
 import org.robolectric.annotation.Config
+import java.util.*
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.O], application = HiltTestApplication::class)
 class CreateSavingsGoalFragmentTest {
 
-    private val viewModel = mock(CreateSavingsGoalViewModel::class.java)
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
 
-    private val navController = TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
-        setGraph(R.navigation.nav_graph)
-        setCurrentDestination(R.id.createSavingsGoalDestination)
-    }
+    @get:Rule(order = 1)
+    var mockitoRule = MockitoJUnit.rule()
+
+    @BindValue // Hilt-testing: use this instance instead of creating an instance of the class
+    @Mock
+    internal lateinit var interactor: CreateSavingsGoalInteractor
+
+    val argBundle = CreateSavingsGoalFragmentArgs("1", Currency.getInstance("GBP")).toBundle()
+
+    private val navController =
+        TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
+            setGraph(R.navigation.nav_graph)
+            setCurrentDestination(R.id.createSavingsGoalDestination)
+        }
 
     @Before
     fun beforeEach() {
-        // make the fragment use the mock view model
-        UIUnitTestRegistry.viewModelFactory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return viewModel as T
-            }
-        }
+        // used for field injection
+        hiltRule.inject()
+    }
+
+    // TODO use runBlockingTest
+    @Test
+    fun `Should push fragment arguments and Name text`() = runBlocking {
+        given(interactor.validateName("a")).willReturn(true)
+        launchFragment(argBundle)
+        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
+
+        onView(withId(R.id.createSavingsGoalButton)).perform(click())
+
+        then(interactor).should().execute("a", "1", Currency.getInstance("GBP"))
+    }
+
+    // TODO use runBlockingTest
+    @Test
+    fun `Should execute CreateSavingsGoalInteractor if enabled Create button is clicked`() = runBlocking {
+        givenCreateButtonIsEnabled()
+
+        onView(withId(R.id.createSavingsGoalButton)).perform(click())
+
+        then(interactor).should().execute(any(), any(), any())
     }
 
     @Test
-    fun buttonEnabled() {
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
+    fun `Should pull Name text if saved`() {
+        argBundle.putString(CreateSavingsGoalViewModel.NAME_KEY, "saved")
 
-        launchFragment()
+        launchFragment(argBundle)
 
-        then(viewModel).should().createCommandEnabled
+        onView(withId(R.id.nameEditText)).check(matches(withText("saved")))
+    }
+
+    @Test
+    fun `Should pull Create button enabled state`() {
+        given(interactor.validateName(any())).willReturn(true)
+
+        launchFragment(argBundle)
+
+        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
         onView(withId(R.id.createSavingsGoalButton)).check(matches(isEnabled()))
     }
 
     @Test
-    fun buttonDisabled() {
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(false))
+    fun `Should pull Create button disabled sate`() {
+        given(interactor.validateName(any())).willReturn(false)
 
-        launchFragment()
+        launchFragment(argBundle)
 
-        then(viewModel).should().createCommandEnabled
+        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
         onView(withId(R.id.createSavingsGoalButton)).check(matches(not(isEnabled())))
     }
 
-    @Test
-    fun nameTextPassed() {
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(false))
-        given(viewModel.name).willReturn(spy(MutableLiveData("")))
-        launchFragment()
-
-        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
-
-        then(viewModel.name).should().value = "a"
+    private fun givenCreateButtonIsEnabled() {
+        given(interactor.validateName(any())).willReturn(true)
+        launchFragment(argBundle)
+        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("any"))
     }
 
-    @Test
-    fun buttonClicked() {
-        given(viewModel.createCommandEnabled).willReturn(MutableLiveData(true))
-        launchFragment()
-
-        onView(withId(R.id.createSavingsGoalButton)).perform(click())
-
-        then(viewModel).should().onCreateCommand()
-    }
-
-    private fun launchFragment() {
+    private fun launchFragment(bundle: Bundle) {
         // launch the fragment in isolation - in empty activity
-        val fragmentScenario = launchFragmentInContainer<CreateSavingsGoalFragment>()
-        fragmentScenario.onFragment { fragment ->
+        launchFragmentInHiltContainer<CreateSavingsGoalFragment>(bundle) {
             Navigation.setViewNavController(
-                fragment.requireView(),
+                requireView(),
                 navController
             )
         }

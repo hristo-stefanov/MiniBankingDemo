@@ -24,8 +24,9 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     private val createSavingsGoalInteractor = sessionRegistry.sessionComponent.createSavingGoalsInteractor
 
     companion object {
-        internal const val NAME_KEY = "name"
+        const val NAME_KEY = "name"
 
+        // TODO really?
         private var SavedStateHandle.name: String
             get() = this[NAME_KEY] ?: ""
             set(value) {
