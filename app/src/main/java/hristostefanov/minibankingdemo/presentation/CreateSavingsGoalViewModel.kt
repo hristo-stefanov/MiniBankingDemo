@@ -25,20 +25,10 @@ open class CreateSavingsGoalViewModel @Inject constructor(
 
     companion object {
         const val NAME_KEY = "name"
-
-        // TODO really?
-        private var SavedStateHandle.name: String
-            get() = this[NAME_KEY] ?: ""
-            set(value) {
-                this[NAME_KEY] = value
-            }
     }
 
-    // lazy to avoid initializing before savedState is provided by the init() method
     // exposing MutableLiveData to allow two-way data binding
-    val name: MutableLiveData<String> by lazy {
-        savedState.getLiveData(NAME_KEY)
-    }
+    val name: MutableLiveData<String> = savedState.getLiveData(NAME_KEY)
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {
         Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
@@ -48,7 +38,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
 
 
     open fun onCreateCommand() {
-        savedState.name.also { name ->
+        savedState.get<String>(NAME_KEY)?.also { name ->
             if (createSavingsGoalInteractor.validateName(name)) {
                 viewModelScope.launch {
                     try {
