@@ -39,10 +39,10 @@ import java.util.*
 @Config(sdk = [Build.VERSION_CODES.O], application = HiltTestApplication::class)
 class CreateSavingsGoalFragmentTest {
     @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
+    internal val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    var mockitoRule = MockitoJUnit.rule()
+    internal val mockitoRule = MockitoJUnit.rule()
 
     @get:Rule(order = 2)
     internal val coroutinesTestRule = CoroutinesTestRule()
@@ -51,7 +51,7 @@ class CreateSavingsGoalFragmentTest {
     @Mock
     internal lateinit var interactor: CreateSavingsGoalInteractor
 
-    val argBundle = CreateSavingsGoalFragmentArgs("1", Currency.getInstance("GBP")).toBundle()
+    private val argBundle = CreateSavingsGoalFragmentArgs("1", Currency.getInstance("GBP")).toBundle()
 
     private val navController =
         TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
