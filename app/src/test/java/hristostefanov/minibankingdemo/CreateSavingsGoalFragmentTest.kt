@@ -19,7 +19,8 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -32,16 +33,19 @@ import org.mockito.junit.MockitoJUnit
 import org.robolectric.annotation.Config
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.O], application = HiltTestApplication::class)
 class CreateSavingsGoalFragmentTest {
-
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
     var mockitoRule = MockitoJUnit.rule()
+
+    @get:Rule(order = 2)
+    internal val coroutinesTestRule = CoroutinesTestRule()
 
     @BindValue // Hilt-testing: use this instance instead of creating an instance of the class
     @Mock
@@ -61,27 +65,27 @@ class CreateSavingsGoalFragmentTest {
         hiltRule.inject()
     }
 
-    // TODO use runBlockingTest
     @Test
-    fun `Should push fragment arguments and Name text`() = runBlocking {
-        given(interactor.validateName("a")).willReturn(true)
-        launchFragment(argBundle)
-        onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
+    fun `Should push fragment arguments and Name text`() =
+        coroutinesTestRule.testDispatcher.runBlockingTest {
+            given(interactor.validateName("a")).willReturn(true)
+            launchFragment(argBundle)
+            onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
 
-        onView(withId(R.id.createSavingsGoalButton)).perform(click())
+            onView(withId(R.id.createSavingsGoalButton)).perform(click())
 
-        then(interactor).should().execute("a", "1", Currency.getInstance("GBP"))
-    }
+            then(interactor).should().execute("a", "1", Currency.getInstance("GBP"))
+        }
 
-    // TODO use runBlockingTest
     @Test
-    fun `Should execute CreateSavingsGoalInteractor if enabled Create button is clicked`() = runBlocking {
-        givenCreateButtonIsEnabled()
+    fun `Should execute CreateSavingsGoalInteractor if enabled Create button is clicked`() =
+        coroutinesTestRule.testDispatcher.runBlockingTest {
+            givenCreateButtonIsEnabled()
 
-        onView(withId(R.id.createSavingsGoalButton)).perform(click())
+            onView(withId(R.id.createSavingsGoalButton)).perform(click())
 
-        then(interactor).should().execute(any(), any(), any())
-    }
+            then(interactor).should().execute(any(), any(), any())
+        }
 
     @Test
     fun `Should pull Name text if saved`() {
