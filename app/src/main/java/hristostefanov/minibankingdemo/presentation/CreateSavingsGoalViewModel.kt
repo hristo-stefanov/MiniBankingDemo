@@ -20,7 +20,8 @@ open class CreateSavingsGoalViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
-    // TODO look for other options to inject the viewmodel from SessionComponent directly, see https://dagger.dev/hilt/view-model.html
+    // Another approach could be using @EntryPoint, see
+    // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
     private val createSavingsGoalInteractor = sessionRegistry.sessionComponent.createSavingGoalsInteractor
 
     companion object {
