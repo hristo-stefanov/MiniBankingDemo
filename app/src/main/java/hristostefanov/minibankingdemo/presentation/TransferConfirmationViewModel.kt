@@ -1,15 +1,13 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -20,17 +18,18 @@ import javax.inject.Inject
 
 private const val NAVIGATION_DELAY_MS = 2000L
 
-class TransferConfirmationViewModel constructor(
-    private val args: TransferConfirmationFragmentArgs
+@HiltViewModel
+class TransferConfirmationViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    sessionRegistry: SessionRegistry,
+    private val stringSupplier: StringSupplier,
+    private val amountFormatter: AmountFormatter,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
-    @Inject
-    internal lateinit var interactor: AddMoneyIntoGoalInteractor
-    @Inject
-    internal lateinit var stringSupplier: StringSupplier
-    @Inject
-    internal lateinit var amountFormatter: AmountFormatter
-    @Inject @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
+
+    private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
+    private val interactor = sessionRegistry.sessionComponent.addMoneyIntoGoalInteractor
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel
@@ -38,14 +37,13 @@ class TransferConfirmationViewModel constructor(
     private val _info = MutableLiveData("")
     val info: LiveData<String> = _info
 
-    @Inject
-    internal fun init() {
+    init {
         val amountFormatted = amountFormatter.format(
             args.roundUpAmount,
             args.accountCurrency.currencyCode
         )
         _info.value = stringSupplier.get(R.string.transferInfo)
-             .format(amountFormatted, args.savingsGoal.name)
+            .format(amountFormatted, args.savingsGoal.name)
     }
 
     fun onConfirmCommand() {

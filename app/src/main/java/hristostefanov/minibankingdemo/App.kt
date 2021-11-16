@@ -1,10 +1,7 @@
 package hristostefanov.minibankingdemo
 
 import android.app.Application
-import hristostefanov.minibankingdemo.util.ApplicationComponent
-import hristostefanov.minibankingdemo.util.DaggerApplicationComponent
+import dagger.hilt.android.HiltAndroidApp
 
-class App : Application() {
-    val applicationComponent: ApplicationComponent =
-        DaggerApplicationComponent.factory().create(this)
-}
+@HiltAndroidApp
+class App : Application()

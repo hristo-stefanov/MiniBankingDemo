@@ -5,18 +5,16 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.databinding.AccountsFragmentBinding
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 
+@AndroidEntryPoint
 class AccountsFragment : Fragment() {
     private lateinit var binding: AccountsFragmentBinding
 
-    private val viewModel: AccountsViewModel by viewModels {
-        viewModelFactory { savedStateHandle ->
-            AccountsViewModel(savedStateHandle).also { sessionComponent().inject(it) }
-        }
-    }
+    private val viewModel: AccountsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

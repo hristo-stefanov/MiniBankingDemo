@@ -4,8 +4,10 @@ import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import hristostefanov.minibankingdemo.acceptancetest.technical.TestAmountFormatter
-import hristostefanov.minibankingdemo.acceptancetest.technical.TokenStoreStub
+import dagger.hilt.migration.DisableInstallInCheck
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
+import hristostefanov.minibankingdemo.acceptancetest.technical.*
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -15,16 +17,18 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
+import javax.inject.Singleton
 
-@Module(subcomponents = [TestSessionComponent::class])
+@DisableInstallInCheck
+@Module(subcomponents = [SessionComponent::class])
 abstract class TestApplicationModule {
 
     companion object {
-        @ApplicationScope
+        @Singleton
         @Provides
         fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
-        @ApplicationScope
+        @Singleton
         @Provides @NavigationChannel
         fun provideNavigationChannel(): Channel<Navigation> = Channel()
 
@@ -41,12 +45,27 @@ abstract class TestApplicationModule {
 
         @Provides
         fun provideTestDispatcher() = TestCoroutineDispatcher()
+
+        @Provides
+        fun provideGson() = Gson()
     }
 
-    @ApplicationScope
+    @Singleton
     @Binds
     abstract fun bindTokenStore(tokenStore: TokenStoreStub): TokenStore
 
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: TestAmountFormatter): AmountFormatter
+
+    @Binds
+    abstract fun bind(impl: SessionRegistryImp): SessionRegistry
+
+    @Singleton
+    @Binds
+    abstract fun bindBusinessRulesTestAutomation(impl: BusinessRulesTestAutomationImpl): BusinessRulesTestAutomation
+
+    @Singleton
+    @Binds
+    abstract fun bindPresentationTestAutomation(impl: PresentationTestAutomationImpl): PresentationTestAutomation
+
 }

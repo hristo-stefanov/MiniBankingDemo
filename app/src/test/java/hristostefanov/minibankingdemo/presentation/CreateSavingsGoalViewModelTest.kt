@@ -6,12 +6,14 @@ import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel.Companion.NAME_KEY
-import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
+import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.SessionComponent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.*
 import java.util.*
@@ -28,6 +30,9 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     @Suppress("UNCHECKED_CAST")
     val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
 
+    private val sessionRegistry = mock(SessionRegistry::class.java)
+    private val sessionComponent = mock(SessionComponent::class.java)
+
     // test data
     private val gbp = Currency.getInstance("GBP")
     private val account1Id = "1"
@@ -37,13 +42,18 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     private val validGoalName = "Goal1"
     private val invalidGoalName = ""
 
-    private val savedState = SavedStateHandle()
-    private val validArgs = CreateSavingsGoalFragmentArgs(account1Id, gbp)
+    private val savedState = SavedStateHandle(
+        mapOf("accountId" to account1Id, "accountCurrency" to gbp)
+    )
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(createSavingsGoalsIterator, navigationChannel).apply {
-            init(validArgs, savedState)
-        }
+        CreateSavingsGoalViewModel(savedState, sessionRegistry, navigationChannel)
+    }
+
+    @Before
+    fun beforeEach() {
+        given(sessionRegistry.sessionComponent).willReturn(sessionComponent)
+        given(sessionComponent.createSavingGoalsInteractor).willReturn(createSavingsGoalsIterator)
     }
 
     @Test

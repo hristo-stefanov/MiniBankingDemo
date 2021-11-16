@@ -1,18 +1,17 @@
 package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -29,40 +28,24 @@ import javax.inject.Inject
 
 const val ACCOUNT_ID_KEY = "accountId"
 
-class AccountsViewModel constructor(
-    private val state: SavedStateHandle
+@HiltViewModel
+class AccountsViewModel @Inject constructor(
+    private val state: SavedStateHandle,
+    private val locale: Locale,
+    private val stringSupplier: StringSupplier,
+    private val amountFormatter: AmountFormatter,
+    private val eventBus: EventBus,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>,
+    private val tokenStore: TokenStore,
+    private val sessionRegistry: SessionRegistry,
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
         state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
 
-    @Inject
-    internal lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
-
-    @Inject
-    internal lateinit var listAccountsInteractor: ListAccountsInteractor
-
-    @Inject
-    internal lateinit var locale: Locale
-
-    @Inject
-    internal lateinit var stringSupplier: StringSupplier
-
-    @Inject
-    internal lateinit var amountFormatter: AmountFormatter
-
-    @Inject
-    internal lateinit var eventBus: EventBus
-
-    @Inject
-    @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
-
-    @Inject
-    internal lateinit var tokenStore: TokenStore
-
-    @Inject
-    internal lateinit var sessionRegistry: SessionRegistry
+    private val calcRoundUpInteractor = sessionRegistry.sessionComponent.calcRoundUpInteractor
+    private val listAccountsInteractor = sessionRegistry.sessionComponent.listAccountsInteractor
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
@@ -118,8 +101,7 @@ class AccountsViewModel constructor(
         state[ACCOUNT_ID_KEY] = accountId
     }
 
-    @Inject
-    fun init() {
+    init {
         load()
         eventBus.register(this)
 

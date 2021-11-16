@@ -1,49 +1,35 @@
 package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
-open class CreateSavingsGoalViewModel
-@Inject
-constructor(
-    private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    @NavigationChannel private val navigationChannel: Channel<Navigation>
+@HiltViewModel
+open class CreateSavingsGoalViewModel @Inject constructor(
+    private val savedState: SavedStateHandle,
+    private val sessionRegistry: SessionRegistry,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
-    private lateinit var args: CreateSavingsGoalFragmentArgs
-    private lateinit var savedState: SavedStateHandle
-    private var isInitialized = false
+    private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
+    // Another approach could be using @EntryPoint, see
+    // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
+    private val createSavingsGoalInteractor = sessionRegistry.sessionComponent.createSavingGoalsInteractor
 
     companion object {
-        internal const val NAME_KEY = "name"
-
-        private var SavedStateHandle.name: String
-            get() = this[NAME_KEY] ?: ""
-            set(value) {
-                this[NAME_KEY] = value
-            }
+        const val NAME_KEY = "name"
     }
 
-    // lazy to avoid initializing before savedState is provided by the init() method
     // exposing MutableLiveData to allow two-way data binding
-    val name: MutableLiveData<String> by lazy {
-        savedState.getLiveData(NAME_KEY)
-    }
-
-    fun init(args: CreateSavingsGoalFragmentArgs, savedState: SavedStateHandle) {
-        if (isInitialized) throw IllegalStateException()
-        this.args = args
-        this.savedState = savedState
-        isInitialized = true
-    }
+    val name: MutableLiveData<String> = savedState.getLiveData(NAME_KEY)
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {
         Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
@@ -53,7 +39,7 @@ constructor(
 
 
     open fun onCreateCommand() {
-        savedState.name.also { name ->
+        savedState.get<String>(NAME_KEY)?.also { name ->
             if (createSavingsGoalInteractor.validateName(name)) {
                 viewModelScope.launch {
                     try {

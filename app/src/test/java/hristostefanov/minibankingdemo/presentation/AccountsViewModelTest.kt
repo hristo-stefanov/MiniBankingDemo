@@ -12,6 +12,8 @@ import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteracto
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
+import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.SessionComponent
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -36,6 +38,8 @@ class AccountsViewModelTest {
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
+    private val sessionRegistry = mock(SessionRegistry::class.java)
+    private val sessionComponent = mock(SessionComponent::class.java)
 
     @get:Rule
     val coroutineTestRule = CoroutinesTestRule()
@@ -74,22 +78,24 @@ class AccountsViewModelTest {
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel by lazy {
-        AccountsViewModel(state).also {
-            // manual field and method injection
-            it.calcRoundUpInteractor = calcRoundUpInteractor
-            it.listAccountsInteractor = listAccountsInteractor
-            it.locale = Locale.UK
-            it.stringSupplier = stringSupplier
-            it.amountFormatter = amountFormatter
-            it.eventBus = eventBus
-            it.navigationChannel = navigationChannel
-            it.tokenStore = tokenStore
-            it.init()
-        }
+        AccountsViewModel(
+            state,
+            Locale.UK,
+            stringSupplier,
+            amountFormatter,
+            eventBus,
+            navigationChannel,
+            tokenStore,
+            sessionRegistry
+        )
     }
 
     @Before
     fun beforeEach() = coroutineTestRule.testDispatcher.runBlockingTest {
+        given(sessionRegistry.sessionComponent).willReturn(sessionComponent)
+        given(sessionComponent.calcRoundUpInteractor).willReturn(calcRoundUpInteractor)
+        given(sessionComponent.listAccountsInteractor).willReturn(listAccountsInteractor)
+
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("Round up amount since %s")
         given(stringSupplier.get(R.string.no_account)).willReturn("No account")
         given(amountFormatter.format(any(), any())).willReturn("")

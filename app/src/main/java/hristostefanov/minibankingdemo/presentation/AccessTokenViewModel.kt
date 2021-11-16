@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -8,15 +9,13 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
-class AccessTokenViewModel(private val state: SavedStateHandle) : ViewModel() {
-    @Inject
-    internal lateinit var tokenStore: TokenStore
-
-    @Inject @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
-
-    @Inject
-    internal lateinit var eventBus: EventBus
+@HiltViewModel
+class AccessTokenViewModel @Inject constructor(
+    private val tokenStore: TokenStore,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>,
+    private val eventBus: EventBus
+) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled

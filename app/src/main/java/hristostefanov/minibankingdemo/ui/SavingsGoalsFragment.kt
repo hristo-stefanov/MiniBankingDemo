@@ -7,21 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
+import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.databinding.SavingsGoalsFragmentBinding
 import hristostefanov.minibankingdemo.presentation.SavingsGoalsViewModel
 
+@AndroidEntryPoint
 class SavingsGoalsFragment : Fragment() {
-
-    private val args: SavingsGoalsFragmentArgs by navArgs()
 
     private lateinit var binding: SavingsGoalsFragmentBinding
 
-    private val viewModel: SavingsGoalsViewModel by viewModels {
-        viewModelFactory {
-            SavingsGoalsViewModel(args).also { sessionComponent().inject(it) }
-        }
-    }
+    private val viewModel: SavingsGoalsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -8,17 +8,15 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.databinding.AccessTokenFragmentBinding
 import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
 
+@AndroidEntryPoint
 class AccessTokenFragment : Fragment() {
     private lateinit var binding: AccessTokenFragmentBinding
 
-    private val viewModel: AccessTokenViewModel by viewModels {
-        viewModelFactory { savedStateHandle ->
-            AccessTokenViewModel(savedStateHandle).also { sessionComponent().inject(it) }
-        }
-    }
+    private val viewModel: AccessTokenViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

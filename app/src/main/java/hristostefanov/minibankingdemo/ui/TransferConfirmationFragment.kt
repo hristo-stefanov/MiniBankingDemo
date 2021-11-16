@@ -8,20 +8,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.databinding.TransferConfirmationFragmentBinding
 import hristostefanov.minibankingdemo.presentation.TransferConfirmationViewModel
 
+@AndroidEntryPoint
 class TransferConfirmationFragment : Fragment() {
 
-    private val viewModel: TransferConfirmationViewModel by viewModels {
-        viewModelFactory {
-            TransferConfirmationViewModel(args).also { sessionComponent().inject(it) }
-        }
-    }
-
-    private val args: TransferConfirmationFragmentArgs by navArgs()
+    private val viewModel: TransferConfirmationViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

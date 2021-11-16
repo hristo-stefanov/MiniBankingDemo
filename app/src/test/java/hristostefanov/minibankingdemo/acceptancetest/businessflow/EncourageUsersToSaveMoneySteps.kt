@@ -17,7 +17,7 @@ class EncourageUsersToSaveMoneySteps {
     private lateinit var accountsViewModel: AccountsViewModel
 
     init {
-        TestApp.component.getSessionRegistry().sessionComponent.inject(this)
+        TestApp.component.inject(this)
     }
 
     @Given("the calculated round-up for my account is {double}")

@@ -20,7 +20,7 @@ class RoundUpSteps {
     lateinit var automation: BusinessRulesTestAutomation
 
     init {
-        TestApp.component.getSessionRegistry().sessionComponent.inject(this)
+        TestApp.component.inject(this)
     }
 
     @Given("the following transactions in an account")
