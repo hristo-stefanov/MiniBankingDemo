@@ -1,15 +1,13 @@
 package hristostefanov.minibankingdemo.presentation
 
-import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel.Companion.NAME_KEY
-import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
-import hristostefanov.minibankingdemo.util.ISessionRegistry
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.SessionComponent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -32,7 +30,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     @Suppress("UNCHECKED_CAST")
     val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
 
-    private val sessionRegistry = mock(ISessionRegistry::class.java)
+    private val sessionRegistry = mock(SessionRegistry::class.java)
     private val sessionComponent = mock(SessionComponent::class.java)
 
     // test data

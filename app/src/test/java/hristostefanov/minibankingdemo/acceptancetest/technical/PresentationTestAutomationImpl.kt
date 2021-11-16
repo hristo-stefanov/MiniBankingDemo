@@ -8,7 +8,7 @@ import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.util.ISessionRegistry
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.SessionComponent
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -45,7 +45,7 @@ class PresentationTestAutomationImpl @Inject constructor(
             get() = throw AssertionError()
     }
 
-    private val sessionRegistry = object: ISessionRegistry {
+    private val sessionRegistry = object: SessionRegistry {
         override var sessionComponent: SessionComponent = this@PresentationTestAutomationImpl.sessionComponent
 
         override fun newSession() {

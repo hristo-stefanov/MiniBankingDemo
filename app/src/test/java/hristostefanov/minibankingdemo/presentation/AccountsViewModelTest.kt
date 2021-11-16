@@ -12,7 +12,7 @@ import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteracto
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.util.ISessionRegistry
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.SessionComponent
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +38,7 @@ class AccountsViewModelTest {
     private val stringSupplier = mock(StringSupplier::class.java)
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
-    private val sessionRegistry = mock(ISessionRegistry::class.java)
+    private val sessionRegistry = mock(SessionRegistry::class.java)
     private val sessionComponent = mock(SessionComponent::class.java)
 
     @get:Rule

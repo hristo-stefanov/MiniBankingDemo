@@ -7,9 +7,8 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
-import hristostefanov.minibankingdemo.util.ISessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -22,7 +21,7 @@ private const val NAVIGATION_DELAY_MS = 2000L
 @HiltViewModel
 class TransferConfirmationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    sessionRegistry: ISessionRegistry,
+    sessionRegistry: SessionRegistry,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
