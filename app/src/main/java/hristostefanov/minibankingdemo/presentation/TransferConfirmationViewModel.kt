@@ -29,7 +29,8 @@ class TransferConfirmationViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val interactor = sessionRegistry.sessionComponent.addMoneyIntoGoalInteractor
+    // TODO we need a better way to handle nullability
+    private val interactor = sessionRegistry.sessionComponent!!.addMoneyIntoGoalInteractor
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel

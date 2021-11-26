@@ -28,7 +28,8 @@ class SavingsGoalsViewModel @Inject constructor(
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
-    private val listSavingGoalsInteractor = sessionRegistry.sessionComponent.listSavingGoalInteractor
+    // TODO we need a better way to handle nullability
+    private val listSavingGoalsInteractor = sessionRegistry.sessionComponent!!.listSavingGoalInteractor
 
     private var goals: List<SavingsGoal> = emptyList()
 

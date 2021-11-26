@@ -1,8 +1,8 @@
 package hristostefanov.minibankingdemo.util
 
+import dagger.BindsInstance
 import dagger.Subcomponent
 import hristostefanov.minibankingdemo.business.interactors.*
-import hristostefanov.minibankingdemo.presentation.*
 
 // NOTE: Another option would be to use a Hilt's "custom component" which is essentially
 // a subcomponent but with less code and with some limitations. See
@@ -13,8 +13,11 @@ import hristostefanov.minibankingdemo.presentation.*
 interface SessionComponent {
     @Subcomponent.Factory
     interface Factory {
-        fun create(): SessionComponent
+        // TODO make it named
+        fun create(@BindsInstance token: String): SessionComponent
     }
+
+    val token: String
 
     val calcRoundUpInteractor: CalcRoundUpInteractor
     val listAccountsInteractor: ListAccountsInteractor

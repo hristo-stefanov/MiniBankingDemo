@@ -22,7 +22,9 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
     // Another approach could be using @EntryPoint, see
     // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
-    private val createSavingsGoalInteractor = sessionRegistry.sessionComponent.createSavingGoalsInteractor
+
+    // TODO we need a better way to handle nullability
+    private val createSavingsGoalInteractor = sessionRegistry.sessionComponent!!.createSavingGoalsInteractor
 
     companion object {
         const val NAME_KEY = "name"

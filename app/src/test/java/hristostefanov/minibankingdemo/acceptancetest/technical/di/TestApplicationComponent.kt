@@ -3,6 +3,7 @@ package hristostefanov.minibankingdemo.acceptancetest.technical.di
 import dagger.Component
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.EncourageUsersToSaveMoneySteps
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.Hooks
+import hristostefanov.minibankingdemo.acceptancetest.businessflow.LoginSteps
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.RoundUpSteps
 import hristostefanov.minibankingdemo.util.SessionRegistryImp
 import javax.inject.Singleton
@@ -14,5 +15,6 @@ interface TestApplicationComponent {
 
     fun inject(hooks: Hooks)
     fun inject(target: RoundUpSteps)
+    fun inject(target: LoginSteps)
     fun inject(target: EncourageUsersToSaveMoneySteps)
 }

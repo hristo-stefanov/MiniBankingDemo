@@ -6,7 +6,9 @@ import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
+import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
@@ -44,8 +46,16 @@ class AccountsViewModel @Inject constructor(
     private val savedAccountIdFlow: Flow<String?> =
         state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
 
-    private val calcRoundUpInteractor = sessionRegistry.sessionComponent.calcRoundUpInteractor
-    private val listAccountsInteractor = sessionRegistry.sessionComponent.listAccountsInteractor
+    // TODO we need a better way to handle nullability
+    private val calcRoundUpInteractor: CalcRoundUpInteractor
+    get() {
+        return sessionRegistry.sessionComponent!!.calcRoundUpInteractor
+    }
+
+    private val listAccountsInteractor: ListAccountsInteractor
+    get() {
+        return sessionRegistry.sessionComponent!!.listAccountsInteractor
+    }
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
@@ -234,7 +244,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onLogout() {
         tokenStore.token = ""
-        sessionRegistry.newSession()
+        sessionRegistry.close()
         // restart to get deps from the new session
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)
