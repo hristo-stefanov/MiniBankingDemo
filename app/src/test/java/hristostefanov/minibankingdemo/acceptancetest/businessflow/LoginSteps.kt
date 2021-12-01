@@ -1,12 +1,12 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.acceptancetest.technical.CORRECT_TOKEN
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -15,7 +15,10 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
+val CORRECT_TOKEN = "correctToken"
+
 class LoginSteps {
+
     init {
         TestApp.component.inject(this)
     }
@@ -27,8 +30,14 @@ class LoginSteps {
     @NavigationChannel
     lateinit var navigationChannel: Channel<Navigation>
 
+    // TODO use a map to share state accross step files?
     private lateinit var accountsViewModel: AccountsViewModel
     private lateinit var accessTokenViewModel: AccessTokenViewModel
+
+    @Before
+    fun beforeEachScenario() {
+        automation.correctAuthTokenIs(CORRECT_TOKEN)
+    }
 
     @Given("I am not logged in")
     fun i_am_not_logged_in() {
@@ -52,6 +61,7 @@ class LoginSteps {
 
     @Given("I'm asked to login to access Accounts")
     fun i_m_asked_to_login_to_access_accounts() {
+        automation.accountIn("GBP")
         automation.calculatedRoundUpIs("3.14".toBigDecimal())
         accountsViewModel = automation.openAccountScreen()
         accessTokenViewModel = automation.openLoginScreen()
@@ -59,7 +69,6 @@ class LoginSteps {
 
     @When("I provided correct credentials")
     fun i_provided_correct_credentials() {
-        // TODO distinguish this way of logging in from using login()
         accessTokenViewModel.onAccessTokenChanged(CORRECT_TOKEN)
         accessTokenViewModel.onAcceptCommand()
     }

@@ -2,17 +2,25 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
+import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import javax.inject.Inject
 
 
 class EncourageUsersToSaveMoneySteps {
+
     @Inject
     lateinit var automation: PresentationTestAutomation
+
+    @Inject @NavigationChannel
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     private lateinit var accountsViewModel: AccountsViewModel
 
@@ -20,9 +28,22 @@ class EncourageUsersToSaveMoneySteps {
         TestApp.component.inject(this)
     }
 
+    @Given("I am logged in")
+    fun i_am_logged_in() {
+        automation.openLoginScreen().run {
+            onAccessTokenChanged(CORRECT_TOKEN)
+            onAcceptCommand()
+        }
+
+        // consume back navigation event
+        runBlocking {
+            navigationChannel.receive()
+        }
+    }
+
     @Given("the calculated round-up for my account is {double}")
     fun the_calculated_round_up_for_my_account_is(amount: Double) {
-        automation.login()
+        automation.accountIn("GBP")
         automation.calculatedRoundUpIs(amount.toBigDecimal())
     }
 

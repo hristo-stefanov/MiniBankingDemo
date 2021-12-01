@@ -10,16 +10,14 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
+import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.lang.AssertionError
-import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
-
-val CORRECT_TOKEN = "correctToken"
 
 class PresentationTestAutomationImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
@@ -30,16 +28,17 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val tokenStore: TokenStore,
 ) : PresentationTestAutomation {
 
-    private lateinit var listAccountsInteractor: ListAccountsInteractor
-    private lateinit var calcRoundUpInteractor: CalcRoundUpInteractor
+    private lateinit var listAccountsInteractorStub: ListAccountsInteractor
+    private lateinit var calcRoundUpInteractorStub: CalcRoundUpInteractor
+    private lateinit var correctToken: String
 
     private val sessionComponentFactory: SessionComponent.Factory = object: SessionComponent.Factory {
         override fun create(token: String): SessionComponent {
             return object : SessionComponent {
                 override val calcRoundUpInteractor: CalcRoundUpInteractor
-                    get() = this@PresentationTestAutomationImpl.calcRoundUpInteractor
+                    get() = this@PresentationTestAutomationImpl.calcRoundUpInteractorStub
                 override val listAccountsInteractor: ListAccountsInteractor
-                    get() = this@PresentationTestAutomationImpl.listAccountsInteractor
+                    get() = this@PresentationTestAutomationImpl.listAccountsInteractorStub
                 override val listSavingGoalInteractor: ListSavingGoalsInteractor
                     get() = throw AssertionError()
                 override val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
@@ -54,15 +53,15 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = SessionRegistryImp(sessionComponentFactory)
 
-    override fun login() {
-        tokenStore.token = CORRECT_TOKEN
-        sessionRegistry.createSession(tokenStore.token)
+    override fun correctAuthTokenIs(token: String) {
+        correctToken = token
     }
 
-    override fun calculatedRoundUpIs(amount: BigDecimal) {
-        listAccountsInteractor = object : ListAccountsInteractor {
+    override fun accountIn(currencyCode: String) {
+        listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
-                if(sessionRegistry.sessionComponent?.token == CORRECT_TOKEN) {
+                // simulate auth check in the data layer
+                if(sessionRegistry.sessionComponent?.token == correctToken) {
                     return listOf(
                         Account(
                             "1",
@@ -73,15 +72,21 @@ class PresentationTestAutomationImpl @Inject constructor(
                         )
                     )
                 } else {
-                    // TODO consider special exception for not authorized
-                    throw IllegalStateException()
+                    throw ServiceException("401: Unauthorized")
                 }
             }
         }
+    }
 
-        calcRoundUpInteractor = object : CalcRoundUpInteractor {
+    override fun calculatedRoundUpIs(amount: BigDecimal) {
+        calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
-                return amount
+                // simulate auth check in the data layer
+                if(sessionRegistry.sessionComponent?.token == correctToken) {
+                    return amount
+                } else {
+                    throw ServiceException("401: Unauthorized")
+                }
             }
         }
     }
