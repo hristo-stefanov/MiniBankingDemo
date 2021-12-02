@@ -86,4 +86,22 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Backward)
         assertThat(accountsViewModel.roundUpAmountText.value).isEqualTo("£3.14")
     }
+
+    @When("I log out")
+    fun i_log_out() {
+        accountsViewModel = automation.openAccountScreen()
+        accountsViewModel.onLogout()
+
+        // restarting navigation is supposed reopen the screen
+        accountsViewModel = automation.openAccountScreen()
+    }
+
+    @Then("my account information should disappear")
+    fun my_account_information_should_disappear() {
+        val nav = runBlocking {
+            navigationChannel.receive()
+        }
+
+        assertThat(nav).isEqualTo(Navigation.Restart)
+    }
 }

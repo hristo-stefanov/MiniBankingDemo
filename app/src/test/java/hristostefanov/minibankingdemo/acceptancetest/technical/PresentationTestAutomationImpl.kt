@@ -28,8 +28,18 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val tokenStore: TokenStore,
 ) : PresentationTestAutomation {
 
-    private lateinit var listAccountsInteractorStub: ListAccountsInteractor
-    private lateinit var calcRoundUpInteractorStub: CalcRoundUpInteractor
+    private var listAccountsInteractorStub: ListAccountsInteractor = object : ListAccountsInteractor {
+        // dummy implementation
+        override suspend fun execute(): List<Account> {
+            return emptyList()
+        }
+    }
+    private var calcRoundUpInteractorStub: CalcRoundUpInteractor = object : CalcRoundUpInteractor {
+        // dummy implementation
+        override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
+            return "0.00".toBigDecimal()
+        }
+    }
     private lateinit var correctToken: String
 
     private val sessionComponentFactory: SessionComponent.Factory = object: SessionComponent.Factory {
