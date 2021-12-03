@@ -245,7 +245,7 @@ class AccountsViewModel @Inject constructor(
     fun onLogout() {
         tokenStore.token = ""
         sessionRegistry.close()
-        // restart to get deps from the new session
+        // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)
         }
