@@ -15,11 +15,19 @@ import hristostefanov.minibankingdemo.business.interactors.*
 interface SessionComponent {
     @Subcomponent.Factory
     interface Factory {
-        // TODO make it named
-        fun create(@BindsInstance token: String): SessionComponent
+        fun create(
+            @AccessToken
+            @BindsInstance
+            token: String,
+            @TokenType
+            @BindsInstance
+            tokenType: String
+        ): SessionComponent
     }
 
-    val token: String
+    // TODO used for testing move to test component?
+    @get:AccessToken
+    val accessToken: String
 
     val calcRoundUpInteractor: CalcRoundUpInteractor
     val listAccountsInteractor: ListAccountsInteractor

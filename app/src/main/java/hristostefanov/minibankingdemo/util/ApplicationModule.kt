@@ -7,11 +7,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.util.oauth.OAuth
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Singleton
@@ -52,6 +56,16 @@ abstract class ApplicationModule {
 
         @Provides
         fun provideGson() = Gson()
+
+        @Provides
+        fun provideOAuth(): OAuth {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BuildConfig.SERVICE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            return retrofit.create(OAuth::class.java)
+        }
     }
 
     @Binds

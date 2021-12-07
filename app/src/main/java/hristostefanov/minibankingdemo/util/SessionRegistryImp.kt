@@ -10,8 +10,8 @@ class SessionRegistryImp @Inject constructor(
 
     override var sessionComponent: SessionComponent? = null
 
-    override fun createSession(token: String) {
-        sessionComponent = sessionComponentFactory.create(token)
+    override fun createSession(token: String, tokenType: String) {
+        sessionComponent = sessionComponentFactory.create(token, tokenType)
     }
 
     override fun close() {

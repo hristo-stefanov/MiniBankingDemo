@@ -101,7 +101,7 @@ class AccountsViewModelTest {
         given(amountFormatter.format(any(), any())).willReturn("")
         given(calcRoundUpInteractor.execute(any(), any())).willReturn(quarter)
         given(listAccountsInteractor.execute()).willReturn(listOf(account1))
-        given(tokenStore.token).willReturn("token")
+        given(tokenStore.refreshToken).willReturn("token")
     }
 
     @Test

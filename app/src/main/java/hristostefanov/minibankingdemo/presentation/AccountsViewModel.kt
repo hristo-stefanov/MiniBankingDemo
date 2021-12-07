@@ -211,7 +211,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun load() {
-        if (tokenStore.token.isBlank()) {
+        if (sessionRegistry.sessionComponent == null) {
             viewModelScope.launch {
                 navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
             }
@@ -243,7 +243,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onLogout() {
-        tokenStore.token = ""
+        tokenStore.refreshToken = ""
         sessionRegistry.close()
         // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {

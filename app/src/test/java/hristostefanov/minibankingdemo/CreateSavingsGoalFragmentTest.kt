@@ -70,7 +70,7 @@ class CreateSavingsGoalFragmentTest {
         hiltRule.inject()
 
         // TODO is this valid at all?
-        sessionRegistry.createSession("token")
+        sessionRegistry.createSession("token", "Bearer")
     }
 
     @Test

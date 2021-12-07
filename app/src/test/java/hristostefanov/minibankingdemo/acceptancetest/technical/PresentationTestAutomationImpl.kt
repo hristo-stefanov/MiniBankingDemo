@@ -10,6 +10,8 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
+import hristostefanov.minibankingdemo.util.oauth.AccessTokenResponse
+import hristostefanov.minibankingdemo.util.oauth.OAuth
 import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
@@ -40,10 +42,29 @@ class PresentationTestAutomationImpl @Inject constructor(
             return "0.00".toBigDecimal()
         }
     }
+
+    private val oAuthStub = object: OAuth {
+        override suspend fun accessToken(
+            client_id: String,
+            client_secret: String,
+            grant_type: String,
+            refresh_token: String
+        ): AccessTokenResponse {
+            return AccessTokenResponse(
+                access_token = correctToken,
+                refresh_token = "refreshtoken",
+                token_type = "Bearer",
+                expires_in = 0,
+                scope = ""
+            )
+        }
+    }
+
+
     private lateinit var correctToken: String
 
     private val sessionComponentFactory: SessionComponent.Factory = object: SessionComponent.Factory {
-        override fun create(token: String): SessionComponent {
+        override fun create(token: String, tokenType: String): SessionComponent {
             return object : SessionComponent {
                 override val calcRoundUpInteractor: CalcRoundUpInteractor
                     get() = this@PresentationTestAutomationImpl.calcRoundUpInteractorStub
@@ -55,7 +76,7 @@ class PresentationTestAutomationImpl @Inject constructor(
                     get() = throw AssertionError()
                 override val createSavingGoalsInteractor: CreateSavingsGoalInteractor
                     get() = throw AssertionError()
-                override val token: String
+                override val accessToken: String
                     get() = token
             }
         }
@@ -71,7 +92,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.token == correctToken) {
+                if(sessionRegistry.sessionComponent?.accessToken == correctToken) {
                     return listOf(
                         Account(
                             "1",
@@ -92,7 +113,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.token == correctToken) {
+                if(sessionRegistry.sessionComponent?.accessToken == correctToken) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")
@@ -120,7 +141,8 @@ class PresentationTestAutomationImpl @Inject constructor(
             tokenStore,
             sessionRegistry,
             navigationChannel,
-            eventBus
+            eventBus,
+            oAuthStub
         )
     }
 }
