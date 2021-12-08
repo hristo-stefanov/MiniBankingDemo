@@ -14,12 +14,17 @@ import hristostefanov.minibankingdemo.util.oauth.AccessTokenResponse
 import hristostefanov.minibankingdemo.util.oauth.OAuth
 import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.greenrobot.eventbus.EventBus
+import retrofit2.HttpException
+import retrofit2.Response
 import java.lang.AssertionError
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
+
+private const val CORRECT_ACCESS_TOKEN = "correctAccessToken"
 
 class PresentationTestAutomationImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
@@ -48,20 +53,23 @@ class PresentationTestAutomationImpl @Inject constructor(
             client_id: String,
             client_secret: String,
             grant_type: String,
-            refresh_token: String
+            refreshToken: String
         ): AccessTokenResponse {
-            return AccessTokenResponse(
-                access_token = correctToken,
-                refresh_token = "refreshtoken",
-                token_type = "Bearer",
-                expires_in = 0,
-                scope = ""
-            )
+            if (refreshToken == correctRefreshToken) {
+                return AccessTokenResponse(
+                    access_token = CORRECT_ACCESS_TOKEN,
+                    refresh_token = "newRefreshToken",
+                    token_type = "Bearer",
+                    expires_in = 0,
+                    scope = ""
+                )
+            } else {
+                throw HttpException(Response.error<String>(401, "".toResponseBody()))
+            }
         }
     }
 
-
-    private lateinit var correctToken: String
+    private lateinit var correctRefreshToken: String
 
     private val sessionComponentFactory: SessionComponent.Factory = object: SessionComponent.Factory {
         override fun create(token: String, tokenType: String): SessionComponent {
@@ -84,15 +92,19 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = SessionRegistryImp(sessionComponentFactory)
 
-    override fun correctAuthTokenIs(token: String) {
-        correctToken = token
+    override fun correctRefreshTokenIs(refreshToken: String) {
+        correctRefreshToken = refreshToken
+    }
+
+    override fun savedRefreshTokenIs(refreshToken: String) {
+        tokenStore.refreshToken = refreshToken
     }
 
     override fun accountIn(currencyCode: String) {
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.accessToken == correctToken) {
+                if(sessionRegistry.sessionComponent?.accessToken == CORRECT_ACCESS_TOKEN) {
                     return listOf(
                         Account(
                             "1",
@@ -113,7 +125,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.accessToken == correctToken) {
+                if(sessionRegistry.sessionComponent?.accessToken == CORRECT_ACCESS_TOKEN ) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")

@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 // NOTE: it's not clear what "pretty" plugin does, but normally goes together
 // with the "html" plugin. Perhaps, it improves the generated html code.
     plugin = ["pretty", "html:build/reports/tests/cucumber.html"],
-//    tags = "not @draft",
+    tags = "not @draft",
 //    tags = "@debug",
 )
 class RunCucumberTest {

@@ -6,6 +6,9 @@ Feature: Log in
   Rule:
     The user must be logged in to access any online banking function
 
+    Background:
+      Given online banking
+
     Scenario Outline: prompt users to log in (instead of refusing access)
       Given I am not logged in
       When I try to access "<Service>"
@@ -19,6 +22,7 @@ Feature: Log in
     Scenario: logging in provides access
       Given I'm asked to login to access Accounts
       When I provided correct credentials
+      Then credentials screen will disappear
       Then I should access the online banking
 
 

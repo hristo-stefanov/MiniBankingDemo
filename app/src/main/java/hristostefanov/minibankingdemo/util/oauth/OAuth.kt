@@ -1,7 +1,11 @@
 package hristostefanov.minibankingdemo.util.oauth
 
+import retrofit2.HttpException
 import retrofit2.http.*
 
+/**
+ * NOTE: Any method can throw [HttpException] on non 2xx HTTP response
+ */
 interface OAuth {
     @POST("/oauth/access-token")
     @FormUrlEncoded

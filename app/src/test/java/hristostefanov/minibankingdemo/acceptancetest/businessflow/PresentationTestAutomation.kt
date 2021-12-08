@@ -15,7 +15,8 @@ import java.math.BigDecimal
 interface PresentationTestAutomation {
     // stubbing
     fun calculatedRoundUpIs(amount: BigDecimal)
-    fun correctAuthTokenIs(token: String)
+    fun correctRefreshTokenIs(accessToken: String)
+    fun savedRefreshTokenIs(refreshToken: String)
     fun accountIn(currencyCode: String)
 
     // exercising

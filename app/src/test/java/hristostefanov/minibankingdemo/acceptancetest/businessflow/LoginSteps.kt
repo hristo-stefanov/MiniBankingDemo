@@ -6,7 +6,6 @@ import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -15,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
-val CORRECT_TOKEN = "correctToken"
+val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class LoginSteps {
 
@@ -33,11 +32,6 @@ class LoginSteps {
     // TODO use a map to share state accross step files?
     private lateinit var accountsViewModel: AccountsViewModel
     private lateinit var accessTokenViewModel: AccessTokenViewModel
-
-    @Before
-    fun beforeEachScenario() {
-        automation.correctAuthTokenIs(CORRECT_TOKEN)
-    }
 
     @Given("I am not logged in")
     fun i_am_not_logged_in() {
@@ -59,22 +53,28 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Forward(AccountsFragmentDirections.toAccessTokenDestination()))
     }
 
-    @Given("I'm asked to login to access Accounts")
-    fun i_m_asked_to_login_to_access_accounts() {
+    @Given("online banking")
+    fun online_banking() {
+        automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
         automation.accountIn("GBP")
         automation.calculatedRoundUpIs("3.14".toBigDecimal())
+    }
+
+
+    @Given("I'm asked to login to access Accounts")
+    fun i_m_asked_to_login_to_access_accounts() {
         accountsViewModel = automation.openAccountScreen()
         accessTokenViewModel = automation.openLoginScreen()
     }
 
     @When("I provided correct credentials")
     fun i_provided_correct_credentials() {
-        accessTokenViewModel.onAccessTokenChanged(CORRECT_TOKEN)
+        accessTokenViewModel.onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
         accessTokenViewModel.onAcceptCommand()
     }
 
-    @Then("I should access the online banking")
-    fun i_should_access_the_online_banking() {
+    @Then("credentials screen will disappear")
+    fun credentials_screen_will_disappear() {
         val nav = runBlocking {
             // consume the navigation to log in
             navigationChannel.receive()
@@ -84,6 +84,10 @@ class LoginSteps {
         }
 
         assertThat(nav).isEqualTo(Navigation.Backward)
+    }
+
+    @Then("I should access the online banking")
+    fun i_should_access_the_online_banking() {
         assertThat(accountsViewModel.roundUpAmountText.value).isEqualTo("£3.14")
     }
 
@@ -104,4 +108,20 @@ class LoginSteps {
 
         assertThat(nav).isEqualTo(Navigation.Restart)
     }
+
+    @Given("I was logged before exiting the app")
+    fun i_was_logged_before_exiting_the_app() {
+        automation.savedRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+    }
+
+    @When("I launch the app")
+    fun i_launch_the_app() {
+        // this is main screen
+        accountsViewModel = automation.openAccountScreen()
+        // the main screen should navigate to this screen
+        // it will auto-login or ask for credential
+        accessTokenViewModel = automation.openLoginScreen()
+
+    }
+
 }

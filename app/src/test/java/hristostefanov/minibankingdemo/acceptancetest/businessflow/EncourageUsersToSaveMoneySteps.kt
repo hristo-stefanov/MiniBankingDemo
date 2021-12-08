@@ -31,7 +31,7 @@ class EncourageUsersToSaveMoneySteps {
     @Given("I am logged in")
     fun i_am_logged_in() {
         automation.openLoginScreen().run {
-            onAccessTokenChanged(CORRECT_TOKEN)
+            onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
             onAcceptCommand()
         }
 

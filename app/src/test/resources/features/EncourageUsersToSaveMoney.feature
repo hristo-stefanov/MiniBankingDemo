@@ -1,6 +1,7 @@
 Feature: Encourage users to save money
 
   Background:
+    Given online banking
     Given I am logged in
 
   Scenario: The app encourages users to save round-ups
