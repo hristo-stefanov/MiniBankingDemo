@@ -53,11 +53,10 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Forward(AccountsFragmentDirections.toAccessTokenDestination()))
     }
 
-    @Given("online banking")
+    @Given("I am registered for online banking")
     fun online_banking() {
         automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
         automation.accountIn("GBP")
-        automation.calculatedRoundUpIs("3.14".toBigDecimal())
     }
 
 
@@ -86,9 +85,9 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Backward)
     }
 
-    @Then("I should access the online banking")
+    @Then("I should be given access to the online banking")
     fun i_should_access_the_online_banking() {
-        assertThat(accountsViewModel.roundUpAmountText.value).isEqualTo("£3.14")
+        assertThat(accountsViewModel.accountList.value).isNotEmpty
     }
 
     @When("I log out")

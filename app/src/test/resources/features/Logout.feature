@@ -4,7 +4,7 @@ Feature:
   I want to be able to log out
 
   Background:
-    Given online banking
+    Given I am registered for online banking
 
   Scenario: logging out
     Given I am logged in
