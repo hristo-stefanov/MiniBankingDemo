@@ -56,6 +56,8 @@ class LoginSteps {
     @Given("I am registered for online banking")
     fun online_banking() {
         automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+        // create a default account to be able to verify access to online banking is given
+        // this works ok for the purpose of loggin related scenarios
         automation.accountIn("GBP")
     }
 
@@ -63,6 +65,10 @@ class LoginSteps {
     @Given("I'm asked to login to access Accounts")
     fun i_m_asked_to_login_to_access_accounts() {
         accountsViewModel = automation.openAccountScreen()
+        runBlocking {
+            // consume the navigation to log in
+            navigationChannel.receive()
+        }
         accessTokenViewModel = automation.openLoginScreen()
     }
 
@@ -75,9 +81,6 @@ class LoginSteps {
     @Then("credentials screen will disappear")
     fun credentials_screen_will_disappear() {
         val nav = runBlocking {
-            // consume the navigation to log in
-            navigationChannel.receive()
-
             // consume the backwards navigation from the login screen
             navigationChannel.receive()
         }
@@ -85,9 +88,10 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Backward)
     }
 
-    @Then("I should be given access to the online banking")
+    @Then("I should be given access to my accounts")
     fun i_should_access_the_online_banking() {
-        assertThat(accountsViewModel.accountList.value).isNotEmpty
+        // check if the default account can be accessed
+        assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
 
     @When("I log out")
@@ -113,12 +117,11 @@ class LoginSteps {
         automation.savedRefreshTokenIs(CORRECT_REFRESH_TOKEN)
     }
 
-    @When("I launch the app")
-    fun i_launch_the_app() {
-        // this is main screen
+    @When("I launch the app to access Accounts")
+    fun i_launch_the_app_to_access_accounts() {
         accountsViewModel = automation.openAccountScreen()
-        // the main screen should navigate to this screen
-        // it will auto-login or ask for credential
+        // Accounts screen should navigate to Login screen
+        // which will auto-login or ask for credentials
         accessTokenViewModel = automation.openLoginScreen()
 
     }

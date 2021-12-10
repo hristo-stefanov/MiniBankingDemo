@@ -8,5 +8,5 @@ Feature: Session persistence
 
   Scenario: session persistence
     Given I was logged before exiting the app
-    When I launch the app
-    Then I should be given access to the online banking
+    When I launch the app to access Accounts
+    Then I should be given access to my accounts

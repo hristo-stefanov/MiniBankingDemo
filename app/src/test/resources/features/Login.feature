@@ -19,12 +19,11 @@ Feature: Log in
 # TODO
 #        | Saving goals |
 
-    # TODO how specific should be 'Accounts'? specific password?
     Scenario: logging on successfully
       Given I'm asked to login to access Accounts
       When I provide correct credentials
       Then credentials screen will disappear
-      Then I should be given access to the online banking
+      Then I should be given access to my accounts
 
 @draft
       Scenario: logging with incorrect credentials
