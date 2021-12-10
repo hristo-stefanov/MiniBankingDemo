@@ -4,7 +4,7 @@ Feature: Log in
   I want to be able to log in
 
   Rule:
-    The user must be logged in to access any online banking function
+    The user must be logged in to access any online banking functions
 
     Background:
       Given I am registered for online banking
@@ -19,11 +19,15 @@ Feature: Log in
 # TODO
 #        | Saving goals |
 
-    Scenario: logging in provides access
+    # TODO how specific should be 'Accounts'? specific password?
+    Scenario: logging on successfully
       Given I'm asked to login to access Accounts
-      When I provided correct credentials
+      When I provide correct credentials
       Then credentials screen will disappear
       Then I should be given access to the online banking
 
-
-
+@draft
+      Scenario: logging with incorrect credentials
+        Given I'm asked to login to access Accounts
+        When I provided incorrect credentials
+        Then I should be informed the credentials were incorrect

@@ -66,8 +66,8 @@ class LoginSteps {
         accessTokenViewModel = automation.openLoginScreen()
     }
 
-    @When("I provided correct credentials")
-    fun i_provided_correct_credentials() {
+    @When("I provide correct credentials")
+    fun i_provide_correct_credentials() {
         accessTokenViewModel.onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
         accessTokenViewModel.onAcceptCommand()
     }

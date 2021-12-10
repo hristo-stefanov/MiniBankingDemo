@@ -10,9 +10,3 @@ Feature: Session persistence
     Given I was logged before exiting the app
     When I launch the app
     Then I should be given access to the online banking
-
-  @draft
-  Scenario: ??? too trivial ???
-    Given I was logged out before exitting the app
-    When I launch the app
-    Then I should be asked to log in
