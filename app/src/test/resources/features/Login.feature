@@ -22,8 +22,7 @@ Feature: Log in
     Scenario: logging on successfully
       Given I'm asked to login to access Accounts
       When I provide correct credentials
-      Then credentials screen will disappear
-      Then I should be given access to my accounts
+      And I should be given access to my accounts
 
 @draft
       Scenario: logging with incorrect credentials

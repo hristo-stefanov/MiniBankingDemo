@@ -7,6 +7,6 @@ Feature: Session persistence
     Given I am registered for online banking
 
   Scenario: session persistence
-    Given I was logged before exiting the app
+    Given I was logged in before exiting the app
     When I launch the app to access Accounts
-    Then I should be given access to my accounts
+    Then I should be logged in

@@ -78,18 +78,14 @@ class LoginSteps {
         accessTokenViewModel.onAcceptCommand()
     }
 
-    @Then("credentials screen will disappear")
-    fun credentials_screen_will_disappear() {
+    @Then("I should be given access to my accounts")
+    fun i_should_access_the_online_banking() {
         val nav = runBlocking {
             // consume the backwards navigation from the login screen
             navigationChannel.receive()
         }
 
         assertThat(nav).isEqualTo(Navigation.Backward)
-    }
-
-    @Then("I should be given access to my accounts")
-    fun i_should_access_the_online_banking() {
         // check if the default account can be accessed
         assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
@@ -112,8 +108,8 @@ class LoginSteps {
         assertThat(nav).isEqualTo(Navigation.Restart)
     }
 
-    @Given("I was logged before exiting the app")
-    fun i_was_logged_before_exiting_the_app() {
+    @Given("I was logged in before exiting the app")
+    fun i_was_logged_in_before_exiting_the_app() {
         automation.savedRefreshTokenIs(CORRECT_REFRESH_TOKEN)
     }
 
@@ -124,6 +120,12 @@ class LoginSteps {
         // which will auto-login or ask for credentials
         accessTokenViewModel = automation.openLoginScreen()
 
+    }
+
+    @Then("I should be logged in")
+    fun i_should_be_logged_in() {
+        // check if the default account can be accessed
+        assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
 
 }
