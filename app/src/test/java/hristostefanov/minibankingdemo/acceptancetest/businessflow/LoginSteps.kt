@@ -38,9 +38,8 @@ class LoginSteps {
         // empty
     }
 
-    @When("I try to access {string}")
-    fun i_try_to_access(service: String) {
-        // TODO the rest of the screens
+    @When("I try to access my bank accounts")
+    fun i_try_to_access_my_bank_accounts() {
         val vm = automation.openAccountScreen()
     }
 
@@ -62,8 +61,8 @@ class LoginSteps {
     }
 
 
-    @Given("I'm asked to login to access Accounts")
-    fun i_m_asked_to_login_to_access_accounts() {
+    @Given("I'm asked to login to access my accounts")
+    fun i_m_asked_to_login_to_access_my_accounts() {
         accountsViewModel = automation.openAccountScreen()
         runBlocking {
             // consume the navigation to log in
@@ -90,12 +89,26 @@ class LoginSteps {
         assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
 
+    @Given("I am seeing my account information")
+    fun i_am_seeing_my_account_information() {
+        automation.openLoginScreen().run {
+            onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
+            onAcceptCommand()
+        }
+
+        // consume back navigation event
+        runBlocking {
+            navigationChannel.receive()
+        }
+
+        accountsViewModel = automation.openAccountScreen()
+    }
+
     @When("I log out")
     fun i_log_out() {
-        accountsViewModel = automation.openAccountScreen()
         accountsViewModel.onLogout()
 
-        // restarting navigation is supposed reopen the screen
+        // restarting navigation reopens the screen
         accountsViewModel = automation.openAccountScreen()
     }
 
