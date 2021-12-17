@@ -11,8 +11,8 @@ import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,8 +30,8 @@ class TransferConfirmationViewModel @Inject constructor(
 
     private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
-    private val _acknowledgementChannel = Channel<String>()
-    val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel
+    private val _acknowledgement = Channel<String>()
+    val acknowledgement = _acknowledgement.receiveAsFlow()
 
     private val _info = MutableLiveData("")
     val info: LiveData<String> = _info
@@ -55,7 +55,7 @@ class TransferConfirmationViewModel @Inject constructor(
                     args.roundUpAmount
                 )
 
-                _acknowledgementChannel.send(stringSupplier.get(R.string.success))
+                _acknowledgement.send(stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)
                 navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
             } catch (e: ServiceException) {
