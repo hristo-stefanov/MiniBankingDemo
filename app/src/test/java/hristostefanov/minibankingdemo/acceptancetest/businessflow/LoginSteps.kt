@@ -112,7 +112,7 @@ class LoginSteps {
         accountsViewModel = automation.openAccountScreen()
     }
 
-    @Then("my account information should disappear")
+    @Then("my account information should be hidden")
     fun my_account_information_should_disappear() {
         val nav = runBlocking {
             navigationChannel.receive()

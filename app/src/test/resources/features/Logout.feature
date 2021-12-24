@@ -7,13 +7,14 @@ Feature: Log out
   Background:
     Given I am registered for online banking
 
-    # TODO illustrate each rule with an example
-#  Rule: The user can log out when logged in
-#    Rule: User specific information should disappear when logging out
-#  Rule: User should be asked to log in after logging out
+  Rule: User specific information should disappear when logging out
+  and the user should be asked to log in
 
     Scenario: logging out
       Given I am seeing my account information
       When I log out
-      Then my account information should disappear
+      Then my account information should be hidden
       And I should be asked to login
+
+  # TODO illustrate the log out command should be available
+  Rule: The user can log out when logged in

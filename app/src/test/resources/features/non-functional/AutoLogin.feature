@@ -8,7 +8,7 @@ Feature: Session persistence
   Background:
     Given I am registered for online banking
 
-  Scenario: auto-loggin in
+  Scenario: auto-logging in
     Given I was logged in before exiting the app
     When I launch the app to access Accounts
     Then I should be logged in
