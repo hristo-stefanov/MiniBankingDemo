@@ -25,17 +25,18 @@ class EncourageUsersToSaveMoneySteps {
 
     private lateinit var accountsViewModel: AccountsViewModel
 
-    @Before("@steps:encourage")
+    @Before("@steps:encourageUsersToSaveMoney")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
+
+        i_am_logged_in()
     }
 
-    @Given("I am logged in")
     fun i_am_logged_in() {
-        automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+        automation.correctRefreshTokenIs("correctToken")
 
         automation.openLoginScreen().run {
-            onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
+            onAccessTokenChanged("correctToken")
             onAcceptCommand()
         }
 

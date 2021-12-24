@@ -1,8 +1,5 @@
-@steps:encourage
+@steps:encourageUsersToSaveMoney
 Feature: Encourage users to save money
-
-  Background:
-    Given I am logged in
 
   Scenario: The app encourages users to save round-ups
     Given the calculated round-up for my account is 1.0

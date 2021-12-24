@@ -1,4 +1,4 @@
-@steps:roundup
+@steps:roundUp
 Feature: Calculate a Round-up amount for an account
 
   Scenario: Example

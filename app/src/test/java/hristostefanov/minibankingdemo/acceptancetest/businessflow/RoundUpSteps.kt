@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
-import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -15,19 +14,20 @@ import io.cucumber.java.Before
 private const val ACCOUNT_NUM = "12345678"
 
 class RoundUpSteps {
+    // shared data between steps
     private lateinit var result: BigDecimal
 
     @Inject
     lateinit var automation: BusinessRulesTestAutomation
 
-    @Before("@steps:roundup")
+    @Before("@steps:roundUp")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
 
     @Given("the following transactions in an account")
-    fun the_following_transactions_in_an_account(list: List<BigDecimal>) {
-        automation.createAccount(ACCOUNT_NUM, "GBP", list)
+    fun the_following_transactions_in_an_account(transactions: List<BigDecimal>) {
+        automation.createAccount(ACCOUNT_NUM, "GBP", transactions)
     }
 
     @When("the round up amount is calculated")

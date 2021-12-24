@@ -15,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
-val CORRECT_REFRESH_TOKEN = "correctToken"
+private val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class LoginSteps {
     // TODO use a map to share state accross step files?
