@@ -1,8 +1,7 @@
+@steps:encourage
 Feature: Encourage users to save money
 
-#  TODO can use tagged hooks to setup
   Background:
-    Given I am registered for online banking
     Given I am logged in
 
   Scenario: The app encourages users to save round-ups

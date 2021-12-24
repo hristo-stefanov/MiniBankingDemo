@@ -1,3 +1,4 @@
+@steps:login
 Feature: Session persistence
   In order to save time and effort
   As a user

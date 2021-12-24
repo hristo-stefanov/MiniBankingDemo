@@ -4,6 +4,7 @@ import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -24,12 +25,15 @@ class EncourageUsersToSaveMoneySteps {
 
     private lateinit var accountsViewModel: AccountsViewModel
 
-    init {
+    @Before("@steps:encourage")
+    fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
 
     @Given("I am logged in")
     fun i_am_logged_in() {
+        automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+
         automation.openLoginScreen().run {
             onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
             onAcceptCommand()

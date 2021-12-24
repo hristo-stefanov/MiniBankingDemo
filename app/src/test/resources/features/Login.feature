@@ -1,3 +1,4 @@
+@steps:login
 Feature: Log in
   In order to access online banking
   As a user

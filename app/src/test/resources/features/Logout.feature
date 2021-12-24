@@ -1,3 +1,4 @@
+@steps:login
 Feature: Log out
   In order to protect my financial information and assets from unauthorised access
   and to be able log in with different credentials

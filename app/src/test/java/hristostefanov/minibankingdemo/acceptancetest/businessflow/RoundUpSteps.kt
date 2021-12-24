@@ -9,6 +9,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import java.math.BigDecimal
 import javax.inject.Inject
+import io.cucumber.java.Before
 
 
 private const val ACCOUNT_NUM = "12345678"
@@ -19,14 +20,13 @@ class RoundUpSteps {
     @Inject
     lateinit var automation: BusinessRulesTestAutomation
 
-    init {
+    @Before("@steps:roundup")
+    fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
 
     @Given("the following transactions in an account")
-    fun the_following_transactions_in_an_account(dataTable: DataTable) {
-        val list: MutableList<BigDecimal> = dataTable.asList(BigDecimal::class.java)
-
+    fun the_following_transactions_in_an_account(list: List<BigDecimal>) {
         automation.createAccount(ACCOUNT_NUM, "GBP", list)
     }
 

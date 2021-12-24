@@ -6,6 +6,7 @@ import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -17,10 +18,9 @@ import javax.inject.Inject
 val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class LoginSteps {
-
-    init {
-        TestApp.component.inject(this)
-    }
+    // TODO use a map to share state accross step files?
+    private lateinit var accountsViewModel: AccountsViewModel
+    private lateinit var accessTokenViewModel: AccessTokenViewModel
 
     @Inject
     lateinit var automation: PresentationTestAutomation
@@ -29,9 +29,10 @@ class LoginSteps {
     @NavigationChannel
     lateinit var navigationChannel: Channel<Navigation>
 
-    // TODO use a map to share state accross step files?
-    private lateinit var accountsViewModel: AccountsViewModel
-    private lateinit var accessTokenViewModel: AccessTokenViewModel
+    @Before("@steps:login")
+    fun beforeEachScenario() {
+        TestApp.component.inject(this)
+    }
 
     @Given("I am not logged in")
     fun i_am_not_logged_in() {
@@ -113,7 +114,7 @@ class LoginSteps {
     }
 
     @Then("my account information should be hidden")
-    fun my_account_information_should_disappear() {
+    fun my_account_information_should_be_hidden() {
         val nav = runBlocking {
             navigationChannel.receive()
         }
