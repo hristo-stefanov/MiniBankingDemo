@@ -4,9 +4,6 @@ Feature: Log in
   As a user
   I want to be able to log in
 
-  Background:
-    Given I am registered for online banking
-
   Rule:  Should prompt the user to login when trying to access online banking without being logged in
   (instead of refusing access)
 

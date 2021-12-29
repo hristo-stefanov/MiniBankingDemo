@@ -19,7 +19,9 @@ class Hooks {
         TestApp.component.inject(this)
     }
 
-    @Before
+    // this hook recreates the test app component so it must run before any other hook
+    // that might inject from it
+    @Before(order = 0)
     fun beforeEachScenario() {
         TestApp.newComponent()
         Dispatchers.setMain(testDispatcher)
