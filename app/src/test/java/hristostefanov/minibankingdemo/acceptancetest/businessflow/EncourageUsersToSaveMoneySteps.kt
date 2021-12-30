@@ -18,7 +18,7 @@ import javax.inject.Inject
 class EncourageUsersToSaveMoneySteps {
 
     @Inject
-    lateinit var automation: PresentationTestAutomation
+    internal lateinit var automation: PresentationTestAutomation
 
     @Inject @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>

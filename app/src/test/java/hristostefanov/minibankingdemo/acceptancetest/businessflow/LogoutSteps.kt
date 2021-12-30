@@ -17,11 +17,11 @@ class LogoutSteps {
     private lateinit var accountsViewModel: AccountsViewModel
 
     @Inject
-    lateinit var automation: PresentationTestAutomation
+    internal lateinit var automation: PresentationTestAutomation
 
     @Inject
     @NavigationChannel
-    lateinit var navigationChannel: Channel<Navigation>
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     @Before("@steps:logout")
     fun beforeEachScenario() {

@@ -6,14 +6,12 @@ import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -45,17 +43,6 @@ class AccountsViewModel @Inject constructor(
 
     private val savedAccountIdFlow: Flow<String?> =
         state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
-
-    // TODO we need a better way to handle nullability
-    private val calcRoundUpInteractor: CalcRoundUpInteractor
-    get() {
-        return sessionRegistry.sessionComponent!!.calcRoundUpInteractor
-    }
-
-    private val listAccountsInteractor: ListAccountsInteractor
-    get() {
-        return sessionRegistry.sessionComponent!!.listAccountsInteractor
-    }
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
@@ -148,7 +135,7 @@ class AccountsViewModel @Inject constructor(
         selectedAccountFlow
             .map { account ->
                 account?.let {
-                    calcRoundUpInteractor.execute(it.id, roundUpSinceDate)
+                    sessionRegistry.sessionComponent?.calcRoundUpInteractor?.execute(it.id, roundUpSinceDate)
                 }
             }
             .catch { exception ->
@@ -228,7 +215,7 @@ class AccountsViewModel @Inject constructor(
 
         viewModelScope.launch {
             accounts.value = try {
-                listAccountsInteractor.execute()
+                sessionRegistry.sessionComponent?.listAccountsInteractor?.execute()
             } catch (e: ServiceException) {
                 e.message?.also {
                     navigationChannel.send(
@@ -237,8 +224,8 @@ class AccountsViewModel @Inject constructor(
                         )
                     )
                 }
-                emptyList()
-            }
+                null
+            } ?: emptyList()
         }
     }
 

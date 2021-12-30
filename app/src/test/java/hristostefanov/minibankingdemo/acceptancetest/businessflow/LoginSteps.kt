@@ -19,16 +19,15 @@ import javax.inject.Inject
 private const val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class LoginSteps {
-    // TODO use a map to share state accross step files?
     private lateinit var accountsViewModel: AccountsViewModel
     private lateinit var accessTokenViewModel: AccessTokenViewModel
 
     @Inject
-    lateinit var automation: PresentationTestAutomation
+    internal lateinit var automation: PresentationTestAutomation
 
     @Inject
     @NavigationChannel
-    lateinit var navigationChannel: Channel<Navigation>
+    internal lateinit var navigationChannel: Channel<Navigation>
 
     @Before("@steps:login")
     fun beforeEachScenario() {
@@ -79,5 +78,4 @@ class LoginSteps {
         // check if the default account can be accessed
         assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
-
 }

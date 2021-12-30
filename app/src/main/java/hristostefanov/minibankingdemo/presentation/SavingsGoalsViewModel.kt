@@ -20,16 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    sessionRegistry: SessionRegistry,
+    private val sessionRegistry: SessionRegistry,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
-
-    // TODO we need a better way to handle nullability
-    private val listSavingGoalsInteractor = sessionRegistry.sessionComponent!!.listSavingGoalInteractor
 
     private var goals: List<SavingsGoal> = emptyList()
 
@@ -54,7 +51,8 @@ class SavingsGoalsViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             try {
-                goals = listSavingGoalsInteractor.execute(args.accountId)
+                goals = sessionRegistry.sessionComponent?.listSavingGoalInteractor?.execute(args.accountId)
+                    ?: emptyList()
                 _list.value = goals.map { DisplaySavingsGoal(it.id, it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {

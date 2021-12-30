@@ -23,9 +23,6 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     // Another approach could be using @EntryPoint, see
     // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
 
-    // TODO we need a better way to handle nullability
-    private val createSavingsGoalInteractor = sessionRegistry.sessionComponent!!.createSavingGoalsInteractor
-
     companion object {
         const val NAME_KEY = "name"
     }
@@ -35,17 +32,16 @@ open class CreateSavingsGoalViewModel @Inject constructor(
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {
         Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
-            createSavingsGoalInteractor.validateName(name)
+            sessionRegistry.sessionComponent?.createSavingGoalsInteractor?.validateName(name) ?: false
         }
     }
 
-
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
-            if (createSavingsGoalInteractor.validateName(name)) {
+            if (sessionRegistry.sessionComponent?.createSavingGoalsInteractor?.validateName(name) == true) {
                 viewModelScope.launch {
                     try {
-                        createSavingsGoalInteractor.execute(
+                        sessionRegistry?.sessionComponent?.createSavingGoalsInteractor?.execute(
                             name,
                             args.accountId,
                             args.accountCurrency

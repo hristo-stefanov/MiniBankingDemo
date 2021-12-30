@@ -10,7 +10,6 @@ import java.math.BigDecimal
 import javax.inject.Inject
 import io.cucumber.java.Before
 
-
 private const val ACCOUNT_NUM = "12345678"
 
 class RoundUpSteps {
@@ -18,7 +17,7 @@ class RoundUpSteps {
     private lateinit var result: BigDecimal
 
     @Inject
-    lateinit var automation: BusinessRulesTestAutomation
+    internal lateinit var automation: BusinessRulesTestAutomation
 
     @Before("@steps:roundUp")
     fun beforeEachScenario() {

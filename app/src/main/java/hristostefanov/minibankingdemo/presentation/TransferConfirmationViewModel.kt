@@ -21,7 +21,7 @@ private const val NAVIGATION_DELAY_MS = 2000L
 @HiltViewModel
 class TransferConfirmationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    sessionRegistry: SessionRegistry,
+    private val sessionRegistry: SessionRegistry,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
@@ -29,8 +29,6 @@ class TransferConfirmationViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    // TODO we need a better way to handle nullability
-    private val interactor = sessionRegistry.sessionComponent!!.addMoneyIntoGoalInteractor
 
     private val _acknowledgementChannel = Channel<String>()
     val acknowledgementChannel: ReceiveChannel<String> = _acknowledgementChannel
@@ -50,7 +48,7 @@ class TransferConfirmationViewModel @Inject constructor(
     fun onConfirmCommand() {
         viewModelScope.launch {
             try {
-                interactor.execute(
+                sessionRegistry?.sessionComponent?.addMoneyIntoGoalInteractor?.execute(
                     args.accountId,
                     args.savingsGoal.id,
                     args.accountCurrency,
