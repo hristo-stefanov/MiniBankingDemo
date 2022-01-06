@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
-    private val sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
@@ -32,16 +32,16 @@ open class CreateSavingsGoalViewModel @Inject constructor(
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {
         Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
-            sessionRegistry.sessionComponent?.createSavingGoalsInteractor?.validateName(name) ?: false
+            loginSessionRegistry.component?.createSavingGoalsInteractor?.validateName(name) ?: false
         }
     }
 
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
-            if (sessionRegistry.sessionComponent?.createSavingGoalsInteractor?.validateName(name) == true) {
+            if (loginSessionRegistry.component?.createSavingGoalsInteractor?.validateName(name) == true) {
                 viewModelScope.launch {
                     try {
-                        sessionRegistry?.sessionComponent?.createSavingGoalsInteractor?.execute(
+                        loginSessionRegistry?.component?.createSavingGoalsInteractor?.execute(
                             name,
                             args.accountId,
                             args.accountCurrency

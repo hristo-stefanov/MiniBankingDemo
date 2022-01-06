@@ -19,7 +19,7 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.Matchers.not
@@ -54,7 +54,7 @@ class CreateSavingsGoalFragmentTest {
     internal lateinit var interactor: CreateSavingsGoalInteractor
 
     @Inject
-    internal lateinit var sessionRegistry: SessionRegistry
+    internal lateinit var loginSessionRegistry: LoginSessionRegistry
 
     private val argBundle = CreateSavingsGoalFragmentArgs("1", Currency.getInstance("GBP")).toBundle()
 
@@ -70,7 +70,7 @@ class CreateSavingsGoalFragmentTest {
         hiltRule.inject()
 
         // the user is logged in (fake session)
-        sessionRegistry.createSession("token", "Bearer")
+        loginSessionRegistry.createSession("token", "Bearer")
     }
 
     @Test

@@ -71,9 +71,9 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private lateinit var correctRefreshToken: String
 
-    private val sessionComponentFactory: SessionComponent.Factory = object: SessionComponent.Factory {
-        override fun create(token: String, tokenType: String): SessionComponent {
-            return object : SessionComponent {
+    private val loginSessionComponentFactory: LoginSessionComponent.Factory = object: LoginSessionComponent.Factory {
+        override fun create(token: String, tokenType: String): LoginSessionComponent {
+            return object : LoginSessionComponent {
                 override val calcRoundUpInteractor: CalcRoundUpInteractor
                     get() = this@PresentationTestAutomationImpl.calcRoundUpInteractorStub
                 override val listAccountsInteractor: ListAccountsInteractor
@@ -90,7 +90,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         }
     }
 
-    private val sessionRegistry = SessionRegistryImp(sessionComponentFactory)
+    private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
     override fun correctRefreshTokenIs(refreshToken: String) {
         correctRefreshToken = refreshToken
@@ -104,7 +104,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.accessToken == CORRECT_ACCESS_TOKEN) {
+                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN) {
                     return listOf(
                         Account(
                             "1",
@@ -125,7 +125,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.sessionComponent?.accessToken == CORRECT_ACCESS_TOKEN ) {
+                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN ) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")

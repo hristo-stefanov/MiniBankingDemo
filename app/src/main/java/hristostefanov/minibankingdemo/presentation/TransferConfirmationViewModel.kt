@@ -7,7 +7,7 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -21,7 +21,7 @@ private const val NAVIGATION_DELAY_MS = 2000L
 @HiltViewModel
 class TransferConfirmationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
@@ -48,7 +48,7 @@ class TransferConfirmationViewModel @Inject constructor(
     fun onConfirmCommand() {
         viewModelScope.launch {
             try {
-                sessionRegistry?.sessionComponent?.addMoneyIntoGoalInteractor?.execute(
+                loginSessionRegistry?.component?.addMoneyIntoGoalInteractor?.execute(
                     args.accountId,
                     args.savingsGoal.id,
                     args.accountCurrency,

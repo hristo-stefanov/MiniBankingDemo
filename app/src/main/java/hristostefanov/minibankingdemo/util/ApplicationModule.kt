@@ -21,7 +21,7 @@ import java.util.*
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
-@Module(subcomponents = [SessionComponent::class])
+@Module(subcomponents = [LoginSessionComponent::class])
 abstract class ApplicationModule {
 
     companion object {
@@ -72,5 +72,5 @@ abstract class ApplicationModule {
     abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
 
     @Binds
-    abstract fun bind(impl: SessionRegistryImp): SessionRegistry
+    abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
 }

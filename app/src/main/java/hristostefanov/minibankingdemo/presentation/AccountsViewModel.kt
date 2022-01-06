@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -38,7 +38,7 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
-    private val sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
@@ -135,7 +135,7 @@ class AccountsViewModel @Inject constructor(
         selectedAccountFlow
             .map { account ->
                 account?.let {
-                    sessionRegistry.sessionComponent?.calcRoundUpInteractor?.execute(it.id, roundUpSinceDate)
+                    loginSessionRegistry.component?.calcRoundUpInteractor?.execute(it.id, roundUpSinceDate)
                 }
             }
             .catch { exception ->
@@ -198,7 +198,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun load() {
-        if (sessionRegistry.sessionComponent == null) {
+        if (loginSessionRegistry.component == null) {
             viewModelScope.launch {
                 navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
             }
@@ -215,7 +215,7 @@ class AccountsViewModel @Inject constructor(
 
         viewModelScope.launch {
             accounts.value = try {
-                sessionRegistry.sessionComponent?.listAccountsInteractor?.execute()
+                loginSessionRegistry.component?.listAccountsInteractor?.execute()
             } catch (e: ServiceException) {
                 e.message?.also {
                     navigationChannel.send(
@@ -231,7 +231,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onLogout() {
         tokenStore.refreshToken = ""
-        sessionRegistry.close()
+        loginSessionRegistry.close()
         // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)

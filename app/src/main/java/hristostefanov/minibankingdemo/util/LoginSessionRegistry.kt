@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.util
 
-interface SessionRegistry {
-    var sessionComponent: SessionComponent?
+interface LoginSessionRegistry {
+    var component: LoginSessionComponent?
     fun createSession(token: String, tokenType: String)
     fun close()
 }

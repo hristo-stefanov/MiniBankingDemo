@@ -12,7 +12,7 @@ import hristostefanov.minibankingdemo.business.interactors.*
 // https://dagger.dev/hilt/custom-components
 @SessionScope
 @Subcomponent(modules = [SessionModule::class])
-interface SessionComponent {
+interface LoginSessionComponent {
     @Subcomponent.Factory
     interface Factory {
         fun create(
@@ -22,7 +22,7 @@ interface SessionComponent {
             @TokenType
             @BindsInstance
             tokenType: String
-        ): SessionComponent
+        ): LoginSessionComponent
     }
 
     // used for testing automation

@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.oauth.OAuth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccessTokenViewModel @Inject constructor(
     private val tokenStore: TokenStore,
-    private val sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val eventBus: EventBus,
@@ -58,7 +58,7 @@ class AccessTokenViewModel @Inject constructor(
             )
 
             tokenStore.refreshToken = response.refresh_token
-            sessionRegistry.createSession(response.access_token, response.token_type)
+            loginSessionRegistry.createSession(response.access_token, response.token_type)
 
             eventBus.post(AuthenticatedEvent())
             navigationChannel.send(Navigation.Backward)

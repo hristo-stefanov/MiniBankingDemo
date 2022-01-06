@@ -2,7 +2,6 @@ package hristostefanov.minibankingdemo.acceptancetest.technical.di
 
 import dagger.Component
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.*
-import hristostefanov.minibankingdemo.util.SessionRegistryImp
 import javax.inject.Singleton
 
 @Singleton
