@@ -10,8 +10,8 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.util.SessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -38,14 +38,11 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
-    private val sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
         state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
-
-    private val calcRoundUpInteractor = sessionRegistry.sessionComponent.calcRoundUpInteractor
-    private val listAccountsInteractor = sessionRegistry.sessionComponent.listAccountsInteractor
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
@@ -138,7 +135,7 @@ class AccountsViewModel @Inject constructor(
         selectedAccountFlow
             .map { account ->
                 account?.let {
-                    calcRoundUpInteractor.execute(it.id, roundUpSinceDate)
+                    loginSessionRegistry.component?.calcRoundUpInteractor?.execute(it.id, roundUpSinceDate)
                 }
             }
             .catch { exception ->
@@ -201,9 +198,9 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun load() {
-        if (tokenStore.token.isBlank()) {
+        if (loginSessionRegistry.component == null) {
             viewModelScope.launch {
-                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
+                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
             }
             return
         }
@@ -218,7 +215,7 @@ class AccountsViewModel @Inject constructor(
 
         viewModelScope.launch {
             accounts.value = try {
-                listAccountsInteractor.execute()
+                loginSessionRegistry.component?.listAccountsInteractor?.execute()
             } catch (e: ServiceException) {
                 e.message?.also {
                     navigationChannel.send(
@@ -227,15 +224,15 @@ class AccountsViewModel @Inject constructor(
                         )
                     )
                 }
-                emptyList()
-            }
+                null
+            } ?: emptyList()
         }
     }
 
     fun onLogout() {
-        tokenStore.token = ""
-        sessionRegistry.newSession()
-        // restart to get deps from the new session
+        tokenStore.refreshToken = ""
+        loginSessionRegistry.close()
+        // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)
         }

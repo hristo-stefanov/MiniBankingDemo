@@ -1,8 +1,10 @@
 package hristostefanov.minibankingdemo.util
 
+import dagger.BindsInstance
 import dagger.Subcomponent
 import hristostefanov.minibankingdemo.business.interactors.*
-import hristostefanov.minibankingdemo.presentation.*
+// TODO rename Session* to LoginSession* to make it clear that the lifecycle is the
+// as the one of the interactive user session
 
 // NOTE: Another option would be to use a Hilt's "custom component" which is essentially
 // a subcomponent but with less code and with some limitations. See
@@ -10,11 +12,22 @@ import hristostefanov.minibankingdemo.presentation.*
 // https://dagger.dev/hilt/custom-components
 @SessionScope
 @Subcomponent(modules = [SessionModule::class])
-interface SessionComponent {
+interface LoginSessionComponent {
     @Subcomponent.Factory
     interface Factory {
-        fun create(): SessionComponent
+        fun create(
+            @AccessToken
+            @BindsInstance
+            token: String,
+            @TokenType
+            @BindsInstance
+            tokenType: String
+        ): LoginSessionComponent
     }
+
+    // used for testing automation
+    @get:AccessToken
+    val accessToken: String
 
     val calcRoundUpInteractor: CalcRoundUpInteractor
     val listAccountsInteractor: ListAccountsInteractor

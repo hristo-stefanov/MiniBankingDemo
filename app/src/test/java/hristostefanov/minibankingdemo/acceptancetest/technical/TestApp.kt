@@ -4,7 +4,8 @@ import hristostefanov.minibankingdemo.acceptancetest.technical.di.DaggerTestAppl
 import hristostefanov.minibankingdemo.acceptancetest.technical.di.TestApplicationComponent
 object TestApp {
     private var _component: TestApplicationComponent = DaggerTestApplicationComponent.create()
-    val component = _component
+    val component
+    get() = _component
 
     fun newComponent() {
         _component = DaggerTestApplicationComponent.create()

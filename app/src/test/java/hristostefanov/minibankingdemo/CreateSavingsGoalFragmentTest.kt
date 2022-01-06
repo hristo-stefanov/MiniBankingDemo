@@ -19,6 +19,7 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.Matchers.not
@@ -32,6 +33,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.robolectric.annotation.Config
 import java.util.*
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
@@ -51,6 +53,9 @@ class CreateSavingsGoalFragmentTest {
     @Mock
     internal lateinit var interactor: CreateSavingsGoalInteractor
 
+    @Inject
+    internal lateinit var loginSessionRegistry: LoginSessionRegistry
+
     private val argBundle = CreateSavingsGoalFragmentArgs("1", Currency.getInstance("GBP")).toBundle()
 
     private val navController =
@@ -63,6 +68,9 @@ class CreateSavingsGoalFragmentTest {
     fun beforeEach() {
         // used for field injection
         hiltRule.inject()
+
+        // the user is logged in (fake session)
+        loginSessionRegistry.createSession("token", "Bearer")
     }
 
     @Test

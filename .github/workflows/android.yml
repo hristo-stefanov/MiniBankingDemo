@@ -39,7 +39,7 @@ jobs:
     - name: Build APK
       # Make sure the branch code can produce final deliverables (APKs) by merging manifest files,
       # other resources etc.
-      run: bash ./gradlew assemble
+      run: bash ./gradlew assembleSandbox
 
     - name: Run tests (unit tests + Espresso tests on Robolectric)
       # NOTE: because of the fragment-testing library, only the debug build type

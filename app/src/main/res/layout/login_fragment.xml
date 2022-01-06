@@ -5,26 +5,26 @@
     <data>
         <variable
             name="viewmodel"
-            type="hristostefanov.minibankingdemo.presentation.AccessTokenViewModel" />
+            type="hristostefanov.minibankingdemo.presentation.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.AccessTokenFragment">
+        tools:context=".ui.LoginFragment">
 
 <!--        SECURITY: saveEnabled="false" to avoid saving the token in the "saved instance state"
             by ActivityManager service -->
         <!--suppress AndroidUnknownAttribute -->
         <EditText
-            android:id="@+id/accessTokenEditText"
+            android:id="@+id/refreshTokenEditText"
             android:saveEnabled="false"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginVertical="8dp"
-            android:afterTextChanged="@{(sequence) -> viewmodel.onAccessTokenChanged(sequence.toString())}"
-            android:hint="@string/access_token_hint"
+            android:afterTextChanged="@{(sequence) -> viewmodel.onRefreshTokenChanged(sequence.toString())}"
+            android:hint="@string/refresh_token_hint"
             android:inputType="textMultiLine|textVisiblePassword"
             android:maxLines="3"
             app:layout_constraintBottom_toTopOf="@+id/acceptButton"
@@ -46,7 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/accessTokenEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/refreshTokenEditText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

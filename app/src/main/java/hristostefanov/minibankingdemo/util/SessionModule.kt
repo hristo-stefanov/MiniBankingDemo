@@ -28,10 +28,15 @@ abstract class SessionModule {
     companion object {
         @SessionScope
         @Provides
-        fun provideRetrofit(tokenStore: TokenStore): Retrofit {
+        fun provideRetrofit(
+            @AccessToken
+            accessToken: String,
+            @TokenType
+            tokenType: String
+        ): Retrofit {
             val interceptor = Interceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer ${tokenStore.token}").build()
+                    .addHeader("Authorization", "${tokenType} ${accessToken}").build()
                 chain.proceed(request)
             }
             val client = OkHttpClient.Builder().addInterceptor(interceptor).build()

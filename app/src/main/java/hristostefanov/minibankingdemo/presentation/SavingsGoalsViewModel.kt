@@ -8,7 +8,7 @@ import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import hristostefanov.minibankingdemo.util.SessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -20,15 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    sessionRegistry: SessionRegistry,
+    private val loginSessionRegistry: LoginSessionRegistry,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
-
-    private val listSavingGoalsInteractor = sessionRegistry.sessionComponent.listSavingGoalInteractor
 
     private var goals: List<SavingsGoal> = emptyList()
 
@@ -53,7 +51,8 @@ class SavingsGoalsViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             try {
-                goals = listSavingGoalsInteractor.execute(args.accountId)
+                goals = loginSessionRegistry.component?.listSavingGoalInteractor?.execute(args.accountId)
+                    ?: emptyList()
                 _list.value = goals.map { DisplaySavingsGoal(it.id, it.name) }
             } catch (e: ServiceException) {
                 e.localizedMessage?.also {

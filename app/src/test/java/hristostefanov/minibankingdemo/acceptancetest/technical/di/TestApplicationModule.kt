@@ -20,7 +20,7 @@ import java.util.*
 import javax.inject.Singleton
 
 @DisableInstallInCheck
-@Module(subcomponents = [SessionComponent::class])
+@Module(subcomponents = [LoginSessionComponent::class])
 abstract class TestApplicationModule {
 
     companion object {
@@ -58,7 +58,7 @@ abstract class TestApplicationModule {
     abstract fun bindAmountFormatter(amountFormatter: TestAmountFormatter): AmountFormatter
 
     @Binds
-    abstract fun bind(impl: SessionRegistryImp): SessionRegistry
+    abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
 
     @Singleton
     @Binds

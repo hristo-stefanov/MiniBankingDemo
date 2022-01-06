@@ -9,20 +9,20 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import hristostefanov.minibankingdemo.databinding.AccessTokenFragmentBinding
-import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
+import hristostefanov.minibankingdemo.databinding.LoginFragmentBinding
+import hristostefanov.minibankingdemo.presentation.LoginViewModel
 
 @AndroidEntryPoint
-class AccessTokenFragment : Fragment() {
-    private lateinit var binding: AccessTokenFragmentBinding
+class LoginFragment : Fragment() {
+    private lateinit var binding: LoginFragmentBinding
 
-    private val viewModel: AccessTokenViewModel by viewModels()
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = AccessTokenFragmentBinding.inflate(inflater, container, false)
+        binding = LoginFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,7 +32,7 @@ class AccessTokenFragment : Fragment() {
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
 
-        binding.accessTokenEditText.requestFocus()
+        binding.refreshTokenEditText.requestFocus()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

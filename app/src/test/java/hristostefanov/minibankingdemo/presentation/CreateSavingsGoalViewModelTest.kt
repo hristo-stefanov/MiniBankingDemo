@@ -7,8 +7,8 @@ import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel.Companion.NAME_KEY
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
-import hristostefanov.minibankingdemo.util.SessionRegistry
-import hristostefanov.minibankingdemo.util.SessionComponent
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionComponent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -30,8 +30,8 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     @Suppress("UNCHECKED_CAST")
     val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
 
-    private val sessionRegistry = mock(SessionRegistry::class.java)
-    private val sessionComponent = mock(SessionComponent::class.java)
+    private val sessionRegistry = mock(LoginSessionRegistry::class.java)
+    private val sessionComponent = mock(LoginSessionComponent::class.java)
 
     // test data
     private val gbp = Currency.getInstance("GBP")
@@ -52,7 +52,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
     @Before
     fun beforeEach() {
-        given(sessionRegistry.sessionComponent).willReturn(sessionComponent)
+        given(sessionRegistry.component).willReturn(sessionComponent)
         given(sessionComponent.createSavingGoalsInteractor).willReturn(createSavingsGoalsIterator)
     }
 
