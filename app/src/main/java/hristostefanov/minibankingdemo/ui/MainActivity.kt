@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // needed to hide the Up button on the ActionBar for top-level destinations
-        val topLevelDestinationIds = setOf(R.id.accessTokenDestination, R.id.accountsDestination)
+        val topLevelDestinationIds = setOf(R.id.loginDestination, R.id.accountsDestination)
 
         val navController = findNavController(R.id.navHostFragment)
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)

@@ -6,10 +6,10 @@
     app:startDestination="@id/accountsDestination">
 
     <fragment
-        android:id="@+id/accessTokenDestination"
-        android:name="hristostefanov.minibankingdemo.ui.AccessTokenFragment"
-        android:label="@string/access_token_title"
-        tools:layout="@layout/access_token_fragment"/>
+        android:id="@+id/loginDestination"
+        android:name="hristostefanov.minibankingdemo.ui.LoginFragment"
+        android:label="@string/login_title"
+        tools:layout="@layout/login_fragment"/>
     <fragment
         android:id="@+id/accountsDestination"
         android:name="hristostefanov.minibankingdemo.ui.AccountsFragment"
@@ -76,8 +76,8 @@
         app:destination="@id/errorDialog" />
 
     <action
-        android:id="@+id/to_accessTokenDestination"
-        app:destination="@id/accessTokenDestination" />
+        android:id="@+id/to_loginDestination"
+        app:destination="@id/loginDestination" />
 
     <dialog
         android:id="@+id/errorDialog"

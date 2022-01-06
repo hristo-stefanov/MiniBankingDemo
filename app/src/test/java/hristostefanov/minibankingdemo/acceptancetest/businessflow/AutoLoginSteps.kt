@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
-import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
+import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
@@ -14,7 +14,7 @@ private const val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class AutoLoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
-    private lateinit var accessTokenViewModel: AccessTokenViewModel
+    private lateinit var loginViewModel: LoginViewModel
 
     @Inject
     lateinit var automation: PresentationTestAutomation
@@ -40,7 +40,7 @@ class AutoLoginSteps {
         accountsViewModel = automation.openAccountScreen()
         // Accounts screen should navigate to Login screen
         // which will auto-login or ask for credentials
-        accessTokenViewModel = automation.openLoginScreen()
+        loginViewModel = automation.openLoginScreen()
     }
 
     @Then("I should be logged in")

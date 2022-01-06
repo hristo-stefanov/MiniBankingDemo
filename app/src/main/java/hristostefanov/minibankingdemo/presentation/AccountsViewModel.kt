@@ -200,7 +200,7 @@ class AccountsViewModel @Inject constructor(
     private fun load() {
         if (loginSessionRegistry.component == null) {
             viewModelScope.launch {
-                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toAccessTokenDestination()))
+                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
             }
             return
         }

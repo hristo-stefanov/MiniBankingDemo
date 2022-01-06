@@ -1,10 +1,9 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
-import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
+import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
@@ -12,7 +11,6 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
@@ -20,7 +18,7 @@ private const val CORRECT_REFRESH_TOKEN = "correctToken"
 
 class LoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
-    private lateinit var accessTokenViewModel: AccessTokenViewModel
+    private lateinit var loginViewModel: LoginViewModel
 
     @Inject
     internal lateinit var automation: PresentationTestAutomation
@@ -58,13 +56,13 @@ class LoginSteps {
             // consume the navigation to log in
             navigationChannel.receive()
         }
-        accessTokenViewModel = automation.openLoginScreen()
+        loginViewModel = automation.openLoginScreen()
     }
 
     @When("I provide correct credentials")
     fun i_provide_correct_credentials() {
-        accessTokenViewModel.onAccessTokenChanged(CORRECT_REFRESH_TOKEN)
-        accessTokenViewModel.onAcceptCommand()
+        loginViewModel.onRefreshTokenChanged(CORRECT_REFRESH_TOKEN)
+        loginViewModel.onAcceptCommand()
     }
 
     @Then("I should be given access to my accounts")

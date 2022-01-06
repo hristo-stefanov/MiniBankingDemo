@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.*
-import hristostefanov.minibankingdemo.presentation.AccessTokenViewModel
+import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
@@ -148,8 +148,8 @@ class PresentationTestAutomationImpl @Inject constructor(
         )
     }
 
-    override fun openLoginScreen(): AccessTokenViewModel {
-        return AccessTokenViewModel(
+    override fun openLoginScreen(): LoginViewModel {
+        return LoginViewModel(
             tokenStore,
             sessionRegistry,
             navigationChannel,

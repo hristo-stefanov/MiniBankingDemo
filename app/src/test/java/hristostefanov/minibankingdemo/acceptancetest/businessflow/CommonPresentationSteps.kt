@@ -27,7 +27,7 @@ class CommonPresentationSteps {
             navigationChannel.receive()
         }
 
-        Assertions.assertThat(nav).isEqualTo(Navigation.Forward(AccountsFragmentDirections.toAccessTokenDestination()))
+        Assertions.assertThat(nav).isEqualTo(Navigation.Forward(AccountsFragmentDirections.toLoginDestination()))
     }
 
 }

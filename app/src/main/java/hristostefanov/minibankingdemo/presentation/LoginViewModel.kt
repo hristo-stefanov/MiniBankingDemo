@@ -13,7 +13,7 @@ import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 @HiltViewModel
-class AccessTokenViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
@@ -34,7 +34,7 @@ class AccessTokenViewModel @Inject constructor(
         }
     }
 
-    fun onAccessTokenChanged(refreshToken: String) {
+    fun onRefreshTokenChanged(refreshToken: String) {
         // SECURITY: do not save the token in SavedStateHandle, which is saved in the
         // "saved instance state" by ActivityManager service
         // this also requires EditText#saveEnabled = false !!!

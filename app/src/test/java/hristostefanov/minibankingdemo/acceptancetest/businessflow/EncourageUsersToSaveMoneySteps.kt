@@ -36,7 +36,7 @@ class EncourageUsersToSaveMoneySteps {
         automation.correctRefreshTokenIs("correctToken")
 
         automation.openLoginScreen().run {
-            onAccessTokenChanged("correctToken")
+            onRefreshTokenChanged("correctToken")
             onAcceptCommand()
         }
 
