@@ -15,9 +15,9 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,14 +39,13 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        lifecycleScope.launch {
-            navigationChannel
-                .receiveAsFlow()
-                .flowWithLifecycle(lifecycle)
-                .collect { navigation ->
-                    onNavigation(navigation, navController)
-                }
-        }
+        navigationChannel
+            .receiveAsFlow()
+            .flowWithLifecycle(lifecycle)
+            .onEach { navigation ->
+                onNavigation(navigation, navController)
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun onNavigation(navigation: Navigation, navController: NavController) {
