@@ -25,7 +25,7 @@ interface SessionComponent {
         ): SessionComponent
     }
 
-    // TODO used for testing move to test component?
+    // used for testing automation
     @get:AccessToken
     val accessToken: String
 

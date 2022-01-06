@@ -69,7 +69,7 @@ class CreateSavingsGoalFragmentTest {
         // used for field injection
         hiltRule.inject()
 
-        // TODO is this valid at all?
+        // the user is logged in (fake session)
         sessionRegistry.createSession("token", "Bearer")
     }
 

@@ -8,8 +8,6 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [TestApplicationModule::class])
 interface TestApplicationComponent {
-    fun getSessionRegistry(): SessionRegistryImp
-
     fun inject(hooks: Hooks)
     fun inject(target: RoundUpSteps)
     fun inject(target: LoginSteps)

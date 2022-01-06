@@ -26,7 +26,7 @@ android {
         debug {
             buildConfigField("String", "SERVICE_BASE_URL", '"http:mock"')
 
-            // TODO what to do with these
+            // needed along wih the refresh token to obtain the access token from the sandbox environment
             buildConfigField("String", "CLIENT_ID", '"zBJLBbysdvjhkCedWxz0"')
             buildConfigField("String", "CLIENT_SECRET", '"m1U0y7vbV28k1LVbGvGy54Erk1SmY3DlU8kDM3SS"')
         }

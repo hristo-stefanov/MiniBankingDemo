@@ -21,7 +21,7 @@ Feature: Log in
 
   Rule: Should inform the user when failing to log in
 
-    @draft
+    @manual
     Scenario: logging with incorrect credentials
       Given I'm asked to login to access Accounts
       When I provided incorrect credentials

@@ -58,8 +58,6 @@ class AccessTokenViewModel @Inject constructor(
             )
 
             tokenStore.refreshToken = response.refresh_token
-            // TODO pass token_type as session argument and make retrofit use it instead
-            // of hardcoded "bearer"
             sessionRegistry.createSession(response.access_token, response.token_type)
 
             eventBus.post(AuthenticatedEvent())

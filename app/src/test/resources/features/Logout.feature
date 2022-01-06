@@ -13,6 +13,3 @@ Feature: Log out
       When I log out
       Then my account information should be hidden
       And I should be asked to login
-
-  # TODO illustrate the log out command should be available
-  Rule: The user can log out when logged in

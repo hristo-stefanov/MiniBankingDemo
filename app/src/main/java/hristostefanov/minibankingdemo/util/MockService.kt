@@ -93,7 +93,6 @@ class MockService(private val delegate: BehaviorDelegate<Service>): Service {
             }
         """.trimIndent()
             val responseBody = errorResponse.toResponseBody("application/json".toMediaType())
-            // TODO 401 (Unauthorized) doesn't seem appropriate
             val response = Response.error<ErrorResponse>(401, responseBody)
             throw HttpException(response)
         }
