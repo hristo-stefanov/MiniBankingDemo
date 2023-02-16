@@ -73,8 +73,8 @@ dependencies {
 
     // explicitly referenced for keeping up with security updates and
     // for use of toMediaType() and toResponseBody() extension functions
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.2.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:retrofit-mock:2.9.0'

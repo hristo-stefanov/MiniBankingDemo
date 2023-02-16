@@ -13,6 +13,8 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.oauth.OAuth
 import kotlinx.coroutines.channels.Channel
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.greenrobot.eventbus.EventBus
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -59,7 +61,20 @@ abstract class ApplicationModule {
 
         @Provides
         fun provideOAuth(): OAuth {
+            val client = OkHttpClient.Builder()
+                .apply {
+                    if (BuildConfig.BUILD_TYPE == "sandbox") {
+                        addInterceptor(
+                            HttpLoggingInterceptor().apply {
+                                level = HttpLoggingInterceptor.Level.BODY
+                            }
+                        )
+                    }
+                }
+                .build()
+
             val retrofit = Retrofit.Builder()
+                .client(client)
                 .baseUrl(BuildConfig.SERVICE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

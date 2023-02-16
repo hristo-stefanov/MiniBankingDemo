@@ -15,6 +15,7 @@ import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.mock.MockRetrofit
@@ -39,7 +40,18 @@ abstract class SessionModule {
                     .addHeader("Authorization", "${tokenType} ${accessToken}").build()
                 chain.proceed(request)
             }
-            val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+            val client = OkHttpClient.Builder()
+                .apply {
+                    if (BuildConfig.BUILD_TYPE == "sandbox") {
+                        addInterceptor(
+                            HttpLoggingInterceptor().apply {
+                                level = HttpLoggingInterceptor.Level.BODY
+                            }
+                        )
+                    }
+                    addInterceptor(interceptor)
+                }
+                .build()
 
             return Retrofit.Builder()
                 .client(client)
