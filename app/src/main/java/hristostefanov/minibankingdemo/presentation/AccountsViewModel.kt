@@ -42,7 +42,7 @@ class AccountsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
-        state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
+        state.getLiveData<String?>(ACCOUNT_ID_KEY, null).asFlow()
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
