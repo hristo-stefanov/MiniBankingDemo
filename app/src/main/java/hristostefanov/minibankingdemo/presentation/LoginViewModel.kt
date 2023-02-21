@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
+import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -10,6 +11,7 @@ import hristostefanov.minibankingdemo.util.oauth.OAuth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,18 +52,22 @@ class LoginViewModel @Inject constructor(
 
     private fun refreshTokenAndGoBack() {
         viewModelScope.launch {
-            val response = oAuth.accessToken(
-                client_id = BuildConfig.CLIENT_ID,
-                client_secret = BuildConfig.CLIENT_SECRET,
-                grant_type = "refresh_token",
-                tokenStore.refreshToken
-            )
+            try {
+                val response = oAuth.accessToken(
+                    client_id = BuildConfig.CLIENT_ID,
+                    client_secret = BuildConfig.CLIENT_SECRET,
+                    grant_type = "refresh_token",
+                    tokenStore.refreshToken
+                )
 
-            tokenStore.refreshToken = response.refresh_token
-            loginSessionRegistry.createSession(response.access_token, response.token_type)
+                tokenStore.refreshToken = response.refresh_token
+                loginSessionRegistry.createSession(response.access_token, response.token_type)
 
-            eventBus.post(AuthenticatedEvent())
-            navigationChannel.send(Navigation.Backward)
+                eventBus.post(AuthenticatedEvent())
+                navigationChannel.send(Navigation.Backward)
+            } catch (e: HttpException) {
+                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+            }
         }
     }
 }

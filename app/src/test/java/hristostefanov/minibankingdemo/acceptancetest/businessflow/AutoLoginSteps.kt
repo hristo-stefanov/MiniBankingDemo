@@ -1,8 +1,8 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
-import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
+import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions
 import javax.inject.Inject
 
 private const val CORRECT_REFRESH_TOKEN = "correctToken"
+private const val INVALID_REFRESH_TOKEN = "invalidToken"
 
 class AutoLoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
@@ -49,4 +50,8 @@ class AutoLoginSteps {
         Assertions.assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
 
+    @Given("the app keeps an invalid token")
+    fun the_app_keeps_an_invalid_token() {
+        automation.savedRefreshTokenIs(INVALID_REFRESH_TOKEN)
+    }
 }

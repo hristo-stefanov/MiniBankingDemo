@@ -16,7 +16,7 @@ class CommonPresentationSteps {
     @NavigationChannel
     lateinit var navigationChannel: Channel<Navigation>
 
-    @Before("@steps:login or @steps:logout")
+    @Before("@steps:login or @steps:logout or @steps:autologin")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
