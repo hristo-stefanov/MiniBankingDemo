@@ -28,6 +28,13 @@ class MainActivity : AppCompatActivity() {
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
+    private val navController by lazy { findNavController(R.id.navHostFragment) }
+
+    private val sentryNavListener = SentryNavigationListener(
+        enableNavigationBreadcrumbs = true,
+        enableNavigationTracing = true,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,7 +42,6 @@ class MainActivity : AppCompatActivity() {
         // needed to hide the Up button on the ActionBar for top-level destinations
         val topLevelDestinationIds = setOf(R.id.loginDestination, R.id.accountsDestination)
 
-        val navController = findNavController(R.id.navHostFragment)
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
@@ -71,6 +77,17 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        navController.addOnDestinationChangedListener(sentryNavListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navController.removeOnDestinationChangedListener(sentryNavListener)
+    }
+
 
     // To make the Up button operable, we need to override this method.
     // This is not needed when using Toolbar instead of ActionBAr
