@@ -50,3 +50,11 @@ Architectural decisions for patterns and techniques:
 * Coroutines and Flow
 * Dependency injection (Dagger 2)
 * EventBus for local broadcasting
+
+## Sentry
+
+The Sentry Android Gradle plugin will automatically integrated with OkHttp, androidx.fragment and 
+other, see Sentry for Android > Gradle. Only integration with the Navigation component is "manual".
+
+If _Performance_ section reveals no transactions, click "Enable real time updates" at the top-right
+corner of the screen. If this wont help, wait for an hour :)
