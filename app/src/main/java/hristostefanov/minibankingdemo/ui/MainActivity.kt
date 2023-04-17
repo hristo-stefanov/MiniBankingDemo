@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,6 +58,8 @@ class MainActivity : AppCompatActivity() {
     private fun onNavigation(navigation: Navigation, navController: NavController) {
         when (navigation) {
             is Navigation.Forward -> navController.navigate(navigation.navDirections)
+            is Navigation.ForwardToDestination -> navController.navigate(navigation
+                .destinationResId, navigation.args, navigation.navOptions)
             is Navigation.Backward -> navController.popBackStack()
             is Navigation.Restart -> {
                 // this way is better than restarting the Activity which may cause
