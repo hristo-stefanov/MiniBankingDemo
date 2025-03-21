@@ -66,7 +66,7 @@ class LoginViewModel @Inject constructor(
                 eventBus.post(AuthenticatedEvent())
                 navigationChannel.send(Navigation.Backward)
             } catch (e: HttpException) {
-                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(e.toString())))
             }
         }
     }

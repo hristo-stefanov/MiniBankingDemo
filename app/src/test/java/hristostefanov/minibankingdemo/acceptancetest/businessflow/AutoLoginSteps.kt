@@ -4,6 +4,7 @@ import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import io.cucumber.java.Before
+import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -53,5 +54,10 @@ class AutoLoginSteps {
     @Given("the app keeps an invalid token")
     fun the_app_keeps_an_invalid_token() {
         automation.savedRefreshTokenIs(INVALID_REFRESH_TOKEN)
+    }
+
+    @Given("there is no internet connection")
+    fun there_is_no_internet_connection() {
+        automation.thereIsNoInternetConnection()
     }
 }

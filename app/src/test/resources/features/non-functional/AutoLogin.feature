@@ -13,7 +13,6 @@ Feature: Session persistence
 
   Rule: Should allow the user to retry auto-logging if a network error occurs
 
-    @manual
     Scenario: there is no internet connection
       Given I was logged in before exiting the app
       And there is no internet connection

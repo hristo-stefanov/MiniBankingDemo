@@ -20,6 +20,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.lang.AssertionError
 import java.math.BigDecimal
+import java.net.NoRouteToHostException
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
@@ -55,6 +56,9 @@ class PresentationTestAutomationImpl @Inject constructor(
             grant_type: String,
             refreshToken: String
         ): AccessTokenResponse {
+            if (!isThereInternetConnection) {
+                throw NoRouteToHostException()
+            }
             if (refreshToken == correctRefreshToken) {
                 return AccessTokenResponse(
                     access_token = CORRECT_ACCESS_TOKEN,
@@ -70,6 +74,12 @@ class PresentationTestAutomationImpl @Inject constructor(
     }
 
     private lateinit var correctRefreshToken: String
+
+    private var isThereInternetConnection = true
+
+    override fun thereIsNoInternetConnection() {
+        isThereInternetConnection = false
+    }
 
     private val loginSessionComponentFactory: LoginSessionComponent.Factory = object: LoginSessionComponent.Factory {
         override fun create(token: String, tokenType: String): LoginSessionComponent {

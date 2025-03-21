@@ -18,6 +18,7 @@ interface PresentationTestAutomation {
     fun correctRefreshTokenIs(accessToken: String)
     fun savedRefreshTokenIs(refreshToken: String)
     fun accountIn(currencyCode: String)
+    fun thereIsNoInternetConnection()
 
     // exercising
     fun openAccountScreen(): AccountsViewModel
