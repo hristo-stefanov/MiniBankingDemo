@@ -56,5 +56,15 @@ Architectural decisions for patterns and techniques:
 The Sentry Android Gradle plugin will automatically integrated with OkHttp, androidx.fragment and 
 other, see Sentry for Android > Gradle. Only integration with the Navigation component is "manual".
 
+Is this option still available?
 If _Performance_ section reveals no transactions, click "Enable real time updates" at the top-right
 corner of the screen. If this wont help, wait for an hour :)
+
+### Useful links
+
+https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction
+https://docs.sentry.io/product/sentry-basics/tracing/distributed-tracing/#traces-transactions-and-spans
+https://docs.sentry.io/platforms/android/configuration/integrations/fragment/
+https://docs.sentry.io/platforms/android/performance/instrumentation/automatic-instrumentation/
+https://docs.sentry.io/platforms/android/performance/instrumentation/custom-instrumentation/
+https://docs.sentry.io/platforms/android/configuration/options/#idle-timeout
