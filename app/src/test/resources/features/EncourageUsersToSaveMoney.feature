@@ -1,6 +1,9 @@
 @steps:encourageUsersToSaveMoney
+#  TODO what about Encourage users to save round-ups
 Feature: Encourage users to save money
 
+  Rule: TODO
+  # TODO what about (The one where) the user is offered to save round-ups
   Scenario: The app encourages users to save round-ups
     Given the calculated round-up for my account is 1.0
     When I view this account
