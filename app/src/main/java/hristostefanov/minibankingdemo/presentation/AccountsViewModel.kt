@@ -230,7 +230,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onLogout() {
-        tokenStore.refreshToken = ""
+        tokenStore.token = ""
         loginSessionRegistry.close()
         // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {

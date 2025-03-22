@@ -68,9 +68,6 @@ class CreateSavingsGoalFragmentTest {
     fun beforeEach() {
         // used for field injection
         hiltRule.inject()
-
-        // the user is logged in (fake session)
-        loginSessionRegistry.createSession("token", "Bearer")
     }
 
     @Test

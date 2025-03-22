@@ -15,9 +15,9 @@ class TokenStoreImpl(context: Context): TokenStore {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
     }
 
-    override var refreshToken: String
-        get() = pref.getString("refreshToken", null) ?: ""
+    override var token: String
+        get() = pref.getString("token", null) ?: ""
         set(value) {
-            pref.edit().putString("refreshToken", value).apply()
+            pref.edit().putString("token", value).apply()
         }
 }

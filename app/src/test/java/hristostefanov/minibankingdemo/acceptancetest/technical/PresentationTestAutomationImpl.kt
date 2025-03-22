@@ -10,8 +10,6 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
-import hristostefanov.minibankingdemo.util.oauth.AccessTokenResponse
-import hristostefanov.minibankingdemo.util.oauth.OAuth
 import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -46,30 +44,6 @@ class PresentationTestAutomationImpl @Inject constructor(
         // dummy implementation
         override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
             return "0.00".toBigDecimal()
-        }
-    }
-
-    private val oAuthStub = object: OAuth {
-        override suspend fun accessToken(
-            client_id: String,
-            client_secret: String,
-            grant_type: String,
-            refreshToken: String
-        ): AccessTokenResponse {
-            if (!isThereInternetConnection) {
-                throw NoRouteToHostException()
-            }
-            if (refreshToken == correctRefreshToken) {
-                return AccessTokenResponse(
-                    access_token = CORRECT_ACCESS_TOKEN,
-                    refresh_token = "newRefreshToken",
-                    token_type = "Bearer",
-                    expires_in = 0,
-                    scope = ""
-                )
-            } else {
-                throw HttpException(Response.error<String>(401, "".toResponseBody()))
-            }
         }
     }
 
@@ -163,8 +137,7 @@ class PresentationTestAutomationImpl @Inject constructor(
             tokenStore,
             sessionRegistry,
             navigationChannel,
-            eventBus,
-            oAuthStub
+            eventBus
         )
     }
 }
