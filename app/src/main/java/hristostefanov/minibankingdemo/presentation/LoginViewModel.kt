@@ -34,7 +34,7 @@ class LoginViewModel @Inject constructor(
 
     fun onAcceptCommand() {
         // the user is logged in (fake session)
-        loginSessionRegistry.createSession("token", "Bearer")
+        loginSessionRegistry.createSession(tokenStore.token, "Bearer")
         eventBus.post(AuthenticatedEvent())
 
         viewModelScope.launch {
