@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit
 
 @DisableInstallInCheck
 @Module
-abstract class SessionModule {
+abstract class LoginSessionModule {
 
     companion object {
-        @SessionScope
+        @LoginSessionScope
         @Provides
         fun provideRetrofit(
             @AccessToken
@@ -60,7 +60,7 @@ abstract class SessionModule {
                 .build()
         }
 
-        @SessionScope
+        @LoginSessionScope
         @Provides
         fun provideService(retrofit: Retrofit, tokenStore: TokenStore): Service  {
             // NOTE: Retrofit coroutines support fulfills the @AnyThread requirement of the Service interface
@@ -84,15 +84,15 @@ abstract class SessionModule {
     }
 
     // Repositories may cache session specific data, hence the scoping to session
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
 
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindCalcRoundupInteractor(impl: CalcRoundUpInteractorImpl): CalcRoundUpInteractor
 
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindListAccountsInteractor(impl: ListAccountsInteractorImpl): ListAccountsInteractor
 }
