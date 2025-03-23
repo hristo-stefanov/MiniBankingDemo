@@ -7,18 +7,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import kotlinx.coroutines.channels.Channel
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import org.greenrobot.eventbus.EventBus
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.time.ZoneId
-import java.util.*
+import java.util.Locale
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
