@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+scale 350 width
+[*] --> MainActivity : launch [process not alive]
+[H*] --> MainActivity : launch [process alive]
+
+state MainActivity {
+  [*] --> AccountsFragment
+
+  state AccountsFragment {
+    [*] -->  Interactive
+'    Interactive --> ExitPoint <<ExitPoint>>
+    Interactive --> ErrorDialog : exception(ServiceException)
+    ErrorDialog --> Interactive : onClick(OK)
+  }
+  AccountsFragment --> LoginFragment : load [NoLoginSession]
+
+
+  state LoginFragment {
+    [*] --> FormInvalid
+    FormInvalid --> FormValid : onTextChange(token)[token not empty]
+    FormValid --> FormInvalid : onTextChange(token)[token empty]
+    FormValid --> AccountsFragment : onClick(Accept) / create LoginSession
+  }
+  Interactive --> [*] : onClick(Logout) / destroy LoginSession
+  --
+
+  [*] --> NoLoginSession
+  NoLoginSession --> LoginSession : create LoginSession
+  LoginSession --> NoLoginSession : destroy LoginSession
+}
+@enduml
