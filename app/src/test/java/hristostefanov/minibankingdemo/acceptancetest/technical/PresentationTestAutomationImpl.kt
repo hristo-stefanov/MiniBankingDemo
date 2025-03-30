@@ -81,7 +81,7 @@ class PresentationTestAutomationImpl @Inject constructor(
     }
 
     override fun savedRefreshTokenIs(refreshToken: String) {
-        tokenStore.refreshToken = refreshToken
+        tokenStore.token = refreshToken
     }
 
     override fun accountIn(currencyCode: String) {
