@@ -12,8 +12,9 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
@@ -44,7 +45,7 @@ abstract class TestApplicationModule {
         }
 
         @Provides
-        fun provideTestDispatcher() = TestCoroutineDispatcher()
+        fun provideTestDispatcher(): CoroutineDispatcher = UnconfinedTestDispatcher()
 
         @Provides
         fun provideGson() = Gson()

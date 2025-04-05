@@ -4,9 +4,9 @@ import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesT
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.*
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class BusinessRulesTestAutomationImpl
 @Inject constructor(
     private val zoneId: ZoneId,
-    private val testDispatcher: TestCoroutineDispatcher
+    private val testDispatcher: CoroutineDispatcher
 ): BusinessRulesTestAutomation {
 
     private lateinit var repository: Repository

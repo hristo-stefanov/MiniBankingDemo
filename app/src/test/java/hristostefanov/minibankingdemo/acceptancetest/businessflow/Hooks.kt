@@ -3,17 +3,20 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.java.After
 import io.cucumber.java.Before
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class Hooks {
+    // TODO why injecting? Can create directly, the scheduler will be shared with other
+    //  test dispatchers
     @Inject
-    internal lateinit var testDispatcher: TestCoroutineDispatcher
+    internal lateinit var testDispatcher: CoroutineDispatcher
 
     init {
         TestApp.component.inject(this)
@@ -30,6 +33,5 @@ class Hooks {
     @After
     fun afterEachScenario() {
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 }
