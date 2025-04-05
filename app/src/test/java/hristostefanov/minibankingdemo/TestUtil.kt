@@ -2,7 +2,8 @@ package hristostefanov.minibankingdemo
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
@@ -23,25 +24,33 @@ fun <T> any(): T {
 fun <T> eq(t: T): T = Mockito.eq<T>(t)
 fun <T> uninitialized(): T = null as T
 
-// Originating from: https://medium.com/androiddevelopers/easy-coroutines-in-android-viewmodelscope-25bffb605471
-// NOTE: "we call the runBlockingTest method inside the TestCoroutineDispatcher that the
-// rule creates. Since that Dispatcher overrides Dispatchers.Main, MainViewModel will run the
-// coroutine on that Dispatcher too. Calling runBlockingTest will make that coroutine to execute
-// synchronously in the test."
-
-@ExperimentalCoroutinesApi
+/**
+ *
+ * Based on https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
+ * > some APIs such as viewModelScope use a hardcoded Main dispatcher under the hood.
+ *
+ * > If the Main dispatcher has been replaced with a TestDispatcher, any newly-created
+ * > TestDispatchers will automatically use the scheduler from the Main dispatcher, including
+ * > the StandardTestDispatcher created by runTest if no other dispatcher is passed to it.
+ *
+ * > This makes it easier to ensure that there is only a single scheduler in use during the test.
+ * > For this to work, make sure to create all other TestDispatcher instances after
+ * > calling Dispatchers.setMain.
+ *
+ * > This rule implementation uses an UnconfinedTestDispatcher by default, but a
+ * > StandardTestDispatcher can be passed in as a parameter if the Main dispatcher shouldn’t
+ * > execute eagerly in a given test class.
+ */
+// TODO rename to MainDispatcherRule
 class CoroutinesTestRule(
-    val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 ) : TestWatcher() {
 
     override fun starting(description: Description?) {
-        super.starting(description)
         Dispatchers.setMain(testDispatcher)
     }
 
     override fun finished(description: Description?) {
-        super.finished(description)
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 }

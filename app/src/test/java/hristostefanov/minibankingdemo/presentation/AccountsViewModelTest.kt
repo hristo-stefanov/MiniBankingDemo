@@ -18,7 +18,8 @@ import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.greenrobot.eventbus.EventBus
 import org.junit.Before
@@ -31,7 +32,6 @@ import org.mockito.Mockito.spy
 import java.time.LocalDate
 import java.util.*
 
-@ExperimentalCoroutinesApi
 class AccountsViewModelTest {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
@@ -43,13 +43,6 @@ class AccountsViewModelTest {
 
     @get:Rule
     val coroutineTestRule = CoroutinesTestRule()
-
-    // NOTE: needed for proper testing of Architecture Components -
-    // makes background tasks execute synchronously.
-    // More importantly, provides TaskExecutor#isMainThread implementation which always return `true`
-    // thus avoiding exceptions in LiveData's observe* methods.
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
 
     private val eventBus = spy(EventBus::class.java)
 
@@ -91,7 +84,7 @@ class AccountsViewModelTest {
     }
 
     @Before
-    fun beforeEach() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun beforeEach() = runTest {
         given(loginSessionRegistry.component).willReturn(loginSessionComponent)
         given(loginSessionComponent.calcRoundUpInteractor).willReturn(calcRoundUpInteractor)
         given(loginSessionComponent.listAccountsInteractor).willReturn(listAccountsInteractor)
@@ -105,7 +98,7 @@ class AccountsViewModelTest {
     }
 
     @Test
-    fun `Initial interactions`() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Initial interactions`() = runTest {
         viewModel // instantiate
 
         then(eventBus).should().register(viewModel)
@@ -117,8 +110,8 @@ class AccountsViewModelTest {
     }
 
     @Test
-    fun `Should update outputs when data source changes`() =
-        coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Should update outputs when data source changes`() = runTest {
+            println(this.coroutineContext)
             // get the first data source set
             viewModel
 
@@ -128,6 +121,8 @@ class AccountsViewModelTest {
             given(amountFormatter.format(half, "EUR")).willReturn("€0.50")
 
             viewModel.onDataSourceChanged(DataSourceChangedEvent())
+
+            advanceUntilIdle()
 
             assertThat(viewModel.accountList.value[0].number).isEqualTo("222")
             assertThat(viewModel.roundUpAmountText.value).isEqualTo("€0.50")
@@ -140,7 +135,7 @@ class AccountsViewModelTest {
     }
 
     @Test
-    fun `Transfer command selected`() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Transfer command selected`() = runTest {
         // wait for the command to get enabled
         viewModel.transferCommandEnabled.first()
 
@@ -157,8 +152,7 @@ class AccountsViewModelTest {
     }
 
     @Test
-    fun `First Account should be selected by default`() =
-        coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `First Account should be selected by default`() = runTest {
             given(listAccountsInteractor.execute()).willReturn(listOf(account1, account2))
 
             val position = viewModel.selectedAccountPosition.first()
@@ -167,7 +161,7 @@ class AccountsViewModelTest {
         }
 
     @Test
-    fun `Should restore Account selection`() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Should restore Account selection`() = runTest {
         val accounts = listOf(account1, account2)
         given(listAccountsInteractor.execute()).willReturn(accounts)
         state[ACCOUNT_ID_KEY] = account2.id
@@ -179,8 +173,7 @@ class AccountsViewModelTest {
 
 
     @Test
-    fun `Transfer Command should be enabled when RoundUpAmount is positive`() =
-        coroutineTestRule.testDispatcher.runBlockingTest {
+    fun `Transfer Command should be enabled when RoundUpAmount is positive`() = runTest {
             val isEnabled = viewModel.transferCommandEnabled.first()
 
             assertThat(isEnabled).isTrue()
