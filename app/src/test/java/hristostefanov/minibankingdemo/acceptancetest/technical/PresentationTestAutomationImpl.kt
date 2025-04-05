@@ -23,8 +23,6 @@ import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
-private const val CORRECT_ACCESS_TOKEN = "correctAccessToken"
-
 class PresentationTestAutomationImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
@@ -88,7 +86,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN) {
+                if(sessionRegistry.component?.accessToken == correctRefreshToken) {
                     return listOf(
                         Account(
                             "1",
@@ -109,7 +107,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN ) {
+                if(sessionRegistry.component?.accessToken == correctRefreshToken) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")
