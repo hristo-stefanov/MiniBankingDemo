@@ -19,9 +19,10 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
+import hristostefanov.minibankingdemo.util.LoginSessionComponent
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -68,11 +69,12 @@ class CreateSavingsGoalFragmentTest {
     fun beforeEach() {
         // used for field injection
         hiltRule.inject()
+
+        loginSessionRegistry.createSession("token", "Bearer")
     }
 
     @Test
-    fun `Should push fragment arguments and Name text`() =
-        coroutinesTestRule.testDispatcher.runBlockingTest {
+    fun `Should push fragment arguments and Name text`() = runTest {
             given(interactor.validateName("a")).willReturn(true)
             launchFragment(argBundle)
             onView(withId(R.id.nameEditText)).perform(ViewActions.typeText("a"))
@@ -84,7 +86,7 @@ class CreateSavingsGoalFragmentTest {
 
     @Test
     fun `Should execute CreateSavingsGoalInteractor if enabled Create button is clicked`() =
-        coroutinesTestRule.testDispatcher.runBlockingTest {
+        runTest {
             givenCreateButtonIsEnabled()
 
             onView(withId(R.id.createSavingsGoalButton)).perform(click())
