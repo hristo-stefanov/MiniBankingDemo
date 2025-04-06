@@ -49,19 +49,19 @@ class AccountsViewModel @Inject constructor(
     private val roundUpAmountFlow = MutableStateFlow<BigDecimal?>(null)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
-    val accountList: StateFlow<List<DisplayAccount>> = _accountList
+    val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
 
     private val _selectedAccountPosition = MutableStateFlow(-1)
-    val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition
+    val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition.asStateFlow()
 
     private val _roundUpAmountText = MutableStateFlow("")
-    val roundUpAmountText: StateFlow<String> = _roundUpAmountText
+    val roundUpAmountText: StateFlow<String> = _roundUpAmountText.asStateFlow()
 
     private val _roundUpInfo = MutableStateFlow("")
-    val roundUpInfo: StateFlow<String> = _roundUpInfo
+    val roundUpInfo: StateFlow<String> = _roundUpInfo.asStateFlow()
 
     private val _transferCommandEnabled = MutableStateFlow(false)
-    val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled
+    val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
     private val selectedAccountFlow: Flow<Account?> =
         combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
