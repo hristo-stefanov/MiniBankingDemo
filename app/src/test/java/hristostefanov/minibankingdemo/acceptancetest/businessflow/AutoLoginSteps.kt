@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
+import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import io.cucumber.java.Before
@@ -8,8 +9,10 @@ import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.assertj.core.api.Assertions
 import javax.inject.Inject
+import kotlinx.coroutines.test.runTest
 
 private const val CORRECT_REFRESH_TOKEN = "correctToken"
 private const val INVALID_REFRESH_TOKEN = "invalidToken"
@@ -43,10 +46,14 @@ class AutoLoginSteps {
         // Accounts screen should navigate to Login screen
         // which will auto-login or ask for credentials
         loginViewModel = automation.openLoginScreen()
+
+        accountsViewModel.onDataSourceChanged(DataSourceChangedEvent())
     }
 
     @Then("I should be logged in")
-    fun i_should_be_logged_in() {
+    fun i_should_be_logged_in() = runTest {
+        advanceUntilIdle()
+
         // check if the default account can be accessed
         Assertions.assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
