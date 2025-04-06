@@ -3,7 +3,7 @@ package hristostefanov.minibankingdemo.presentation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
-import hristostefanov.minibankingdemo.CoroutinesTestRule
+import hristostefanov.minibankingdemo.MainDispatcherRule
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
@@ -29,7 +29,7 @@ class CreateSavingsGoalViewModelTest() {
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
-    val coroutineTestrule = CoroutinesTestRule()
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
 

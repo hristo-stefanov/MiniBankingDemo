@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -44,8 +43,7 @@ fun <T> uninitialized(): T = null as T
  * > StandardTestDispatcher can be passed in as a parameter if the Main dispatcher shouldn’t
  * > execute eagerly in a given test class.
  */
-// TODO rename to MainDispatcherRule
-class CoroutinesTestRule(
+class MainDispatcherRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 ) : TestWatcher() {
 

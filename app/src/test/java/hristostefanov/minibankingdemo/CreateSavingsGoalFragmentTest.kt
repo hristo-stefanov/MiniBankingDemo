@@ -19,7 +19,6 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
-import hristostefanov.minibankingdemo.util.LoginSessionComponent
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -48,7 +47,7 @@ class CreateSavingsGoalFragmentTest {
     internal val mockitoRule = MockitoJUnit.rule()
 
     @get:Rule(order = 2)
-    internal val coroutinesTestRule = CoroutinesTestRule()
+    internal val mainDispatcherRule = MainDispatcherRule()
 
     @BindValue // Hilt-testing: use this instance instead of creating an instance of the class
     @Mock

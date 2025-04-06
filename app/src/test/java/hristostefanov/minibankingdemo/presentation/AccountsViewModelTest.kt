@@ -1,8 +1,7 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
-import hristostefanov.minibankingdemo.CoroutinesTestRule
+import hristostefanov.minibankingdemo.MainDispatcherRule
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.entities.Account
@@ -43,7 +42,7 @@ class AccountsViewModelTest {
     private val loginSessionComponent = mock(LoginSessionComponent::class.java)
 
     @get:Rule
-    val coroutineTestRule = CoroutinesTestRule()
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val eventBus = spy(EventBus::class.java)
 
