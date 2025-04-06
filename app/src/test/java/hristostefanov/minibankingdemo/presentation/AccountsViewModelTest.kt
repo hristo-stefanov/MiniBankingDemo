@@ -111,7 +111,6 @@ class AccountsViewModelTest {
 
     @Test
     fun `Should update outputs when data source changes`() = runTest {
-            println(this.coroutineContext)
             // get the first data source set
             viewModel
 
