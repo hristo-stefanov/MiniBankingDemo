@@ -25,6 +25,9 @@ fun <T> eq(t: T): T = Mockito.eq<T>(t)
 fun <T> uninitialized(): T = null as T
 
 /**
+ * This rule sets a [TestDispatcher] as a [Dispatchers.Main] for
+ * [androidx.lifecycle.viewModelScope] and others that are hardcoded to
+ * use [Dispatchers.Main]. This makes injecting a main dispatcher into ViewModels unnecessary.
  *
  * Based on https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
  * > some APIs such as viewModelScope use a hardcoded Main dispatcher under the hood.
