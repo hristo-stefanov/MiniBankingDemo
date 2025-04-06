@@ -2,6 +2,7 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
+import hristostefanov.minibankingdemo.util.AccessToken
 import java.math.BigDecimal
 
 /**
@@ -15,8 +16,8 @@ import java.math.BigDecimal
 interface PresentationTestAutomation {
     // stubbing
     fun calculatedRoundUpIs(amount: BigDecimal)
-    fun correctRefreshTokenIs(accessToken: String)
-    fun savedRefreshTokenIs(refreshToken: String)
+    fun correctAccessTokenIs(accessToken: String)
+    fun savedAccessTokenIs(accessToken: String)
     fun accountIn(currencyCode: String)
     fun thereIsNoInternetConnection()
 

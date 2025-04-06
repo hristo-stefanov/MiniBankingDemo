@@ -33,10 +33,10 @@ class EncourageUsersToSaveMoneySteps {
     }
 
     private fun i_am_logged_in() {
-        automation.correctRefreshTokenIs("correctToken")
+        automation.correctAccessTokenIs("correctToken")
 
         automation.openLoginScreen().run {
-            onRefreshTokenChanged("correctToken")
+            onAccessTokenChanged("correctToken")
             onAcceptCommand()
         }
 

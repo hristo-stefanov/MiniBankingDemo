@@ -22,7 +22,7 @@ class LoginViewModel @Inject constructor(
     private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
 
-    fun onRefreshTokenChanged(accessToken: String) {
+    fun onAccessTokenChanged(accessToken: String) {
         // SECURITY: do not save the token in SavedStateHandle, which is saved in the
         // "saved instance state" by ActivityManager service
         // this also requires EditText#saveEnabled = false !!!

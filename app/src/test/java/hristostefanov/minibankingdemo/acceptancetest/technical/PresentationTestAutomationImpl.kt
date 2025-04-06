@@ -12,13 +12,8 @@ import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
 import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.greenrobot.eventbus.EventBus
-import retrofit2.HttpException
-import retrofit2.Response
-import java.lang.AssertionError
 import java.math.BigDecimal
-import java.net.NoRouteToHostException
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
@@ -45,7 +40,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         }
     }
 
-    private lateinit var correctRefreshToken: String
+    private lateinit var correctAccessToken: String
 
     private var isThereInternetConnection = true
 
@@ -74,19 +69,19 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
-    override fun correctRefreshTokenIs(refreshToken: String) {
-        correctRefreshToken = refreshToken
+    override fun correctAccessTokenIs(accessToken: String) {
+        correctAccessToken = accessToken
     }
 
-    override fun savedRefreshTokenIs(refreshToken: String) {
-        tokenStore.token = refreshToken
+    override fun savedAccessTokenIs(accessToken: String) {
+        tokenStore.token = accessToken
     }
 
     override fun accountIn(currencyCode: String) {
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == correctRefreshToken) {
+                if(sessionRegistry.component?.accessToken == correctAccessToken) {
                     return listOf(
                         Account(
                             "1",
@@ -107,7 +102,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == correctRefreshToken) {
+                if(sessionRegistry.component?.accessToken == correctAccessToken) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")

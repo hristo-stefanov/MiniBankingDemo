@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
-private const val CORRECT_REFRESH_TOKEN = "correctToken"
+private const val CORRECT_ACCESS_TOKEN = "correctToken"
 
 class LoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
@@ -31,7 +31,7 @@ class LoginSteps {
     fun beforeEachScenario() {
         TestApp.component.inject(this)
 
-        automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+        automation.correctAccessTokenIs(CORRECT_ACCESS_TOKEN)
 
         // create a default account to be able to verify access to online banking is given
         // this works ok for the purpose of loggin related scenarios
@@ -61,7 +61,7 @@ class LoginSteps {
 
     @When("I provide correct credentials")
     fun i_provide_correct_credentials() {
-        loginViewModel.onRefreshTokenChanged(CORRECT_REFRESH_TOKEN)
+        loginViewModel.onAccessTokenChanged(CORRECT_ACCESS_TOKEN)
         loginViewModel.onAcceptCommand()
     }
 

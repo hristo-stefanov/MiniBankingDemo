@@ -32,7 +32,7 @@ class LoginFragment : Fragment() {
         binding.lifecycleOwner = this // needed for observing LiveData
         binding.viewmodel = viewModel
 
-        binding.refreshTokenEditText.requestFocus()
+        binding.accessTokenEditText.requestFocus()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

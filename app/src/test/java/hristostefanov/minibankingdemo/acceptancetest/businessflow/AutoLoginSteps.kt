@@ -5,7 +5,6 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import io.cucumber.java.Before
-import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -14,8 +13,8 @@ import org.assertj.core.api.Assertions
 import javax.inject.Inject
 import kotlinx.coroutines.test.runTest
 
-private const val CORRECT_REFRESH_TOKEN = "correctToken"
-private const val INVALID_REFRESH_TOKEN = "invalidToken"
+private const val CORRECT_ACCESS_TOKEN = "correctToken"
+private const val INVALID_ACCESS_TOKEN = "invalidToken"
 
 class AutoLoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
@@ -28,7 +27,7 @@ class AutoLoginSteps {
     fun beforeEachScenario() {
         TestApp.component.inject(this)
 
-        automation.correctRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+        automation.correctAccessTokenIs(CORRECT_ACCESS_TOKEN)
 
         // create a default account to be able to verify access to online banking is given
         // this works ok for the purpose of loggin related scenarios
@@ -37,7 +36,7 @@ class AutoLoginSteps {
 
     @Given("I was logged in before exiting the app")
     fun i_was_logged_in_before_exiting_the_app() {
-        automation.savedRefreshTokenIs(CORRECT_REFRESH_TOKEN)
+        automation.savedAccessTokenIs(CORRECT_ACCESS_TOKEN)
     }
 
     @When("I launch the app to access Accounts")
@@ -60,7 +59,7 @@ class AutoLoginSteps {
 
     @Given("the app keeps an invalid token")
     fun the_app_keeps_an_invalid_token() {
-        automation.savedRefreshTokenIs(INVALID_REFRESH_TOKEN)
+        automation.savedAccessTokenIs(INVALID_ACCESS_TOKEN)
     }
 
     @Given("there is no internet connection")
