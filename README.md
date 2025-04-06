@@ -33,6 +33,8 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
+This project requires JDK 11 to build.
+
 ##  Test suite
 The project includes various types of tests:
 * BDD-style acceptance tests (EncourageUsersToSaveMoney.feature and RoundUp.feature)
