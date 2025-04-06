@@ -32,6 +32,7 @@ import org.mockito.Mockito.spy
 import java.time.LocalDate
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AccountsViewModelTest {
     private val calcRoundUpInteractor = mock(CalcRoundUpInteractor::class.java)
     private val listAccountsInteractor = mock(ListAccountsInteractor::class.java)
