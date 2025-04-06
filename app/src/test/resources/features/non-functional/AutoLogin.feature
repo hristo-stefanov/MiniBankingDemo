@@ -1,3 +1,4 @@
+@draft
 @steps:autologin
 Feature: Session persistence
   In order to save time and effort
