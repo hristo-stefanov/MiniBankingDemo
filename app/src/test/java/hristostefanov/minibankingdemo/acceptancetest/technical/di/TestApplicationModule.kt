@@ -13,6 +13,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.greenrobot.eventbus.EventBus
@@ -43,9 +44,6 @@ abstract class TestApplicationModule {
         fun provideStringSupplier(): StringSupplier = object : StringSupplier {
             override fun get(resId: Int): String = ""
         }
-
-        @Provides
-        fun provideTestDispatcher(): CoroutineDispatcher = UnconfinedTestDispatcher()
 
         @Provides
         fun provideGson() = Gson()

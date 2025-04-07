@@ -12,5 +12,5 @@ interface BusinessRulesTestAutomation {
     fun createAccount(number: String, currency: String, transactions: List<BigDecimal>)
 
     // exercising
-    fun calculateRoundUp(accountNumber: String): BigDecimal
+    suspend fun calculateRoundUp(accountNumber: String): BigDecimal
 }

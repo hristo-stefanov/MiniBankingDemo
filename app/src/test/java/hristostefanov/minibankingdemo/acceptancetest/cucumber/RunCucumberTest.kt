@@ -20,9 +20,9 @@ import org.junit.runner.RunWith
 )
 class RunCucumberTest {
 
-    // Provides TaskExecutor#isMainThread implementation which always return `true`
-    // thus avoiding exceptions in LiveData's observe* methods when running local tests.
     companion object {
+        // Provides TaskExecutor#isMainThread implementation which always return `true`
+        // thus avoiding exceptions in LiveData's observe* methods when running local tests.
         @JvmStatic
         @get:ClassRule
         val rule = InstantTaskExecutorRule()
