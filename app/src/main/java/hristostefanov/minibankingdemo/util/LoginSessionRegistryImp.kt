@@ -3,7 +3,6 @@ package hristostefanov.minibankingdemo.util
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class LoginSessionRegistryImp @Inject constructor(
     private val loginSessionComponentFactory: LoginSessionComponent.Factory
 ) : LoginSessionRegistry {

@@ -58,6 +58,7 @@ abstract class TestApplicationModule {
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: TestAmountFormatter): AmountFormatter
 
+    @Singleton
     @Binds
     abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
 

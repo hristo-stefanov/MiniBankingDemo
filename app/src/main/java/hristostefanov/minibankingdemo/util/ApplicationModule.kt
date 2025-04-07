@@ -57,6 +57,7 @@ abstract class ApplicationModule {
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
 
+    @Singleton
     @Binds
     abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
 }
