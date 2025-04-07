@@ -1,7 +1,10 @@
 package hristostefanov.minibankingdemo.util
 
 import javax.inject.Scope
+import java.lang.annotation.Documented
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 @Scope
-@Retention(value = AnnotationRetention.RUNTIME)
+@Documented
+@Retention(RUNTIME)
 annotation class LoginSessionScope
