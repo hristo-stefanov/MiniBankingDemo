@@ -9,7 +9,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class EncourageUsersToSaveMoneySteps {
         i_am_logged_in()
     }
 
-    private fun i_am_logged_in() {
+    private fun i_am_logged_in() = runTest {
         automation.correctAccessTokenIs("correctToken")
 
         automation.openLoginScreen().run {
@@ -41,9 +41,7 @@ class EncourageUsersToSaveMoneySteps {
         }
 
         // consume back navigation event
-        runBlocking {
-            navigationChannel.receive()
-        }
+        navigationChannel.receive()
     }
 
     @Given("the calculated round-up for my account is {double}")

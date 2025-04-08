@@ -7,7 +7,7 @@ import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Then
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import javax.inject.Inject
 
@@ -22,10 +22,8 @@ class CommonPresentationSteps {
     }
 
     @Then("I should be asked to login")
-    fun i_should_be_asked_to_login() {
-        val nav = runBlocking {
-            navigationChannel.receive()
-        }
+    fun i_should_be_asked_to_login() = runTest {
+        val nav = navigationChannel.receive()
 
         Assertions.assertThat(nav).isEqualTo(Navigation.Forward(AccountsFragmentDirections.toLoginDestination()))
     }

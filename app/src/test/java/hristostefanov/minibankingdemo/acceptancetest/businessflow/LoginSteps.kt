@@ -10,7 +10,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import javax.inject.Inject
 
@@ -51,12 +51,14 @@ class LoginSteps {
 
     @Given("I'm asked to login to access my accounts")
     fun i_m_asked_to_login_to_access_my_accounts() {
-        accountsViewModel = automation.openAccountScreen()
-        runBlocking {
+        runTest {
+            accountsViewModel = automation.openAccountScreen()
+
             // consume the navigation to log in
             navigationChannel.receive()
+
+            loginViewModel = automation.openLoginScreen()
         }
-        loginViewModel = automation.openLoginScreen()
     }
 
     @When("I provide correct credentials")
@@ -67,13 +69,14 @@ class LoginSteps {
 
     @Then("I should be given access to my accounts")
     fun i_should_access_the_online_banking() {
-        val nav = runBlocking {
+        runTest {
             // consume the backwards navigation from the login screen
-            navigationChannel.receive()
+            val nav = navigationChannel.receive()
+
+            assertThat(nav).isEqualTo(Navigation.Backward)
+            // check if the default account can be accessed
+            assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
         }
 
-        assertThat(nav).isEqualTo(Navigation.Backward)
-        // check if the default account can be accessed
-        assertThat(accountsViewModel.accountList.value.first().currency).isEqualTo("GBP")
     }
 }

@@ -9,7 +9,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class LogoutSteps {
         i_am_logged_in()
     }
 
-    private fun i_am_logged_in() {
+    private fun i_am_logged_in() = runTest {
         automation.correctAccessTokenIs("correctToken")
 
         automation.openLoginScreen().run {
@@ -38,9 +38,7 @@ class LogoutSteps {
         }
 
         // consume back navigation event
-        runBlocking {
-            navigationChannel.receive()
-        }
+        navigationChannel.receive()
     }
 
     @Given("I am seeing my account information")
@@ -57,11 +55,8 @@ class LogoutSteps {
     }
 
     @Then("my account information should be hidden")
-    fun my_account_information_should_be_hidden() {
-        val nav = runBlocking {
-            navigationChannel.receive()
-        }
-
+    fun my_account_information_should_be_hidden() = runTest {
+        val nav = navigationChannel.receive()
         Assertions.assertThat(nav).isEqualTo(Navigation.Restart)
     }
 }

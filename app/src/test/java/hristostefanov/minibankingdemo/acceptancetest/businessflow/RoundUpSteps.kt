@@ -9,7 +9,7 @@ import org.hamcrest.Matchers.`is`
 import java.math.BigDecimal
 import javax.inject.Inject
 import io.cucumber.java.Before
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 private const val ACCOUNT_NUM = "12345678"
 
@@ -31,7 +31,7 @@ class RoundUpSteps {
     }
 
     @When("the round up amount is calculated")
-    fun the_round_up_amount_is_calculated() = runBlocking {
+    fun the_round_up_amount_is_calculated() = runTest {
         result = automation.calculateRoundUp(ACCOUNT_NUM)
     }
 
