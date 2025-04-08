@@ -18,7 +18,6 @@ private const val INVALID_ACCESS_TOKEN = "invalidToken"
 
 class AutoLoginSteps {
     private lateinit var accountsViewModel: AccountsViewModel
-    private lateinit var loginViewModel: LoginViewModel
 
     @Inject
     lateinit var automation: PresentationTestAutomation
@@ -42,15 +41,11 @@ class AutoLoginSteps {
     @When("I launch the app to access Accounts")
     fun i_launch_the_app_to_access_accounts() {
         accountsViewModel = automation.openAccountScreen()
-        // Accounts screen should navigate to Login screen
-        // which will auto-login or ask for credentials
-        loginViewModel = automation.openLoginScreen()
-
-        accountsViewModel.onDataSourceChanged(DataSourceChangedEvent())
     }
 
     @Then("I should be logged in")
     fun i_should_be_logged_in() = runTest {
+        // TODO the scenario passes withou it?
         advanceUntilIdle()
 
         // check if the default account can be accessed

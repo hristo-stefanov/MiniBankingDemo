@@ -199,10 +199,17 @@ class AccountsViewModel @Inject constructor(
 
     private fun load() {
         if (loginSessionRegistry.component == null) {
-            viewModelScope.launch {
-                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+            val token = tokenStore.token
+            if (token.isBlank()) {
+                viewModelScope.launch {
+                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+                }
+                return
+            } else {
+                // Auto-login
+                loginSessionRegistry.createSession(token, "Bearer")
+                eventBus.post(AuthenticatedEvent())
             }
-            return
         }
 
         val formatter =
