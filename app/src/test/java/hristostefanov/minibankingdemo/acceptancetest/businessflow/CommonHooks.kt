@@ -1,24 +1,19 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.MainDispatcherRule
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import io.cucumber.java.After
 import io.cucumber.java.Before
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import javax.inject.Inject
 
-// TODO rename to CommonScenarioHooks or SharedHooks or something
-//  cause we have such hooks in the *Steps classes too
+/**
+ * Contains hooks common for all scenarios. Steps files contain scenario specific hooks.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
-class Hooks {
+class CommonHooks {
 
     // This hook recreates the test app component so it must run before any other hooks
     // that might inject from it
