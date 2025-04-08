@@ -27,8 +27,3 @@ Feature: Log in
       When I provided incorrect credentials
       Then I should be informed the credentials were incorrect
 
-# TODO illustrate
-  Rule: Should allow the user to retry logging in after failure
-
-# TODO illustrate
-    Rule: Should prompt the user to log in when their session is closed by the online banking service
