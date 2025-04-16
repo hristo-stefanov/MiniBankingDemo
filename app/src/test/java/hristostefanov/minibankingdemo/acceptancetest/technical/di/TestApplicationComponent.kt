@@ -10,7 +10,7 @@ interface TestApplicationComponent {
     fun inject(target: RoundUpSteps)
     fun inject(target: LoginSteps)
     fun inject(target: LogoutSteps)
-    fun inject(target: EncourageUsersToSaveMoneySteps)
+    fun inject(target: SaveRoundUps)
     fun inject(target: CommonPresentationSteps)
     fun inject(target: AutoLoginSteps)
 }

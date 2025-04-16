@@ -15,7 +15,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import javax.inject.Inject
 
 
-class EncourageUsersToSaveMoneySteps {
+class SaveRoundUps {
 
     @Inject
     internal lateinit var automation: PresentationTestAutomation
@@ -25,7 +25,7 @@ class EncourageUsersToSaveMoneySteps {
 
     private lateinit var accountsViewModel: AccountsViewModel
 
-    @Before("@steps:encourageUsersToSaveMoney")
+    @Before("@steps:saveRoundUps")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
 

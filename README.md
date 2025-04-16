@@ -37,7 +37,7 @@ This project requires JDK 11 to build.
 
 ##  Test suite
 The project includes various types of tests:
-* BDD-style acceptance tests (EncourageUsersToSaveMoney.feature and RoundUp.feature)
+* BDD-style acceptance tests (in .feature files)
 * Unit tests for business logic (CalcRoundUpInteractorTest)
 * Unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
