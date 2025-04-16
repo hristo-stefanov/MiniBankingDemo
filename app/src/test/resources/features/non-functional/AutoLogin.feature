@@ -1,8 +1,9 @@
 @steps:autologin
 Feature: Session persistence
+
   In order to save time and effort
   As a user
-  I want not to be asked to login each time I use the app
+  I want to be automatically logged in with my last credentials when I start the app
 
   Rule: Should auto-login the user when launching the app with the last used credentials
 
