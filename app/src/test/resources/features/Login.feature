@@ -1,6 +1,7 @@
 @steps:login
 Feature: Log in
-  In order to access online banking
+
+  In order to use app features that require access to my banking data
   As a user
   I want to be able to log in
 

@@ -2,7 +2,7 @@
 Feature: Log out
   In order to protect my financial information and assets from unauthorised access
   and to be able log in with different credentials
-  As a bank client
+  As a user
   I want to be able to log out
 
   Rule: User specific information should disappear when logging out
