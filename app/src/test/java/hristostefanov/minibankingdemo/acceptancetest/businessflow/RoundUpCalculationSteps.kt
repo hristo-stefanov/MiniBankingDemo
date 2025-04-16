@@ -13,14 +13,14 @@ import kotlinx.coroutines.test.runTest
 
 private const val ACCOUNT_NUM = "12345678"
 
-class RoundUpSteps {
+class RoundUpCalculationSteps {
     // shared data between steps
     private lateinit var result: BigDecimal
 
     @Inject
     internal lateinit var automation: BusinessRulesTestAutomation
 
-    @Before("@steps:roundUp")
+    @Before("@steps:roundUpCalculation")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
