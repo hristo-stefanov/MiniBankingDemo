@@ -6,7 +6,6 @@ Feature: Log out
   I want to be able to log out
 
   Rule: User specific information should disappear when logging out
-  and the user should be asked to log in
 
     Scenario: logging out
       Given I am seeing my account information
