@@ -36,3 +36,11 @@ Feature: Log in
       And the app keeps an invalid token
       When I launch the app to access Accounts
       Then I should be asked to login
+
+  Rule: Should save credentials to be used for the next interactive session
+
+    @steps:autologin
+    Scenario: auto-logging in
+      Given I was logged in before exiting the app
+      When I launch the app to access Accounts
+      Then I should be logged in
