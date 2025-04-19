@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|user|
+start
+|app|
+:Provides a form;
+|user|
+:Submits goal name;
+|app|
+:Calls createSavingsGoal;
+
+stop
+
+@enduml

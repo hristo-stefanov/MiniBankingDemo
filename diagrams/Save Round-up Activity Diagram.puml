@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|user|
+start
+|app|
+:Provides a form;
+|user|
+:Submits choices of account and savings goal;
+|app|
+:Calls addMoneyIntoSavingsGoal;
+:Provides an acknowledgement;
+:Provides a report of goals and accounts along with round-ups;
+stop
+
+@enduml

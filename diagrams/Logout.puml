@@ -1,0 +1,12 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|user|
+start
+|app|
+:Erases saved credentials;
+:Erases any user specific data;
+:Restarts the app;
+stop
+
+@enduml

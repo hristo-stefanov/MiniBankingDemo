@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+|user|
+start
+|app|
+if (Has saved credentials?) then (yes)
+else (no)
+    :Provides a credentials form;
+    |user|
+    :Submits credentials;
+    |app|
+    :Saves credentials;
+endif
+    :Provides a report of goals and accounts along with round-ups;
+stop
+
+@enduml
