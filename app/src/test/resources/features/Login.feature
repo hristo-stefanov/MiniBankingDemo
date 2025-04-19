@@ -28,3 +28,11 @@ Feature: Log in
       When I provided incorrect credentials
       Then I should be informed the credentials were incorrect
 
+  Rule: The user can provide credentials if the service returns an authentication error
+
+    @manual
+    Scenario: the app keeps an invalid token
+      Given I was logged in before exiting the app
+      And the app keeps an invalid token
+      When I launch the app to access Accounts
+      Then I should be asked to login
