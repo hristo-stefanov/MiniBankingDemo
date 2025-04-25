@@ -3,6 +3,8 @@
 
 |user|
 start
+floating note left: Preconditions: The user\n\
+has already logged in
 |app|
 :Erases saved credentials;
 :Erases any user specific data;
