@@ -79,7 +79,9 @@ class CreateSavingsGoalViewModelTest() {
 
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
-        then(createSavingsGoalsIterator).should().validateName(validGoalName)
+        // Note: validateName() is called twice - once LiveData.map() is invoked and once
+        // when the observer is attached
+        then(createSavingsGoalsIterator).should(times(2)).validateName(validGoalName)
         then(commandEnabledObserver).should().onChanged(true)
     }
 
@@ -90,19 +92,25 @@ class CreateSavingsGoalViewModelTest() {
 
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
-        then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
+
+        // Note: validateName() is called twice - once LiveData.map() is invoked and once
+        // when the observer is attached
+        then(createSavingsGoalsIterator).should(times(2)).validateName(invalidGoalName)
         then(commandEnabledObserver).should().onChanged(false)
     }
 
     @Test
     fun `GIVEN invalid name WHEN name is changed to valid one THEN Create command is enabled`() {
         savedState[NAME_KEY] = invalidGoalName
-        given(createSavingsGoalsIterator.validateName(any())).willReturn(false).willReturn(true)
+        // Note: validateName() is called twice initially hence we need false twice
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(false).willReturn(false).willReturn(true)
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         viewModelUnderTest.name.value = validGoalName
 
-        then(createSavingsGoalsIterator).should().validateName(invalidGoalName)
+        // Note: validateName() is called twice - once LiveData.map() is invoked and once
+        // when the observer is attached
+        then(createSavingsGoalsIterator).should(times(2)).validateName(invalidGoalName)
         then(commandEnabledObserver).should().onChanged(false)
         then(commandEnabledObserver).should().onChanged(true)
         then(commandEnabledObserver).shouldHaveNoMoreInteractions()
@@ -111,12 +119,15 @@ class CreateSavingsGoalViewModelTest() {
     @Test
     fun `GIVEN valid name WHEN name is changed to invalid one THEN Create command is disabled`() {
         savedState[NAME_KEY] = validGoalName
-        given(createSavingsGoalsIterator.validateName(any())).willReturn(true).willReturn(false)
+        // Note: validateName() is called twice initially hence we need true twice
+        given(createSavingsGoalsIterator.validateName(any())).willReturn(true).willReturn(true).willReturn(false)
         viewModelUnderTest.createCommandEnabled.observeForever(commandEnabledObserver)
 
         viewModelUnderTest.name.value = invalidGoalName
 
-        then(createSavingsGoalsIterator).should().validateName(validGoalName)
+        // Note: validateName() is called twice - once LiveData.map() is invoked and once
+        // when the observer is attached
+        then(createSavingsGoalsIterator).should(times(2)).validateName(validGoalName)
         then(commandEnabledObserver).should().onChanged(true)
         then(commandEnabledObserver).should().onChanged(false)
         then(commandEnabledObserver).shouldHaveNoMoreInteractions()
