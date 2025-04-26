@@ -3,15 +3,15 @@
 |user|
 start
 |app|
-if (Has saved credentials?) then (yes)
+if (Has saved login credentials?) then (yes)
 else (no)
-    :Provides a credentials form;
+    :Shows a login form;
     |user|
     :Submits credentials;
     |app|
     :Saves credentials;
 endif
-    :Provides a report of goals and accounts along with round-ups;
+    :Shows the Accounts and Roundups report;
 stop
 
 @enduml
