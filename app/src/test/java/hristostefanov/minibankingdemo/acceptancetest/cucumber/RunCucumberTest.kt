@@ -15,14 +15,14 @@ import org.junit.runner.RunWith
 // NOTE: it's not clear what "pretty" plugin does, but normally goes together
 // with the "html" plugin. Perhaps, it improves the generated html code.
     plugin = ["pretty", "html:build/reports/tests/cucumber.html"],
-    tags = "not @manual",
+    tags = "not @manual and not @draft",
 //    tags = "@debug",
 )
 class RunCucumberTest {
 
-    // Provides TaskExecutor#isMainThread implementation which always return `true`
-    // thus avoiding exceptions in LiveData's observe* methods when running local tests.
     companion object {
+        // Provides TaskExecutor#isMainThread implementation which always return `true`
+        // thus avoiding exceptions in LiveData's observe* methods when running local tests.
         @JvmStatic
         @get:ClassRule
         val rule = InstantTaskExecutorRule()

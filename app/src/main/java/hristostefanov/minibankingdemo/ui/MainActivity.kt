@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.util.NavigationChannel
+import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,6 +29,13 @@ class MainActivity : AppCompatActivity() {
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
+    private val navController by lazy { findNavController(R.id.navHostFragment) }
+
+    private val sentryNavListener = SentryNavigationListener(
+        enableNavigationBreadcrumbs = true,
+        enableNavigationTracing = true,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         // needed to hide the Up button on the ActionBar for top-level destinations
         val topLevelDestinationIds = setOf(R.id.loginDestination, R.id.accountsDestination)
 
-        val navController = findNavController(R.id.navHostFragment)
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
@@ -51,6 +58,8 @@ class MainActivity : AppCompatActivity() {
     private fun onNavigation(navigation: Navigation, navController: NavController) {
         when (navigation) {
             is Navigation.Forward -> navController.navigate(navigation.navDirections)
+            is Navigation.ForwardToDestination -> navController.navigate(navigation
+                .destinationResId, navigation.args, navigation.navOptions)
             is Navigation.Backward -> navController.popBackStack()
             is Navigation.Restart -> {
                 // this way is better than restarting the Activity which may cause
@@ -71,6 +80,17 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        navController.addOnDestinationChangedListener(sentryNavListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navController.removeOnDestinationChangedListener(sentryNavListener)
+    }
+
 
     // To make the Up button operable, we need to override this method.
     // This is not needed when using Toolbar instead of ActionBAr

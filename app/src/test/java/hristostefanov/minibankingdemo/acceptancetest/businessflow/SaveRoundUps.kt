@@ -9,13 +9,13 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import javax.inject.Inject
 
 
-class EncourageUsersToSaveMoneySteps {
+class SaveRoundUps {
 
     @Inject
     internal lateinit var automation: PresentationTestAutomation
@@ -25,25 +25,23 @@ class EncourageUsersToSaveMoneySteps {
 
     private lateinit var accountsViewModel: AccountsViewModel
 
-    @Before("@steps:encourageUsersToSaveMoney")
+    @Before("@steps:saveRoundUps")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
 
         i_am_logged_in()
     }
 
-    private fun i_am_logged_in() {
-        automation.correctRefreshTokenIs("correctToken")
+    private fun i_am_logged_in() = runTest {
+        automation.correctAccessTokenIs("correctToken")
 
         automation.openLoginScreen().run {
-            onRefreshTokenChanged("correctToken")
+            onAccessTokenChanged("correctToken")
             onAcceptCommand()
         }
 
         // consume back navigation event
-        runBlocking {
-            navigationChannel.receive()
-        }
+        navigationChannel.receive()
     }
 
     @Given("the calculated round-up for my account is {double}")

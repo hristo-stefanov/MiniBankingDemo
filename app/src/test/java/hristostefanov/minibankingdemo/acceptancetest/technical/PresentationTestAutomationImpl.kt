@@ -10,21 +10,13 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
-import hristostefanov.minibankingdemo.util.oauth.AccessTokenResponse
-import hristostefanov.minibankingdemo.util.oauth.OAuth
 import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.greenrobot.eventbus.EventBus
-import retrofit2.HttpException
-import retrofit2.Response
-import java.lang.AssertionError
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
-
-private const val CORRECT_ACCESS_TOKEN = "correctAccessToken"
 
 class PresentationTestAutomationImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
@@ -48,28 +40,13 @@ class PresentationTestAutomationImpl @Inject constructor(
         }
     }
 
-    private val oAuthStub = object: OAuth {
-        override suspend fun accessToken(
-            client_id: String,
-            client_secret: String,
-            grant_type: String,
-            refreshToken: String
-        ): AccessTokenResponse {
-            if (refreshToken == correctRefreshToken) {
-                return AccessTokenResponse(
-                    access_token = CORRECT_ACCESS_TOKEN,
-                    refresh_token = "newRefreshToken",
-                    token_type = "Bearer",
-                    expires_in = 0,
-                    scope = ""
-                )
-            } else {
-                throw HttpException(Response.error<String>(401, "".toResponseBody()))
-            }
-        }
-    }
+    private lateinit var correctAccessToken: String
 
-    private lateinit var correctRefreshToken: String
+    private var isThereInternetConnection = true
+
+    override fun thereIsNoInternetConnection() {
+        isThereInternetConnection = false
+    }
 
     private val loginSessionComponentFactory: LoginSessionComponent.Factory = object: LoginSessionComponent.Factory {
         override fun create(token: String, tokenType: String): LoginSessionComponent {
@@ -92,19 +69,19 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
-    override fun correctRefreshTokenIs(refreshToken: String) {
-        correctRefreshToken = refreshToken
+    override fun correctAccessTokenIs(accessToken: String) {
+        correctAccessToken = accessToken
     }
 
-    override fun savedRefreshTokenIs(refreshToken: String) {
-        tokenStore.refreshToken = refreshToken
+    override fun savedAccessTokenIs(accessToken: String) {
+        tokenStore.token = accessToken
     }
 
     override fun accountIn(currencyCode: String) {
         listAccountsInteractorStub = object : ListAccountsInteractor {
             override suspend fun execute(): List<Account> {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN) {
+                if(sessionRegistry.component?.accessToken == correctAccessToken) {
                     return listOf(
                         Account(
                             "1",
@@ -125,7 +102,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         calcRoundUpInteractorStub = object : CalcRoundUpInteractor {
             override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
                 // simulate auth check in the data layer
-                if(sessionRegistry.component?.accessToken == CORRECT_ACCESS_TOKEN ) {
+                if(sessionRegistry.component?.accessToken == correctAccessToken) {
                     return amount
                 } else {
                     throw ServiceException("401: Unauthorized")
@@ -153,8 +130,7 @@ class PresentationTestAutomationImpl @Inject constructor(
             tokenStore,
             sessionRegistry,
             navigationChannel,
-            eventBus,
-            oAuthStub
+            eventBus
         )
     }
 }

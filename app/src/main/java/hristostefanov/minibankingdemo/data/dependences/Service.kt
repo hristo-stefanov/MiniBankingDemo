@@ -4,9 +4,14 @@ import androidx.annotation.AnyThread
 import hristostefanov.minibankingdemo.data.models.*
 import retrofit2.HttpException
 import retrofit2.http.*
+import java.io.IOException
+import com.google.gson.JsonSyntaxException
 
 /**
- * NOTE: Any method can throw [HttpException] on non 2xx HTTP response
+ * NOTE: Any method can throw [HttpException] on non 2xx HTTP responses, [IOException]
+ * on any network error including SSL/TLS related ones and [JsonSyntaxException] on Gson
+ * serialization error.
+ *
  */
 @AnyThread // the design contract is that the implementation must be main-safe
 interface Service {

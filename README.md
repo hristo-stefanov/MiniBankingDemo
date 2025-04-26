@@ -33,9 +33,11 @@ If the build process fails, try:
 * **Build > Rebuild Project**
 * **File > Invalidate caches / Restart**
 
+This project requires JDK 11 to build.
+
 ##  Test suite
 The project includes various types of tests:
-* BDD-style acceptance tests (EncourageUsersToSaveMoney.feature and RoundUp.feature)
+* BDD-style acceptance tests (in .feature files)
 * Unit tests for business logic (CalcRoundUpInteractorTest)
 * Unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
@@ -50,3 +52,21 @@ Architectural decisions for patterns and techniques:
 * Coroutines and Flow
 * Dependency injection (Dagger 2)
 * EventBus for local broadcasting
+
+## Sentry
+
+The Sentry Android Gradle plugin will automatically integrated with OkHttp, androidx.fragment and 
+other, see Sentry for Android > Gradle. Only integration with the Navigation component is "manual".
+
+Is this option still available?
+If _Performance_ section reveals no transactions, click "Enable real time updates" at the top-right
+corner of the screen. If this wont help, wait for an hour :)
+
+### Useful links
+
+https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction
+https://docs.sentry.io/product/sentry-basics/tracing/distributed-tracing/#traces-transactions-and-spans
+https://docs.sentry.io/platforms/android/configuration/integrations/fragment/
+https://docs.sentry.io/platforms/android/performance/instrumentation/automatic-instrumentation/
+https://docs.sentry.io/platforms/android/performance/instrumentation/custom-instrumentation/
+https://docs.sentry.io/platforms/android/configuration/options/#idle-timeout

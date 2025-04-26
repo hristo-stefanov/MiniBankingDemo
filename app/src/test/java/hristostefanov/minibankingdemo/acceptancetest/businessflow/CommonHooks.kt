@@ -5,31 +5,30 @@ import io.cucumber.java.After
 import io.cucumber.java.Before
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import javax.inject.Inject
 
+/**
+ * Contains hooks common for all scenarios. Steps files contain scenario specific hooks.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
-class Hooks {
-    @Inject
-    internal lateinit var testDispatcher: TestCoroutineDispatcher
+class CommonHooks {
 
-    init {
-        TestApp.component.inject(this)
-    }
-
-    // this hook recreates the test app component so it must run before any other hook
+    // This hook recreates the test app component so it must run before any other hooks
     // that might inject from it
     @Before(order = 0)
     fun beforeEachScenario() {
         TestApp.newComponent()
-        Dispatchers.setMain(testDispatcher)
+
+        // Same technique as in [MainDispatcherRule]
+        // runTest will reuse the scheduler of this dispatcher, given the main dispatcher
+        // is set first
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @After
     fun afterEachScenario() {
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 }

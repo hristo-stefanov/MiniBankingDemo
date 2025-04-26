@@ -1,0 +1,46 @@
+Feature: Save Round-ups
+
+  In order to achieve my savings goals
+  As a user
+  I want to be helped to save round-ups from my spending toward those goals
+
+  Rule: Should see the round-up amount for a week for each account
+
+#    @draft
+#    Scenario: see account's round-up
+#      Given I have opened the following accounts:
+#        | number | currency | round-up |
+#        | 123    | GBP      | 1.23     |
+#        | 456    | EUR      | 4.56     |
+#      When I view my accounts
+#      Then I should see the round-up for each account
+
+  Rule: Should be able to choose the account whose round-up to save
+  Rule: Should be able to choose which savings goal to transfer the round-up to
+  Rule: Should be able to create new savings goal
+
+    Rule: TODO
+  # TODO what about (The one where) the user is offered to save round-ups
+      @steps:saveRoundUps
+    Scenario: The app helps users to save round-ups
+      Given the calculated round-up for my account is 1.0
+      When I view this account
+      Then I should be offered to save "£1.00"
+      And I should be able to transfer the offered amount to a savings goal
+
+
+
+  Rule: The suggested round-up amount is the sum of eligible transaction amouts
+
+  # TODO (the one where) all transactions are negative/outgoing???
+    @steps:roundUpCalculation
+    Scenario: Example
+      Given the following transactions in an account
+        |-4.35|
+        |-5.20|
+        |-0.87|
+      When the round up amount is calculated
+      Then the result will be 1.58
+
+
+  Rule: Eligible transactions for round-up should be outbound, settled and with external source

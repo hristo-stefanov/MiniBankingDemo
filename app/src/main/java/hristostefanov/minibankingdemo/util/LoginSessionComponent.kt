@@ -10,8 +10,8 @@ import hristostefanov.minibankingdemo.business.interactors.*
 // a subcomponent but with less code and with some limitations. See
 // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
 // https://dagger.dev/hilt/custom-components
-@SessionScope
-@Subcomponent(modules = [SessionModule::class])
+@LoginSessionScope
+@Subcomponent(modules = [LoginSessionModule::class])
 interface LoginSessionComponent {
     @Subcomponent.Factory
     interface Factory {

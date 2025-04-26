@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|user|
+start
+floating note left: Preconditions: The user\n\
+has already logged in
+|app|
+:Provides a form;
+|user|
+:Submits goal name;
+|app|
+:Calls createSavingsGoal;
+:TODO provide a report?;
+
+stop
+
+@enduml

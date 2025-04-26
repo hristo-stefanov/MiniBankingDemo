@@ -31,7 +31,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     val name: MutableLiveData<String> = savedState.getLiveData(NAME_KEY)
 
     open val createCommandEnabled: LiveData<Boolean> by lazy {
-        Transformations.map(savedState.getLiveData<String>(NAME_KEY)) { name ->
+        savedState.getLiveData<String>(NAME_KEY).map { name ->
             loginSessionRegistry.component?.createSavingGoalsInteractor?.validateName(name) ?: false
         }
     }

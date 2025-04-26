@@ -17,14 +17,14 @@
             by ActivityManager service -->
         <!--suppress AndroidUnknownAttribute -->
         <EditText
-            android:id="@+id/refreshTokenEditText"
+            android:id="@+id/accessTokenEditText"
             android:saveEnabled="false"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginVertical="8dp"
-            android:afterTextChanged="@{(sequence) -> viewmodel.onRefreshTokenChanged(sequence.toString())}"
-            android:hint="@string/refresh_token_hint"
+            android:afterTextChanged="@{(sequence) -> viewmodel.onAccessTokenChanged(sequence.toString())}"
+            android:hint="@string/access_token_hint"
             android:inputType="textMultiLine|textVisiblePassword"
             android:maxLines="3"
             app:layout_constraintBottom_toTopOf="@+id/acceptButton"
@@ -46,7 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/refreshTokenEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/accessTokenEditText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

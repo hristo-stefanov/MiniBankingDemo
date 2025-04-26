@@ -1,7 +1,9 @@
 package hristostefanov.minibankingdemo.presentation
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
+import hristostefanov.minibankingdemo.MainDispatcherRule
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInteractor
@@ -10,17 +12,24 @@ import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.LoginSessionComponent
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.junit.Rule
 import org.mockito.BDDMockito.*
 import java.util.*
 
 private const val TIMEOUT = 100L
 
-class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
+class CreateSavingsGoalViewModelTest() {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
 
@@ -51,13 +60,13 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Before
-    fun beforeEach() {
+    fun beforeEach() = runTest {
         given(sessionRegistry.component).willReturn(sessionComponent)
         given(sessionComponent.createSavingGoalsInteractor).willReturn(createSavingsGoalsIterator)
     }
 
     @Test
-    fun `WHEN name changes THEN name is saved`() = runBlocking {
+    fun `WHEN name changes THEN name is saved`() = runTest {
         viewModelUnderTest.name.value = validGoalName
 
         assertThat(savedState[NAME_KEY], `is`(validGoalName))
@@ -115,7 +124,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
 
 
     @Test
-    fun `GIVEN name is valid WHEN executing Create command THEN will interact`() = runBlocking {
+    fun `GIVEN name is valid WHEN executing Create command THEN will interact`() = runTest {
         viewModelUnderTest.name.value = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
 
@@ -138,7 +147,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun `WHEN interactor succeeds THEN navigate back`() = runBlocking {
+    fun `WHEN interactor succeeds THEN navigate back`() = runTest {
         savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willReturn(Unit)
@@ -149,7 +158,7 @@ class CreateSavingsGoalViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun `WHEN interactor fails THEN navigate to error dialog`() = runBlocking {
+    fun `WHEN interactor fails THEN navigate to error dialog`() = runTest {
         savedState[NAME_KEY] = validGoalName
         given(createSavingsGoalsIterator.validateName(any())).willReturn(true)
         given(createSavingsGoalsIterator.execute(any(), any(), any())).willThrow(ServiceException(error1))

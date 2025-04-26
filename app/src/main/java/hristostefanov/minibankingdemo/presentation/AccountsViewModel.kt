@@ -42,26 +42,26 @@ class AccountsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
-        state.getLiveData<String>(ACCOUNT_ID_KEY, null).asFlow()
+        state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
 
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
     private val roundUpAmountFlow = MutableStateFlow<BigDecimal?>(null)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
-    val accountList: StateFlow<List<DisplayAccount>> = _accountList
+    val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
 
     private val _selectedAccountPosition = MutableStateFlow(-1)
-    val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition
+    val selectedAccountPosition: StateFlow<Int> = _selectedAccountPosition.asStateFlow()
 
     private val _roundUpAmountText = MutableStateFlow("")
-    val roundUpAmountText: StateFlow<String> = _roundUpAmountText
+    val roundUpAmountText: StateFlow<String> = _roundUpAmountText.asStateFlow()
 
     private val _roundUpInfo = MutableStateFlow("")
-    val roundUpInfo: StateFlow<String> = _roundUpInfo
+    val roundUpInfo: StateFlow<String> = _roundUpInfo.asStateFlow()
 
     private val _transferCommandEnabled = MutableStateFlow(false)
-    val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled
+    val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
     private val selectedAccountFlow: Flow<Account?> =
         combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
@@ -199,10 +199,17 @@ class AccountsViewModel @Inject constructor(
 
     private fun load() {
         if (loginSessionRegistry.component == null) {
-            viewModelScope.launch {
-                navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+            val token = tokenStore.token
+            if (token.isBlank()) {
+                viewModelScope.launch {
+                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+                }
+                return
+            } else {
+                // Auto-login
+                loginSessionRegistry.createSession(token, "Bearer")
+                eventBus.post(AuthenticatedEvent())
             }
-            return
         }
 
         val formatter =
@@ -230,8 +237,9 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onLogout() {
-        tokenStore.refreshToken = ""
+        tokenStore.token = ""
         loginSessionRegistry.close()
+        // TODO this looks redundant since using SessionRegistry
         // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)

@@ -15,6 +15,7 @@ import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.mock.MockRetrofit
@@ -23,10 +24,10 @@ import java.util.concurrent.TimeUnit
 
 @DisableInstallInCheck
 @Module
-abstract class SessionModule {
+abstract class LoginSessionModule {
 
     companion object {
-        @SessionScope
+        @LoginSessionScope
         @Provides
         fun provideRetrofit(
             @AccessToken
@@ -39,7 +40,18 @@ abstract class SessionModule {
                     .addHeader("Authorization", "${tokenType} ${accessToken}").build()
                 chain.proceed(request)
             }
-            val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+            val client = OkHttpClient.Builder()
+                .apply {
+                    if (BuildConfig.BUILD_TYPE == "sandbox") {
+                        addInterceptor(
+                            HttpLoggingInterceptor().apply {
+                                level = HttpLoggingInterceptor.Level.BODY
+                            }
+                        )
+                    }
+                    addInterceptor(interceptor)
+                }
+                .build()
 
             return Retrofit.Builder()
                 .client(client)
@@ -48,7 +60,7 @@ abstract class SessionModule {
                 .build()
         }
 
-        @SessionScope
+        @LoginSessionScope
         @Provides
         fun provideService(retrofit: Retrofit, tokenStore: TokenStore): Service  {
             // NOTE: Retrofit coroutines support fulfills the @AnyThread requirement of the Service interface
@@ -72,15 +84,15 @@ abstract class SessionModule {
     }
 
     // Repositories may cache session specific data, hence the scoping to session
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
 
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindCalcRoundupInteractor(impl: CalcRoundUpInteractorImpl): CalcRoundUpInteractor
 
-    @SessionScope
+    @LoginSessionScope
     @Binds
     abstract fun bindListAccountsInteractor(impl: ListAccountsInteractorImpl): ListAccountsInteractor
 }

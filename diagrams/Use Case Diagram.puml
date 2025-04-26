@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+actor User
+rectangle System {
+usecase Startup
+usecase Logout
+usecase "Save Round-ups"
+usecase "Create Savings Goal"
+}
+
+User --> Startup
+User --> "Save Round-ups"
+User --> "Create Savings Goal"
+User --> "Logout"
+
+@enduml
