@@ -1,16 +1,20 @@
+@steps:startup
 Feature: Startup
 
+ @debug
  Scenario: Auto-login
   Given my login credentials have been saved
-  When I start the app
+  When I launch the app
   Then I should be shown the Accounts and Roundups report
 
- Scenario: Login
+  @debug
+ Scenario: Login prompt
   Given my login credentials have not been saved
-  When I start the app
-  Then I should be shown a login form
+   When I launch the app
+   Then I should be prompted to submit my login credentials
 
- Scenario: Post-login
+ @manual
+ Scenario: Login credential submission
   Given I am shown a login form
   When I submit my credentials
   Then my credentials should be saved

@@ -1,0 +1,14 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|app|
+start
+:Fetch accounts and transactions
+(service task);
+:Generate report
+(business rule task);
+:Show report
+(send task);
+stop
+
+@enduml

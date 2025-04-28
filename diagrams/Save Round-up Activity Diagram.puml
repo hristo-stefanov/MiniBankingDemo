@@ -11,7 +11,7 @@ has already logged in
 |app|
 :Calls addMoneyIntoSavingsGoal;
 :Provides an acknowledgement;
-:Provides a report of goals and accounts along with round-ups;
+:Shows the Accounts and Roundups report;
 stop
 
 @enduml

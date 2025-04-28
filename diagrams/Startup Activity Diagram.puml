@@ -1,17 +1,21 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
-|user|
-start
 |app|
+start
+note left
+Launch app event
+end note
 if (Has saved login credentials?) then (yes)
 else (no)
-    :Shows a login form;
     |user|
-    :Submits credentials;
+    :Submit login credentials
+    (user task);
     |app|
-    :Saves credentials;
+    :Save login credentials;
 endif
-    :Shows the Accounts and Roundups report;
+    :Show Accounts and Roundups report
+    (subprocess);
+
 stop
 
 @enduml
