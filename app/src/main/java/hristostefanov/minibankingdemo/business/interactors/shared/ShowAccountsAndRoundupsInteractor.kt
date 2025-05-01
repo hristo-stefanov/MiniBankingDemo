@@ -3,11 +3,9 @@ package hristostefanov.minibankingdemo.business.interactors.shared
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
-import javax.inject.Inject
 
 class ShowAccountsAndRoundupsInteractor constructor(
     private val zoneId: ZoneId,
@@ -37,7 +35,7 @@ class ShowAccountsAndRoundupsInteractor constructor(
                 // as argument instead of using the first element of the collection
                 .fold(BigDecimal.ZERO) { acc, item -> acc.add(item) }
 
-            ShowAccountsAndRoundupModel.Item(
+            AccountsAndRoundupsModel.Item(
                 accountId =  account.id,
                 number = account.accountNum,
                 balance = account.balance,
@@ -46,7 +44,7 @@ class ShowAccountsAndRoundupsInteractor constructor(
         }
 
 
-        val model = ShowAccountsAndRoundupModel(reportItems)
+        val model = AccountsAndRoundupsModel(reportItems)
         output.showReport(model)
     }
 }
