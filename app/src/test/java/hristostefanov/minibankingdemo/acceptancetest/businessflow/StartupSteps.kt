@@ -5,15 +5,20 @@ import hristostefanov.minibankingdemo.business.interactors.shared.ShowAccountsAn
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupInteractor
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupOutputBoundary
 import hristostefanov.minibankingdemo.any
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import io.cucumber.java.Before
 import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import java.time.ZoneId
 
 class StartupSteps {
 //    @Inject
@@ -30,16 +35,19 @@ class StartupSteps {
     private val startupOutputBoundary: StartupOutputBoundary = mock()
     private val showAccountsAndRoundupsOutputBoundary: ShowAccountsAndRoundupsOutputBoundary =
         mock()
+    private val repository: Repository = mock()
 
     private val showAccountsAndRoundupsInteractor =
-        ShowAccountsAndRoundupsInteractor(showAccountsAndRoundupsOutputBoundary)
-    private val startupInteractor =
-        StartupInteractor(startupOutputBoundary, tokenStore, showAccountsAndRoundupsInteractor)
+        ShowAccountsAndRoundupsInteractor(ZoneId.systemDefault(), repository, showAccountsAndRoundupsOutputBoundary)
+    private lateinit var startupInteractor: StartupInteractor
 
 
     @Before("@steps:startup")
-    fun beforeEachScenario() {
+    fun beforeEachScenario() = runTest {
 //        TestApp.component.inject(this)
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        startupInteractor =
+            StartupInteractor(startupOutputBoundary, tokenStore, showAccountsAndRoundupsInteractor, testDispatcher)
     }
 
     @Given("my login credentials have not been saved")
@@ -48,7 +56,8 @@ class StartupSteps {
     }
 
     @When("I launch the app")
-    fun i_launch_the_app() {
+    fun i_launch_the_app() = runTest {
+        given(repository.findAllAccounts()).willReturn(emptyList())
         startupInteractor.launchApp()
     }
 
@@ -63,7 +72,8 @@ class StartupSteps {
     }
 
     @Then("I should be shown the Accounts and Roundups report")
-    fun i_should_be_shown_the_accounts_and_roundups_report() {
+    fun i_should_be_shown_the_accounts_and_roundups_report() = runTest {
+        advanceUntilIdle()
         then(showAccountsAndRoundupsOutputBoundary).should().showReport(any())
     }
 }

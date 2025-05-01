@@ -1,4 +1,14 @@
 package hristostefanov.minibankingdemo.business.interactors.shared
 
-class ShowAccountsAndRoundupModel {
+import java.math.BigDecimal
+
+data class ShowAccountsAndRoundupModel(
+    val items: List<Item>
+) {
+    data class Item(
+        val accountId: String,
+        val number: String,
+        val roundUp: BigDecimal,
+        val balance: BigDecimal,
+    )
 }
