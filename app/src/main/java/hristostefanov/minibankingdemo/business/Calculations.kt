@@ -12,7 +12,6 @@ fun isTransactionEligibleForRoundup(transaction: Transaction) =
 
 fun calcRoundup(amounts: List<BigDecimal>): BigDecimal = amounts
     // TODO optimize processing
-    .map { it.negate() }
     // get the fractional part
     .map { it.remainder(BigDecimal.ONE) }
     // consider only greater than zero fractional parts (zero's complement to 1 is 1)

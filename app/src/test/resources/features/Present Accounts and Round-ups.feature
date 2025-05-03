@@ -1,26 +1,27 @@
 Feature: Show Accounts and Roundups
 
 
-  Rule: Suggested round-up amount is the sum of eligible transaction amouts
+  Rule: The suggested round-up amount is the sum of the difference between each transaction's
+  rounded-up amount and its original value.
+  FEEL expression:  sum(for t in transactions return ceiling(t) - t)
 
-#  TODO defines "suggested roundup"
-  # TODO (the one where) all transactions are eligible
+    @debug
     @steps:roundUpCalculation
-    Scenario: Example
-      Given the following transactions in an account
-        | -4.35 |
-        | -5.20 |
-        | -0.87 |
-      When the round up amount is calculated
-      Then the result will be 1.58
+    Scenario: Suggested round-up is calculated
+      Given the following eligible transactions, with these amounts:
+        | 4.35   |
+        | 5.20   |
+        | 0.87   |
+      When the suggested round-up amount is calculated
+      Then the result should be 1.58
 
-#  TODO introduce "for a week"
+#  TODO introduce "for a week" and consider spending transaction vs eleigible transaction
 
   Rule: Eligible transactions for suggested roundup should be outbound, settled, and from
   an external source
 
     @manual
-    Scenario Outline: Transaction eligibility for roundup suggestion
+    Scenario Outline: Transaction eligibility for round-up suggestion is calculated
       Given I have a transaction from <source> with <status> and <direction>
       When the eligibility for roundup suggestion is calculated
       Then the result should be <eligibility>
@@ -32,7 +33,7 @@ Feature: Show Accounts and Roundups
   Rule: TODO - separeate somehow from the rule above
 
     @manual
-    Scenario: Presenting "Accounts and Round-ups"
+    Scenario: "Accounts and Round-ups" is presented
       Given I have the following accounts
         | account num | currency | balance |
         | 1           | GBP      | 100     |

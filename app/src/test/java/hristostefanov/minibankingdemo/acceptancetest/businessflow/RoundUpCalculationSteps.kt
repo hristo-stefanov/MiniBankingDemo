@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
+import hristostefanov.minibankingdemo.business.calcRoundup
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -20,22 +21,27 @@ class RoundUpCalculationSteps {
     @Inject
     internal lateinit var automation: BusinessRulesTestAutomation
 
+    private lateinit var transactions: List<BigDecimal>
+
     @Before("@steps:roundUpCalculation")
     fun beforeEachScenario() {
         TestApp.component.inject(this)
     }
 
-    @Given("the following transactions in an account")
-    fun the_following_transactions_in_an_account(transactions: List<BigDecimal>) {
-        automation.createAccount(ACCOUNT_NUM, "GBP", transactions)
+    @Given("the following eligible transactions, with these amounts:")
+    fun the_following_transactions_are_eligible_for_round_up_calculation(transactions: List<BigDecimal>) {
+//        automation.createAccount(ACCOUNT_NUM, "GBP", transactions)
+        this.transactions = transactions
+
     }
 
-    @When("the round up amount is calculated")
-    fun the_round_up_amount_is_calculated() = runTest {
-        result = automation.calculateRoundUp(ACCOUNT_NUM)
+    @When("the suggested round-up amount is calculated")
+    fun the_suggested_round_up_amount_is_calculated() {
+//        result = automation.calculateRoundUp(ACCOUNT_NUM)
+        result = calcRoundup(transactions)
     }
 
-    @Then("the result will be {bigdecimal}")
+    @Then("the result should be {bigdecimal}")
     fun the_result_will_be(expected: BigDecimal) {
         assertThat(result, `is`(expected))
     }

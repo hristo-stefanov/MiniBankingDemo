@@ -1,13 +1,11 @@
 @steps:startup
 Feature: Startup
 
- @debug
  Scenario: Auto-login
   Given my login credentials have been saved
   When I launch the app
   Then I should be shown the Accounts and Roundups report
 
-  @debug
  Scenario: Login prompt
   Given my login credentials have not been saved
    When I launch the app
