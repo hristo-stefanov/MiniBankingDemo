@@ -1,18 +1,16 @@
 package hristostefanov.minibankingdemo.business.interactors.startup
 
-import hristostefanov.minibankingdemo.business.interactors.shared.ShowAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import javax.inject.Inject
 
 class StartupInteractor @Inject constructor(
     val output: StartupOutputBoundary,
     val tokenStore: TokenStore,
-    val showAccountsAndRoundupsInteractor: ShowAccountsAndRoundupsInteractor,
+    val presentAccountsAndRoundupsInteractor: PresentAccountsAndRoundupsInteractor,
     val dispatcher: CoroutineDispatcher,
 ) {
     private val coroutineScope = CoroutineScope(dispatcher)
@@ -22,7 +20,7 @@ class StartupInteractor @Inject constructor(
             output.promptUserToSubmitCredentials()
         } else {
             coroutineScope.launch(dispatcher) {
-                showAccountsAndRoundupsInteractor.execute()
+                presentAccountsAndRoundupsInteractor.execute()
             }
         }
     }
@@ -31,7 +29,7 @@ class StartupInteractor @Inject constructor(
         tokenStore.token = token
 
         coroutineScope.launch(dispatcher) {
-            showAccountsAndRoundupsInteractor.execute()
+            presentAccountsAndRoundupsInteractor.execute()
         }
     }
 }

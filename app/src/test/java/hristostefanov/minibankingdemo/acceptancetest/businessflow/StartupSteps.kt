@@ -1,14 +1,13 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.business.interactors.shared.ShowAccountsAndRoundupsInteractor
-import hristostefanov.minibankingdemo.business.interactors.shared.ShowAccountsAndRoundupsOutputBoundary
+import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupInteractor
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupOutputBoundary
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import io.cucumber.java.Before
-import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -33,12 +32,12 @@ class StartupSteps {
     private val tokenStore: TokenStore = mock()
 
     private val startupOutputBoundary: StartupOutputBoundary = mock()
-    private val showAccountsAndRoundupsOutputBoundary: ShowAccountsAndRoundupsOutputBoundary =
+    private val presentAccountsAndRoundupsOutputBoundary: PresentAccountsAndRoundUpsOutputBoundary =
         mock()
     private val repository: Repository = mock()
 
-    private val showAccountsAndRoundupsInteractor =
-        ShowAccountsAndRoundupsInteractor(ZoneId.systemDefault(), repository, showAccountsAndRoundupsOutputBoundary)
+    private val presentAccountsAndRoundupsInteractor =
+        PresentAccountsAndRoundupsInteractor(ZoneId.systemDefault(), repository, presentAccountsAndRoundupsOutputBoundary)
     private lateinit var startupInteractor: StartupInteractor
 
 
@@ -47,7 +46,7 @@ class StartupSteps {
 //        TestApp.component.inject(this)
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         startupInteractor =
-            StartupInteractor(startupOutputBoundary, tokenStore, showAccountsAndRoundupsInteractor, testDispatcher)
+            StartupInteractor(startupOutputBoundary, tokenStore, presentAccountsAndRoundupsInteractor, testDispatcher)
     }
 
     @Given("my login credentials have not been saved")
@@ -74,6 +73,6 @@ class StartupSteps {
     @Then("I should be shown the Accounts and Roundups report")
     fun i_should_be_shown_the_accounts_and_roundups_report() = runTest {
         advanceUntilIdle()
-        then(showAccountsAndRoundupsOutputBoundary).should().showReport(any())
+        then(presentAccountsAndRoundupsOutputBoundary).should().present(any())
     }
 }

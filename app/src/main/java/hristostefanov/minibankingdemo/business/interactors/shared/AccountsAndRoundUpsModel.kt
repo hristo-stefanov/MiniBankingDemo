@@ -2,7 +2,7 @@ package hristostefanov.minibankingdemo.business.interactors.shared
 
 import java.math.BigDecimal
 
-data class AccountsAndRoundupsModel(
+data class AccountsAndRoundUpsModel(
     val items: List<Item>
 ) {
     data class Item(
