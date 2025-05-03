@@ -164,7 +164,7 @@ dependencies {
     testImplementation 'com.google.dagger:hilt-android-testing:2.56.1'
     kspTest 'com.google.dagger:hilt-android-compiler:2.56.1'
 
-    def cucumber_version = '6.10.4'
+    def cucumber_version = '7.21.1'
     testImplementation "io.cucumber:cucumber-java:$cucumber_version"
     testImplementation "io.cucumber:cucumber-junit:$cucumber_version"
 
