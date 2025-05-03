@@ -10,7 +10,6 @@ usecase Logout
 usecase "Save Round-ups"
 usecase "Create Savings Goal"
 usecase "Show Accounts and Roundups report"
-usecase "Calculate Round-ups"
 }
 
 User --> Startup
@@ -20,6 +19,5 @@ User --> "Logout"
 
 Startup .> "Show Accounts and Roundups report"
 "Save Round-ups" .> "Show Accounts and Roundups report"
-"Show Accounts and Roundups report" .> "Calculate Round-ups"
 
 @enduml
