@@ -5,7 +5,6 @@ Feature: Show Accounts and Roundups
   rounded-up amount and its original value.
   FEEL expression:  sum(for t in transactions return ceiling(t) - t)
 
-    @debug
     @steps:roundUpCalculation
     Scenario: Suggested round-up is calculated
       Given the following eligible transactions, with these amounts:
@@ -20,11 +19,10 @@ Feature: Show Accounts and Roundups
   Rule: Eligible transactions for suggested roundup should be outbound, settled, and from
   an external source
 
-    @manual
     Scenario Outline: Transaction eligibility for round-up suggestion is calculated
       Given I have a transaction from <source> with <status> and <direction>
       When the eligibility for roundup suggestion is calculated
-      Then the result should be <eligibility>
+      Then the eligibility should be evaluated as <eligibility>
       Examples:
         | source   | status  | direction | eligibility | notes                    |
         | external | settled | outbound  | eligible    | all criteria are covered |

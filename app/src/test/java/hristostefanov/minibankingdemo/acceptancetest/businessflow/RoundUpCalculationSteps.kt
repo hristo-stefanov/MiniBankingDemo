@@ -2,15 +2,16 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.business.calcRoundup
+import hristostefanov.minibankingdemo.business.entities.Source
+import hristostefanov.minibankingdemo.business.entities.Status
+import hristostefanov.minibankingdemo.business.entities.Transaction
+import hristostefanov.minibankingdemo.business.isTransactionEligibleForRoundup
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
-import javax.inject.Inject
-import io.cucumber.java.Before
-import kotlinx.coroutines.test.runTest
 
 private const val ACCOUNT_NUM = "12345678"
 
@@ -18,10 +19,13 @@ class RoundUpCalculationSteps {
     // shared data between steps
     private lateinit var result: BigDecimal
 
-    @Inject
-    internal lateinit var automation: BusinessRulesTestAutomation
+//    @Inject
+//    internal lateinit var automation: BusinessRulesTestAutomation
 
     private lateinit var transactions: List<BigDecimal>
+
+    private lateinit var tx: Transaction
+    private var isEligible = false
 
     @Before("@steps:roundUpCalculation")
     fun beforeEachScenario() {
@@ -43,6 +47,39 @@ class RoundUpCalculationSteps {
 
     @Then("the result should be {bigdecimal}")
     fun the_result_will_be(expected: BigDecimal) {
-        assertThat(result, `is`(expected))
+        assertThat(result).isEqualTo(expected)
     }
+
+    // ===
+
+    // Note: the new syntax fails with Scenario outline and multiple paramater steps
+    @Given("^I have a transaction from (.+) with (.+) and (.+)$")
+    fun i_have_a_transaction_from_external_with_settled_and_outbound(source: String, status: String, direction: String) {
+        val amount = when (direction) {
+            "outbound" -> -42.toBigDecimal()
+            "inbound" -> 42.toBigDecimal()
+            else -> throw IllegalArgumentException()
+        }
+        tx = Transaction(
+            amount = amount,
+            status = Status.valueOf(status.toUpperCase()),
+            source = Source.valueOf(source.toUpperCase())
+        )
+    }
+
+    @When("the eligibility for roundup suggestion is calculated")
+    fun the_eligibility_for_roundup_suggestion_is_calculated() {
+        isEligible = isTransactionEligibleForRoundup(tx)
+    }
+
+    @Then("^the eligibility should be evaluated as (.+)$")
+    fun the_result_should_be_eligibility(expected: String) {
+        val expectedIsEligible = when(expected) {
+            "eligible" -> true
+            "ineligible" -> false
+            else -> throw IllegalArgumentException()
+        }
+        assertThat(isEligible).isEqualTo(expectedIsEligible)
+    }
+
 }

@@ -2,6 +2,7 @@ package hristostefanov.minibankingdemo.acceptancetest.technical
 
 import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
+import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
@@ -10,7 +11,6 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
-import io.cucumber.messages.internal.com.google.protobuf.ServiceException
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
