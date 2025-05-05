@@ -13,6 +13,20 @@ fun isSpendingTransaction(transaction: Transaction) =
             && transaction.status == Status.SETTLED
             && transaction.source == Source.EXTERNAL
 
+
+@Contract(pure = true)
+fun calcRoundUp(amount: BigDecimal): BigDecimal = amount.setScale(0, RoundingMode.CEILING).minus(amount)
+
+
+// TODO add filtering on time
+@Contract(pure = true)
+fun isEligible(transaction: Transaction) = isSpendingTransaction(transaction)
+
+fun calcAccountRoundUp(transactions: List<Transaction>, isEligiblePolicy: (Transaction) -> Boolean) = transactions
+    .filter { isEligiblePolicy(it) }
+    .map { calcRoundUp(it.amount) }
+    .fold(BigDecimal.ZERO, BigDecimal::add)
+
 /**
  * Implements this FEEL expression: sum(for t in transactions return ceiling(t) - t)
  */

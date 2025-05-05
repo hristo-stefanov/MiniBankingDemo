@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
+import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.calcRoundup
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
@@ -12,6 +13,9 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
+import java.util.ArrayDeque
+import java.util.Deque
+import java.util.Queue
 
 private const val ACCOUNT_NUM = "12345678"
 
@@ -27,22 +31,41 @@ class CalculationsSteps {
     private lateinit var tx: Transaction
     private var isEligible = false
 
-    @Before("@steps:roundUpCalculation")
-    fun beforeEachScenario() {
-        TestApp.component.inject(this)
-    }
+    private lateinit var isEligibleQueue: Queue<Boolean>
+    private lateinit var amountList: List<BigDecimal>
 
-    @Given("the following eligible transactions, with these amounts:")
-    fun the_following_transactions_are_eligible_for_round_up_calculation(transactions: List<BigDecimal>) {
+//    @Before("@steps:roundUpCalculation")
+//    fun beforeEachScenario() {
+//        TestApp.component.inject(this)
+//    }
+
+    @Given("an account has transactions with the following amounts and eligibility for round up:")
+    fun an_account_has_transactions_with_the_following_amounts_and_eligibility_for_round_up(amountsAndEligibilities: List<Map<String, String>>) {
+
+        val isEligibleList =  amountsAndEligibilities.map { it ->
+            when (it["eligibility"]) {
+                "eligible" -> true
+                "ineligible" -> false
+                else -> throw IllegalArgumentException()
+            }
+        }
+
+        isEligibleQueue = ArrayDeque(isEligibleList)
+        amountList = amountsAndEligibilities.map { BigDecimal(it["amount"]) }
+
 //        automation.createAccount(ACCOUNT_NUM, "GBP", transactions)
-        this.transactions = transactions
-
+//        this.transactions = transactions
     }
 
-    @When("the suggested round-up amount is calculated")
-    fun the_suggested_round_up_amount_is_calculated() {
+    @When("the round-up amount for the account is calculated")
+    fun the_round_up_amout_for_the_account_is_calculated() {
+        val isEligible = { _: Transaction ->
+            isEligibleQueue.remove()
+        }
+
+        val transactions = amountList.map { Transaction(it, Status.SETTLED, Source.EXTERNAL)  }
 //        result = automation.calculateRoundUp(ACCOUNT_NUM)
-        result = calcRoundup(transactions)
+        result = calcAccountRoundUp(transactions, isEligible)
     }
 
     @Then("the result should be {bigdecimal}")
