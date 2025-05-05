@@ -3,6 +3,8 @@ package hristostefanov.minibankingdemo.business.entities
 import java.math.BigDecimal
 
 data class Transaction(
+    // TODO positive and negative amount is not appropriate for a transaction. Direction
+    // can be use for clarity. The visual formatting can vary from "-100", "100 -" to "+200"
     /**
      * The amount of the transaction in the **main currency unit**, e.g. pound for GBP.
      *
