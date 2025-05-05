@@ -15,7 +15,7 @@ import java.math.BigDecimal
 
 private const val ACCOUNT_NUM = "12345678"
 
-class RoundUpCalculationSteps {
+class CalculationsSteps {
     // shared data between steps
     private lateinit var result: BigDecimal
 
