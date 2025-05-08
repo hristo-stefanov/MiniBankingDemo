@@ -1,7 +1,8 @@
 package hristostefanov.minibankingdemo.business.interactors.shared
 
-import hristostefanov.minibankingdemo.business.calcRoundup
+import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.dependences.Repository
+import hristostefanov.minibankingdemo.business.isEligible
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import java.time.LocalDate
 import java.time.ZoneId
@@ -17,8 +18,7 @@ class PresentAccountsAndRoundupsInteractor constructor(
 
         val reportItems = repository.findAllAccounts().map { account ->
             val transactions = repository.findTransactions(account.id, zonedDateTime)
-            val eligibleTransactions = transactions.filter { isSpendingTransaction(it) }
-            val roundUp = calcRoundup(eligibleTransactions.map { it.amount} )
+            val roundUp = calcAccountRoundUp(transactions, ::isEligible)
 
             AccountsAndRoundUpsModel.Item(
                 accountId =  account.id,
