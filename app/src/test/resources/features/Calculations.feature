@@ -25,10 +25,9 @@ Feature: Calculations
       Then the result should be 1.45
 
 
-    @manual
-    Rule: A transaction is eligible for round-up when it is classified as "spending"
-    and dated within the last seven days including today. A spending transaction is outbound, settled,
-    and from an external source.
+  Rule: A transaction is eligible for round-up when it is classified as "spending"
+  and dated within the last seven days including today. A spending transaction is outbound, settled,
+  and from an external source.
 
     Scenario Outline: account transactions within the last seven days including today are requested
       Given the current local date and time is <now>

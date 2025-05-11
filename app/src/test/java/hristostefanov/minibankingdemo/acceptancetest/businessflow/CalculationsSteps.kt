@@ -1,15 +1,18 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
+import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
+import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.util.ArrayDeque
 import java.util.Queue
 
@@ -22,6 +25,27 @@ class CalculationsSteps {
 
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
+
+    private lateinit var now: OffsetDateTime
+    private lateinit var since: OffsetDateTime
+
+    @ParameterType(value = ".*", name = "offsetDateTime")
+    fun offsetDateTime(value: String) = OffsetDateTime.parse(value)
+
+    @Given("the current local date and time is {offsetDateTime}")
+    fun the_current_local_date_and_time_is(now: OffsetDateTime) {
+        this.now = now
+    }
+
+    @When("account transactions are requested")
+    fun account_transactions_are_requested() {
+        since = calcStartOfSevenDayWindowIncludingToday(now)
+    }
+
+    @Then("the ones {offsetDateTime} date and time should be requested")
+    fun the_ones_date_and_time_should_be_requested(expectedSince: OffsetDateTime) {
+        assertThat(since).isEqualTo(expectedSince)
+    }
 
     @Given("an account has transactions with the following amounts and eligibility for round up:")
     fun an_account_has_transactions_with_the_following_amounts_and_eligibility_for_round_up(
@@ -59,8 +83,8 @@ class CalculationsSteps {
         assertThat(result).isEqualTo(expected)
     }
 
-    // Note: Using Cucumber expressions fails with Scenario outline and multiple paramater steps,
-    // hence using the old regex syntax.
+    // Note: Using Cucumber expressions fails with Scenario outline and steps with
+    // multiple paramaters, hence using the old regex syntax.
     @Given("^I have a transaction from (.+) that is (.+) and (.+)$")
     fun i_have_a_transaction_from_external_with_settled_and_outbound(
         source: String,

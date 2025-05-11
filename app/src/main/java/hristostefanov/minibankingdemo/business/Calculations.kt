@@ -6,6 +6,12 @@ import hristostefanov.minibankingdemo.business.entities.Transaction
 import org.jetbrains.annotations.Contract
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
+
+@Contract(pure = true)
+fun calcStartOfSevenDayWindowIncludingToday(now: OffsetDateTime): OffsetDateTime =
+    now.truncatedTo(ChronoUnit.DAYS).minus(6, ChronoUnit.DAYS)
 
 @Contract(pure = true)
 fun isSpendingTransaction(transaction: Transaction) =
@@ -15,14 +21,18 @@ fun isSpendingTransaction(transaction: Transaction) =
 
 
 @Contract(pure = true)
-fun calcRoundUp(amount: BigDecimal): BigDecimal = amount.setScale(0, RoundingMode.CEILING).minus(amount)
+fun calcRoundUp(amount: BigDecimal): BigDecimal =
+    amount.setScale(0, RoundingMode.CEILING).minus(amount)
 
 
 // TODO add filtering on time
 @Contract(pure = true)
 fun isEligible(transaction: Transaction) = isSpendingTransaction(transaction)
 
-fun calcAccountRoundUp(transactions: List<Transaction>, isEligiblePolicy: (Transaction) -> Boolean) = transactions
+fun calcAccountRoundUp(
+    transactions: List<Transaction>,
+    isEligiblePolicy: (Transaction) -> Boolean
+) = transactions
     .filter { isEligiblePolicy(it) }
     .map { calcRoundUp(it.amount) }
     .fold(BigDecimal.ZERO, BigDecimal::add)
