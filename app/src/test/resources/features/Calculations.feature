@@ -1,10 +1,11 @@
 Feature: Calculations
 
-    # TODO update the expression to include eligibility
-#  FEEL expression:  sum(for t in transactions return ceiling(t) - t)
-
   Rule: The round-up amount for an account is the sum of the difference between each eligible transaction's
   rounded-up amount and its original value.
+
+  FEEL expression: sum(for t in transactions
+  where t.eligibility = "eligible"
+  return ceiling(t.amount) - t.amount)
 
     Scenario: All transactions in an account are eligible for round-up
       Given an account has transactions with the following amounts and eligibility for round up:
@@ -28,6 +29,15 @@ Feature: Calculations
   Rule: A transaction is eligible for round-up when it is classified as "spending"
   and dated within the last seven days including today. A spending transaction is outbound, settled,
   and from an external source.
+
+  FEEL expression: filter(
+  transactions,
+  t ->
+  t.source = "external" and
+  t.status = "settled" and
+  t.direction = "outbound" and
+  t.dateTime >= date and time(today() - duration("P6D") + "T00:00:00")
+  )
 
     Scenario Outline: account transactions within the last seven days including today are requested
       Given the current local date and time is <now>
