@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -37,7 +38,7 @@ class BusinessRulesTestAutomationImpl
 
             override suspend fun findTransactions(
                 accountId: String,
-                since: ZonedDateTime
+                since: OffsetDateTime
             ): List<Transaction> {
                 return transactions.map { amount ->
                     Transaction(amount, Status.SETTLED, Source.EXTERNAL)

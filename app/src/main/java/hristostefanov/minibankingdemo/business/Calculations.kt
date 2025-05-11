@@ -1,8 +1,10 @@
 package hristostefanov.minibankingdemo.business
 
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
+import hristostefanov.minibankingdemo.business.isEligible
 import org.jetbrains.annotations.Contract
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -25,7 +27,6 @@ fun calcRoundUp(amount: BigDecimal): BigDecimal =
     amount.setScale(0, RoundingMode.CEILING).minus(amount)
 
 
-// TODO add filtering on time
 @Contract(pure = true)
 fun isEligible(transaction: Transaction) = isSpendingTransaction(transaction)
 
@@ -36,6 +37,11 @@ fun calcAccountRoundUp(
     .filter { isEligiblePolicy(it) }
     .map { calcRoundUp(it.amount) }
     .fold(BigDecimal.ZERO, BigDecimal::add)
+
+suspend fun calcAccountRoundUpSuspend(repository: Repository, accountId: String, since: OffsetDateTime): BigDecimal {
+    val transactions = repository.findTransactions(accountId, since)
+    return calcAccountRoundUp(transactions, ::isEligible)
+}
 
 /**
  * Implements this FEEL expression: sum(for t in transactions return ceiling(t) - t)

@@ -1,15 +1,26 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
+import hristostefanov.minibankingdemo.business.calcAccountRoundUp
+import hristostefanov.minibankingdemo.business.calcAccountRoundUpSuspend
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
+import hristostefanov.minibankingdemo.business.interactors.shared.AccountsAndRoundUpsModel
+import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.DataTableType
 import io.cucumber.java.PendingException
+import io.cucumber.java.en.And
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.When
 import io.cucumber.java.en.Then
-import io.cucumber.java.it.Ma
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
+import org.mockito.Mockito.mock
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.util.Currency
 
 
@@ -25,36 +36,54 @@ class PresentAccountsAndRoundUpsSteps {
         )
     }
 
-    private lateinit var presetAccountsAndRoundupsInteractor: PresentAccountsAndRoundupsInteractor
+    private lateinit var presentAccountsAndRoundupsInteractor: PresentAccountsAndRoundupsInteractor
     private lateinit var accounts: List<Account>
+    private val output: PresentAccountsAndRoundUpsOutputBoundary = mock()
+    private val repository: Repository = mock()
 
     @Given("I have the following accounts")
-    fun i_have_the_following_accounts(accounts: List<Account>) {
-        this.accounts = accounts
+    fun i_have_the_following_accounts(accounts: List<Account>) = runTest {
+        this@PresentAccountsAndRoundUpsSteps.accounts = accounts
+
+        given(repository.findAllAccounts()).willReturn(accounts)
     }
 
-    @Given("the suggested round-up for each is")
-    fun the_suggested_round_up_for_each_is(suggestedRoundUps: List<Map<String, String>>) {
+    @And("the calculated round-up for each is")
+    fun the_calculated_round_up_for_each_is(suggestedRoundUps: List<Map<String, String>>) {
 
+        val calcAccountRoundUpStub: suspend (Repository, String, OffsetDateTime) -> BigDecimal =
+            { repository: Repository, accountId: String, since: OffsetDateTime ->
+                suggestedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+            }
+
+        presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
+            repository = repository,
+            output = this@PresentAccountsAndRoundUpsSteps.output,
+            calcAccountRoundUpPolicy = calcAccountRoundUpStub,
+            now = OffsetDateTime.now()
+        )
 
     }
 
     @When("I'm presented with Accounts and Round-ups")
-    fun i_m_presented_with_accounts_and_roundups() {
-        // Write code here that turns the phrase above into concrete actions
-        throw PendingException()
+    fun i_m_presented_with_accounts_and_roundups() = runTest {
+        presentAccountsAndRoundupsInteractor.execute()
     }
 
     @Then("the following information should be included")
-    fun the_following_information_should_be_included(dataTable: DataTable?) {
-        // Write code here that turns the phrase above into concrete actions
-        // For automatic transformation, change DataTable to one of
-        // E, List<E>, List<List<E>>, List<Map<K,V>>, Map<K,V> or
-        // Map<K, List<V>>. E,K,V must be a String, Integer, Float,
-        // Double, Byte, Short, Long, BigInteger or BigDecimal.
-        //
-        // For other transformations you can register a DataTableType.
-        throw PendingException()
+    fun the_following_information_should_be_included(dataTable: List<Map<String, String>>) {
+        val expectedModel = AccountsAndRoundUpsModel(
+            dataTable.map {
+                AccountsAndRoundUpsModel.Item(
+                    accountId = it["number"]!!,
+                    number = it["number"]!!,
+                    roundUp = BigDecimal(it["round-up"]),
+                    balance = BigDecimal(it["balance"]),
+                    currency = Currency.getInstance(it["currency"])
+                )
+            }
+        )
+        then(output).should().present(expectedModel)
     }
 
 }

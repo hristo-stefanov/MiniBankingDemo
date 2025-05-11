@@ -5,6 +5,7 @@ import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccount
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupInteractor
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupOutputBoundary
 import hristostefanov.minibankingdemo.any
+import hristostefanov.minibankingdemo.business.calcAccountRoundUpSuspend
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import io.cucumber.java.Before
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import java.time.OffsetDateTime
 import java.time.ZoneId
 
 class StartupSteps {
@@ -37,7 +39,8 @@ class StartupSteps {
     private val repository: Repository = mock()
 
     private val presentAccountsAndRoundupsInteractor =
-        PresentAccountsAndRoundupsInteractor(ZoneId.systemDefault(), repository, presentAccountsAndRoundupsOutputBoundary)
+        PresentAccountsAndRoundupsInteractor(repository, presentAccountsAndRoundupsOutputBoundary,
+            OffsetDateTime.now(), ::calcAccountRoundUpSuspend)
     private lateinit var startupInteractor: StartupInteractor
 
 

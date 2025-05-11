@@ -10,6 +10,7 @@ import hristostefanov.minibankingdemo.data.models.*
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -58,19 +59,15 @@ class RepositoryImpl @Inject constructor(
     @Throws(ServiceException::class)
     override suspend fun findTransactions(
         accountId: String,
-        since: ZonedDateTime
+        since: OffsetDateTime,
     ): List<Transaction> {
-
-        // to ISO-8601
-        val isoDateTime = since.toOffsetDateTime().toString()
-
         try {
             val account =
                 service.getAccounts().accounts?.firstOrNull { it.accountUid == accountId }
             return if (account?.currency != null && account.defaultCategory != null) {
                 val decimalPlaces = Currency.getInstance(account.currency).defaultFractionDigits
 
-                service.getFeedItemsSince(accountId, account.defaultCategory, isoDateTime)
+                service.getFeedItemsSince(accountId, account.defaultCategory, since.toString())
                     .feedItems
                     ?.map { it.toTransaction(decimalPlaces) }
                     ?: emptyList()

@@ -42,7 +42,7 @@ class CalcRoundUpInteractorImplTest {
 
         interactor.execute(someAccountId, someDate)
 
-        then(repository).should().findTransactions(someAccountId, someDate.atStartOfDay(someZone))
+        then(repository).should().findTransactions(someAccountId, someDate.atStartOfDay(someZone).toOffsetDateTime())
         then(repository).shouldHaveNoMoreInteractions()
     }
 

@@ -15,8 +15,8 @@ class CalcRoundUpInteractorImpl @Inject constructor(
 ) : CalcRoundUpInteractor {
     @Throws(ServiceException::class)
     override suspend fun execute(accountId: String, sinceDate: LocalDate): BigDecimal {
-        val zonedDateTime = sinceDate.atStartOfDay(zoneId)
-        val transactions = repository.findTransactions(accountId, zonedDateTime)
+        val offsetDateTime = sinceDate.atStartOfDay(zoneId).toOffsetDateTime()
+        val transactions = repository.findTransactions(accountId, offsetDateTime)
 
         val settledPaymentsAmounts = transactions
             .filter { it.amount.signum() == -1 && it.status == Status.SETTLED && it.source == Source.EXTERNAL }

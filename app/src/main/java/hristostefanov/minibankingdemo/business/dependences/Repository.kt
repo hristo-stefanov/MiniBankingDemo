@@ -4,6 +4,7 @@ import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -15,7 +16,7 @@ interface Repository {
     @Throws(ServiceException::class)
     suspend fun findTransactions(
         accountId: String,
-        since: ZonedDateTime
+        since: OffsetDateTime,
     ): List<Transaction>
 
     @Throws(ServiceException::class)

@@ -1,29 +1,28 @@
 package hristostefanov.minibankingdemo.business.interactors.shared
 
-import hristostefanov.minibankingdemo.business.calcAccountRoundUp
+import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.business.isEligible
-import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import java.time.LocalDate
-import java.time.ZoneId
+import java.math.BigDecimal
+import java.time.OffsetDateTime
 
 class PresentAccountsAndRoundupsInteractor constructor(
-    private val zoneId: ZoneId,
     private val repository: Repository,
-    val output: PresentAccountsAndRoundUpsOutputBoundary
+    val output: PresentAccountsAndRoundUpsOutputBoundary,
+    val now: OffsetDateTime,
+    val calcAccountRoundUpPolicy: suspend (repository: Repository, accountId: String, since: OffsetDateTime) -> BigDecimal,
 ) {
     suspend fun execute() {
-        val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
-        val zonedDateTime = roundUpSinceDate.atStartOfDay(zoneId)
+
+        val since = calcStartOfSevenDayWindowIncludingToday(now)
 
         val reportItems = repository.findAllAccounts().map { account ->
-            val transactions = repository.findTransactions(account.id, zonedDateTime)
-            val roundUp = calcAccountRoundUp(transactions, ::isEligible)
+            val roundUp = calcAccountRoundUpPolicy(repository, account.id, since)
 
             AccountsAndRoundUpsModel.Item(
                 accountId =  account.id,
                 number = account.accountNum,
                 balance = account.balance,
+                currency = account.currency,
                 roundUp = roundUp,
             )
         }
