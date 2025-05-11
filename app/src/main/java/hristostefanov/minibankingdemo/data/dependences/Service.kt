@@ -30,7 +30,8 @@ interface Service {
     @GET("/api/v2/feed/account/{accountUid}/category/{categoryUid}")
     suspend fun getFeedItemsSince(
         @Path("accountUid") accountUid: String,
-        @Path("categoryUid") categoryUid: String, @Query("changesSince") changesSince: String
+        @Path("categoryUid") categoryUid: String,
+        @Query("changesSince") changesSince: String
     ): SimpleWrapperToAListOfFeedItems
 
     @GET("/api/v2/account/{accountUid}/savings-goals")

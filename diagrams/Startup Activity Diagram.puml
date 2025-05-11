@@ -13,7 +13,7 @@ else (no)
     |app|
     :Save login credentials;
 endif
-    :Show Accounts and Roundups report
+    :Present Accounts and Roundups
     (subprocess);
 
 stop

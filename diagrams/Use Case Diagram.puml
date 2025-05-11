@@ -2,7 +2,8 @@
 'https://plantuml.com/use-case-diagram
 
 left to right direction
-actor User
+actor User <<Human>>
+actor Bank <<Service>>
 
 rectangle System {
 usecase Startup
@@ -12,12 +13,14 @@ usecase "Create Savings Goal"
 usecase "Present 'Accounts and Round-ups'"
 }
 
-User --> Startup
-User --> "Save Round-ups"
-User --> "Create Savings Goal"
-User --> "Logout"
+User -- Startup
+User -- "Save Round-ups"
+User -- "Create Savings Goal"
+User -- "Logout"
 
 Startup .> "Present 'Accounts and Round-ups'"
 "Save Round-ups" .> "Present 'Accounts and Round-ups'"
-
+"Present 'Accounts and Round-ups'" -- "Bank"
+"Save Round-ups" -- "Bank"
+"Create Savings Goal" -- "Bank"
 @enduml

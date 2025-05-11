@@ -15,7 +15,6 @@ Feature: Calculations
       When the round-up amount for the account is calculated
       Then the result should be 1.58
 
-    @debug
     Scenario: Not all transactions in an account are eligible for round-up
       Given an account has transactions with the following amounts and eligibility for round up:
         | amount | eligibility |
@@ -26,19 +25,18 @@ Feature: Calculations
       Then the result should be 1.45
 
 
-  Rule: A transaction is eligible for round-up when it is classified as "spending"
-  and dated within a week
-#      TODO do we really need examples for a simple rule
     @manual
-    Scenario Outline: Transaction eligibility for round-up is calculated
-      Given I have a transaction that is classified as <classification> and dated as <date>
-      When its eligibility for round-up is evalued
-      Then the result should be <eligibility>
-      Examples:
-        | classification | date       | eligibility |
-        | spending       | 2025-10-15 | ?           |
+    Rule: A transaction is eligible for round-up when it is classified as "spending"
+    and dated within the last seven days including today. A spending transaction is outbound, settled,
+    and from an external source.
 
-  Rule: A spending transaction is outbound, settled, and from an external source
+    Scenario Outline: account transactions within the last seven days including today are requested
+      Given the current local date and time is <now>
+      When account transactions are requested
+      Then the ones <since> date and time should be requested
+      Examples:
+        | now                    | since                  | note                       |
+        | 2025-05-11T12:15:08+01 | 2025-05-05T00:00:00+01 | Local time in BST (UTC+01) |
 
     Scenario Outline: A transaction is classified as spending or non-spending
       Given I have a transaction from <source> that is <status> and <direction>
@@ -50,5 +48,3 @@ Feature: Calculations
         | internal | settled   | outbound  | non-spending   | not external             |
         | external | unsettled | outbound  | non-spending   | not settled              |
         | external | settled   | inbound   | non-spending   | not outbound             |
-
-

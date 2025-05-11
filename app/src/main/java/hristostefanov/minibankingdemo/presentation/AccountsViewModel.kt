@@ -44,6 +44,7 @@ class AccountsViewModel @Inject constructor(
     private val savedAccountIdFlow: Flow<String?> =
         state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
 
+    // TODO this business logic shouldn't be here
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
     private var accounts = MutableStateFlow<List<Account>>(emptyList())
     private val roundUpAmountFlow = MutableStateFlow<BigDecimal?>(null)
