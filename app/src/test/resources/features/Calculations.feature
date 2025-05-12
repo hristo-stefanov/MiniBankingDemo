@@ -1,5 +1,7 @@
 Feature: Calculations
 
+#  TODO (pure) transaction amount round-up calculation
+
   Rule: The round-up amount for an account is the sum of the difference between each eligible transaction's
   rounded-up amount and its original value.
 
