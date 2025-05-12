@@ -7,22 +7,22 @@ Feature: Calculations
   where t.eligibility = "eligible"
   return ceiling(t.amount) - t.amount)
 
-    Scenario: All transactions in an account are eligible for round-up
-      Given an account has transactions with the following amounts and eligibility for round up:
-        | amount | eligibility |
-        | 4.35   | eligible    |
-        | 5.20   | eligible    |
-        | 0.87   | eligible    |
-      When the round-up amount for the account is calculated
+    Scenario: All account transactions for a period are spending ones
+      Given an account has transactions for a period with the following amounts and is spending flags:
+        | amount | is spending |
+        | 4.35   | yes         |
+        | 5.20   | yes         |
+        | 0.87   | yes         |
+      When the account round-up amount for the period is calculated
       Then the result should be 1.58
 
-    Scenario: Not all transactions in an account are eligible for round-up
-      Given an account has transactions with the following amounts and eligibility for round up:
-        | amount | eligibility |
-        | 4.35   | eligible    |
-        | 5.20   | eligible    |
-        | 0.87   | ineligible  |
-      When the round-up amount for the account is calculated
+    Scenario: Not all account transactions for a period are spending ones
+      Given an account has transactions for a period with the following amounts and is spending flags:
+        | amount | is spending |
+        | 4.35   | yes         |
+        | 5.20   | yes         |
+        | 0.87   | no          |
+      When the account round-up amount for the period is calculated
       Then the result should be 1.45
 
 

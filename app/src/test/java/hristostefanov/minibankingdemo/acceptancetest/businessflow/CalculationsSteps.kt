@@ -19,7 +19,7 @@ import java.util.Queue
 private const val ACCOUNT_NUM = "12345678"
 
 class CalculationsSteps {
-    private lateinit var isEligibleQueue: Queue<Boolean>
+    private lateinit var isSpendingTransactionFlagQueue: Queue<Boolean>
     private lateinit var amountList: List<BigDecimal>
     private lateinit var result: BigDecimal
 
@@ -47,35 +47,35 @@ class CalculationsSteps {
         assertThat(since).isEqualTo(expectedSince)
     }
 
-    @Given("an account has transactions with the following amounts and eligibility for round up:")
-    fun an_account_has_transactions_with_the_following_amounts_and_eligibility_for_round_up(
-        amountsAndEligibilities: List<Map<String, String>>
+    @Given("an account has transactions for a period with the following amounts and is spending flags:")
+    fun an_account_has_transactions_for_a_period_with_the_following_amounts_and_is_spending_flags(
+        amountsAndIsSpendingFlags: List<Map<String, String>>
     ) {
-        // TODO consider using Mockk for stubbing the top level function isEligible()
+        // TODO consider using Mockk for stubbing the policy
         // as Mockito cannot do that.
-        val isEligibleList = amountsAndEligibilities.map { it ->
-            when (it["eligibility"]) {
-                "eligible" -> true
-                "ineligible" -> false
+        val isSpendingTransactionFlagList = amountsAndIsSpendingFlags.map { it ->
+            when (it["is spending"]) {
+                "yes" -> true
+                "no" -> false
                 else -> throw IllegalArgumentException()
             }
         }
 
-        isEligibleQueue = ArrayDeque(isEligibleList)
-        amountList = amountsAndEligibilities.map { BigDecimal(it["amount"]) }
+        isSpendingTransactionFlagQueue = ArrayDeque(isSpendingTransactionFlagList)
+        amountList = amountsAndIsSpendingFlags.map { BigDecimal(it["amount"]) }
     }
 
-    @When("the round-up amount for the account is calculated")
-    fun the_round_up_amout_for_the_account_is_calculated() {
-        val isEligible = { _: Transaction ->
-            isEligibleQueue.remove()
+    @When("the account round-up amount for the period is calculated")
+    fun the_round_up_amout_for_the_period_is_calculated() {
+        val isSpendingTransactionPolicy = { _: Transaction ->
+            isSpendingTransactionFlagQueue.remove()
         }
 
-        // Only the amount matters as isEligible() is stubbed.
+        // Only the amount matters as the policy is stubbed.
         val transactions =
             amountList.map { amount -> Transaction(amount, Status.SETTLED, Source.EXTERNAL) }
 
-        result = calcAccountRoundUp(transactions, isEligible)
+        result = calcAccountRoundUp(transactions, isSpendingTransactionPolicy)
     }
 
     @Then("the result should be {bigdecimal}")

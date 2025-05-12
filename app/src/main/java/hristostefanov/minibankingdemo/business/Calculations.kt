@@ -27,9 +27,9 @@ fun calcRoundUp(amount: BigDecimal): BigDecimal =
 
 fun calcAccountRoundUp(
     transactions: List<Transaction>,
-    isEligiblePolicy: (Transaction) -> Boolean
+    isSpendingTransactionPolicy: (Transaction) -> Boolean
 ) = transactions
-    .filter { isEligiblePolicy(it) }
+    .filter { isSpendingTransactionPolicy(it) }
     .map { calcRoundUp(it.amount) }
     .fold(BigDecimal.ZERO, BigDecimal::add)
 
