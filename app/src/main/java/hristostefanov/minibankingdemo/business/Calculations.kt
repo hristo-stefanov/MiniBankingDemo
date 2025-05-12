@@ -4,7 +4,6 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
-import hristostefanov.minibankingdemo.business.isEligible
 import org.jetbrains.annotations.Contract
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -26,10 +25,6 @@ fun isSpendingTransaction(transaction: Transaction) =
 fun calcRoundUp(amount: BigDecimal): BigDecimal =
     amount.setScale(0, RoundingMode.CEILING).minus(amount)
 
-
-@Contract(pure = true)
-fun isEligible(transaction: Transaction) = isSpendingTransaction(transaction)
-
 fun calcAccountRoundUp(
     transactions: List<Transaction>,
     isEligiblePolicy: (Transaction) -> Boolean
@@ -38,9 +33,14 @@ fun calcAccountRoundUp(
     .map { calcRoundUp(it.amount) }
     .fold(BigDecimal.ZERO, BigDecimal::add)
 
+/**
+ * The is eligibility criteria for transactions is covered by [isSpendingTransaction] and
+ * by the combination of [Repository.findAllAccounts] plus [since]
+ */
 suspend fun calcAccountRoundUpSuspend(repository: Repository, accountId: String, since: OffsetDateTime): BigDecimal {
+    //
     val transactions = repository.findTransactions(accountId, since)
-    return calcAccountRoundUp(transactions, ::isEligible)
+    return calcAccountRoundUp(transactions, ::isSpendingTransaction)
 }
 
 /**
