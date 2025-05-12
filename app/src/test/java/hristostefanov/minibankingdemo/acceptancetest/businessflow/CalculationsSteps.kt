@@ -1,7 +1,9 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
+import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
@@ -10,7 +12,10 @@ import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.mockito.BDDMockito.given
+import org.mockito.Mockito.mock
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.ArrayDeque
@@ -21,7 +26,7 @@ private const val ACCOUNT_NUM = "12345678"
 class CalculationsSteps {
     private lateinit var isSpendingTransactionFlagQueue: Queue<Boolean>
     private lateinit var amountList: List<BigDecimal>
-    private lateinit var result: BigDecimal
+    private lateinit var accountRoundup: BigDecimal
 
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
@@ -66,7 +71,7 @@ class CalculationsSteps {
     }
 
     @When("the account round-up amount for the period is calculated")
-    fun the_round_up_amout_for_the_period_is_calculated() {
+    fun the_round_up_amout_for_the_period_is_calculated() = runTest {
         val isSpendingTransactionPolicy = { _: Transaction ->
             isSpendingTransactionFlagQueue.remove()
         }
@@ -75,12 +80,16 @@ class CalculationsSteps {
         val transactions =
             amountList.map { amount -> Transaction(amount, Status.SETTLED, Source.EXTERNAL) }
 
-        result = calcAccountRoundUp(transactions, isSpendingTransactionPolicy)
+        val repository: Repository = mock()
+        given(repository.findTransactions(any(), any())).willReturn(transactions)
+
+
+        accountRoundup = calcAccountRoundUp(repository, "1", OffsetDateTime.now(), isSpendingTransactionPolicy)
     }
 
     @Then("the result should be {bigdecimal}")
     fun the_result_will_be(expected: BigDecimal) {
-        assertThat(result).isEqualTo(expected)
+        assertThat(accountRoundup).isEqualTo(expected)
     }
 
     // Note: Using Cucumber expressions fails with Scenario outline and steps with

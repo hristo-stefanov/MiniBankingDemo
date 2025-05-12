@@ -5,7 +5,7 @@ import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccount
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupInteractor
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupOutputBoundary
 import hristostefanov.minibankingdemo.any
-import hristostefanov.minibankingdemo.business.calcAccountRoundUpSuspend
+import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import io.cucumber.java.Before
@@ -19,7 +19,6 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
 import java.time.OffsetDateTime
-import java.time.ZoneId
 
 class StartupSteps {
 //    @Inject
@@ -40,7 +39,7 @@ class StartupSteps {
 
     private val presentAccountsAndRoundupsInteractor =
         PresentAccountsAndRoundupsInteractor(repository, presentAccountsAndRoundupsOutputBoundary,
-            OffsetDateTime.now(), ::calcAccountRoundUpSuspend)
+            OffsetDateTime.now(), ::calcAccountRoundUp)
     private lateinit var startupInteractor: StartupInteractor
 
 

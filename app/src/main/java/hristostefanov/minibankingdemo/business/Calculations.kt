@@ -6,6 +6,7 @@ import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import org.jetbrains.annotations.Contract
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.math.RoundingMode
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -22,25 +23,24 @@ fun isSpendingTransaction(transaction: Transaction) =
 
 
 @Contract(pure = true)
-fun calcRoundUp(amount: BigDecimal): BigDecimal =
+private fun calcRoundUp(amount: BigDecimal): BigDecimal =
     amount.setScale(0, RoundingMode.CEILING).minus(amount)
-
-fun calcAccountRoundUp(
-    transactions: List<Transaction>,
-    isSpendingTransactionPolicy: (Transaction) -> Boolean
-) = transactions
-    .filter { isSpendingTransactionPolicy(it) }
-    .map { calcRoundUp(it.amount) }
-    .fold(BigDecimal.ZERO, BigDecimal::add)
 
 /**
  * The is eligibility criteria for transactions is covered by [isSpendingTransaction] and
  * by the combination of [Repository.findAllAccounts] plus [since]
  */
-suspend fun calcAccountRoundUpSuspend(repository: Repository, accountId: String, since: OffsetDateTime): BigDecimal {
-    //
+suspend fun calcAccountRoundUp(
+    repository: Repository,
+    accountId: String,
+    since: OffsetDateTime,
+    isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction
+): BigDecimal {
     val transactions = repository.findTransactions(accountId, since)
-    return calcAccountRoundUp(transactions, ::isSpendingTransaction)
+    return transactions
+        .filter { isSpendingTransactionPolicy(it) }
+        .map { calcRoundUp(it.amount) }
+        .fold(ZERO, BigDecimal::add)
 }
 
 /**
