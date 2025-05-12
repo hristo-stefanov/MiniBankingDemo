@@ -11,7 +11,7 @@ import okhttp3.ResponseBody
 import retrofit2.HttpException
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.time.ZonedDateTime
+import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
 
@@ -67,7 +67,11 @@ class RepositoryImpl @Inject constructor(
             return if (account?.currency != null && account.defaultCategory != null) {
                 val decimalPlaces = Currency.getInstance(account.currency).defaultFractionDigits
 
-                service.getFeedItemsSince(accountId, account.defaultCategory, since.toString())
+                // TODO add spec/test to cover this logic
+                val changesSinceAsUTCDateTime = since.atZoneSameInstant(
+                    ZoneOffset.UTC
+                ).toString()
+                service.getFeedItemsSince(accountId, account.defaultCategory, changesSinceAsUTCDateTime)
                     .feedItems
                     ?.map { it.toTransaction(decimalPlaces) }
                     ?: emptyList()
