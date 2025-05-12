@@ -1,14 +1,45 @@
 Feature: Calculations
 
-#  TODO (pure) transaction amount round-up calculation
+  Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions
+  dated within a week.
+  A week period is the last seven days including today.
+  A spending transaction is outbound, settled, and from an external source.
+  A round up of transaction t is: ceiling(t.amount) - t.amount)
 
-  Rule: The round-up amount for an account is the sum of the difference between each eligible transaction's
-  rounded-up amount and its original value.
+#    TODO automate
+    @manual
+    Scenario: the round-up amount of an account is calculated
+      Given an account with transactions such as:
+        | with tx round-up | is spending | is within a week |
+        | 0.65             | yes         | yes              |
+        | 0.80             | yes         | yes              |
+        | 0.13             | yes         | yes              |
+      Then the result should be 1.58
 
-  FEEL expression: sum(for t in transactions
-  where t.eligibility = "eligible"
-  return ceiling(t.amount) - t.amount)
+#    TODO automate
+    @manual
+    Scenario: the round-up amount of an account is calculated
+      Given an account with transactions such as:
+        | with tx round-up | is spending | is within a week |
+        | 0.65             | yes         | yes              |
+        | 0.80             | yes         | yes              |
+        | 0.13             | no          | yes              |
+      Then the result should be 1.45
 
+#    TODO automate
+    @manual
+    Scenario: the round-up amount of an account is calculated
+      Given an account with transactions such as:
+        | with tx round-up | is spending | is within a week |
+        | 0.65             | yes         | no               |
+        | 0.80             | yes         | yes              |
+        | 0.13             | yes         | yes              |
+      Then the result should be 0.93
+
+#      TODO for 4.35 should return 0.65
+    Scenario: the round-up amount of a transaction is calculated
+
+#    TODO remove - covered by the above scenarios
     Scenario: All account transactions for a period are spending ones
       Given an account has transactions for a period with the following amounts and is spending flags:
         | amount | is spending |
@@ -18,6 +49,7 @@ Feature: Calculations
       When the account round-up amount for the period is calculated
       Then the result should be 1.58
 
+#    TODO remove - covered by the above scenarios
     Scenario: Not all account transactions for a period are spending ones
       Given an account has transactions for a period with the following amounts and is spending flags:
         | amount | is spending |
@@ -27,20 +59,8 @@ Feature: Calculations
       When the account round-up amount for the period is calculated
       Then the result should be 1.45
 
-
-  Rule: A transaction is eligible for round-up when it is classified as "spending"
-  and dated within the last seven days including today. A spending transaction is outbound, settled,
-  and from an external source.
-
-  FEEL expression: filter(
-  transactions,
-  t ->
-  t.source = "external" and
-  t.status = "settled" and
-  t.direction = "outbound" and
-  t.dateTime >= date and time(today() - duration("P6D") + "T00:00:00")
-  )
-
+#      TODO instead of requested use a word such as "evaluate" or "calculated" because
+#      we do not spcify the requesting behaviour here.
     Scenario Outline: account transactions within the last seven days including today are requested
       Given the current local date and time is <now>
       When account transactions are requested
