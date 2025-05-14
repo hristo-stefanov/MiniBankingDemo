@@ -155,9 +155,10 @@ private fun FeedItem.toTransaction(decimalPlaces: Int): Transaction {
     val txSource = if (source == "INTERNAL_TRANSFER") Source.INTERNAL else Source.EXTERNAL
 
     return Transaction(
-        txAmount,
-        txStatus,
-        txSource
+        id = feedItemUid ?: "",
+        amount = txAmount,
+        status = txStatus,
+        source = txSource
     )
 }
 

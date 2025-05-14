@@ -16,7 +16,8 @@ data class Transaction(
     val amount: BigDecimal,
     val status: Status,
     val source: Source,
-    val title: String = ""
+    val title: String = "",
+    val id: String = "",
 )
 
 enum class Source {

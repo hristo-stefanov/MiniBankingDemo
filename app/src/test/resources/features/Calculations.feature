@@ -6,58 +6,35 @@ Feature: Calculations
   A spending transaction is outbound, settled, and from an external source.
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
-#    TODO automate
-    @manual
-    Scenario: the round-up amount of an account is calculated
-      Given an account with transactions such as:
-        | with tx round-up | is spending | is within a week |
-        | 0.65             | yes         | yes              |
-        | 0.80             | yes         | yes              |
-        | 0.13             | yes         | yes              |
+    Scenario: all transactions are spending and dated withing a week
+      Given an account with these transactions:
+        | round-up | is spending | is dated within a week |
+        | 0.65     | yes         | yes                    |
+        | 0.80     | yes         | yes                    |
+        | 0.13     | yes         | yes                    |
+      When the account round-up is calculated
       Then the result should be 1.58
 
-#    TODO automate
-    @manual
-    Scenario: the round-up amount of an account is calculated
-      Given an account with transactions such as:
-        | with tx round-up | is spending | is within a week |
-        | 0.65             | yes         | yes              |
-        | 0.80             | yes         | yes              |
-        | 0.13             | no          | yes              |
+    Scenario: when a transaction is not a spending one
+      Given an account with these transactions:
+        | round-up | is spending | is dated within a week |
+        | 0.65     | yes         | yes                    |
+        | 0.80     | yes         | yes                    |
+        | 0.13     | no          | yes                    |
+      When the account round-up is calculated
       Then the result should be 1.45
 
-#    TODO automate
-    @manual
-    Scenario: the round-up amount of an account is calculated
-      Given an account with transactions such as:
-        | with tx round-up | is spending | is within a week |
-        | 0.65             | yes         | no               |
-        | 0.80             | yes         | yes              |
-        | 0.13             | yes         | yes              |
+    Scenario: a transaction is not dated withing a week
+      Given an account with these transactions:
+        | round-up | is spending | is dated within a week |
+        | 0.65     | yes         | no                     |
+        | 0.80     | yes         | yes                    |
+        | 0.13     | yes         | yes                    |
+      When the account round-up is calculated
       Then the result should be 0.93
 
 #      TODO for 4.35 should return 0.65
     Scenario: the round-up amount of a transaction is calculated
-
-#    TODO remove - covered by the above scenarios
-    Scenario: All account transactions for a period are spending ones
-      Given an account has transactions for a period with the following amounts and is spending flags:
-        | amount | is spending |
-        | 4.35   | yes         |
-        | 5.20   | yes         |
-        | 0.87   | yes         |
-      When the account round-up amount for the period is calculated
-      Then the result should be 1.58
-
-#    TODO remove - covered by the above scenarios
-    Scenario: Not all account transactions for a period are spending ones
-      Given an account has transactions for a period with the following amounts and is spending flags:
-        | amount | is spending |
-        | 4.35   | yes         |
-        | 5.20   | yes         |
-        | 0.87   | no          |
-      When the account round-up amount for the period is calculated
-      Then the result should be 1.45
 
 #      TODO instead of requested use a word such as "evaluate" or "calculated" because
 #      we do not spcify the requesting behaviour here.

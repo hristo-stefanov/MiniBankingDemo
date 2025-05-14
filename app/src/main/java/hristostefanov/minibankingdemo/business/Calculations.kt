@@ -23,8 +23,8 @@ fun isSpendingTransaction(transaction: Transaction) =
 
 
 @Contract(pure = true)
-private fun calcRoundUp(amount: BigDecimal): BigDecimal =
-    amount.setScale(0, RoundingMode.CEILING).minus(amount)
+private fun calcRoundUp(transaction: Transaction): BigDecimal =
+    transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
 
 /**
  * The is eligibility criteria for transactions is covered by [isSpendingTransaction] and
@@ -34,12 +34,13 @@ suspend fun calcAccountRoundUp(
     repository: Repository,
     accountId: String,
     since: OffsetDateTime,
+    calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction
 ): BigDecimal {
     val transactions = repository.findTransactions(accountId, since)
     return transactions
         .filter { isSpendingTransactionPolicy(it) }
-        .map { calcRoundUp(it.amount) }
+        .map { calcTransactionRoundUpPolicy(it) }
         .fold(ZERO, BigDecimal::add)
 }
 
