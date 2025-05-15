@@ -43,8 +43,9 @@ Feature: Calculations
       When the week-long period is evaluated
       Then the start of the period should be <since> date and time
       Examples:
-        | now                    | since                  | note                       |
-        | 2025-05-11T12:15:08+01 | 2025-05-05T00:00:00+01 | Local time in BST (UTC+01) |
+        | now                 | since               | note                       |
+        | 2025-05-11T12:15+01 | 2025-05-05T00:00+01 | Local time in BST (UTC+01) |
+        | 2025-03-10T08:20Z   | 2025-03-04T00:00Z   | Local time in GMT (UTC)    |
 
     Scenario Outline: A transaction is classified as spending or non-spending
       Given I have a transaction from <source> that is <status> and <direction>
