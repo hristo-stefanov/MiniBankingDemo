@@ -22,7 +22,7 @@ import java.time.OffsetDateTime
 
 private const val ACCOUNT_NUM = "12345678"
 
-class CalculationsSteps {
+class RoundUpCalculationSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
     private lateinit var isDatedWithinAWeekFlagMap: Map<String, Boolean>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
