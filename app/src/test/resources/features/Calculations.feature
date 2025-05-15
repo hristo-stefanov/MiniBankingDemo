@@ -2,7 +2,7 @@ Feature: Calculations
 
   Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions
   dated within a week.
-  A week period is the last seven days including today.
+  A week-long period is the last seven days including today.
   A spending transaction is outbound, settled, and from an external source.
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
@@ -11,7 +11,7 @@ Feature: Calculations
       When the transaction round-up is calculated
       Then the result should be 0.65
 
-    Scenario: all transactions are spending and dated withing a week
+    Scenario: all transactions are spending and dated within a week
       Given an account with these transactions:
         | round-up | is spending | is dated within a week |
         | 0.65     | yes         | yes                    |
@@ -20,7 +20,7 @@ Feature: Calculations
       When the account round-up is calculated
       Then the result should be 1.58
 
-    Scenario: when a transaction is not a spending one
+    Scenario: a transaction is excluded if it is not spending
       Given an account with these transactions:
         | round-up | is spending | is dated within a week |
         | 0.65     | yes         | yes                    |
@@ -29,7 +29,7 @@ Feature: Calculations
       When the account round-up is calculated
       Then the result should be 1.45
 
-    Scenario: a transaction is not dated withing a week
+    Scenario: a transaction is excluded if it is not dated withing a week
       Given an account with these transactions:
         | round-up | is spending | is dated within a week |
         | 0.65     | yes         | no                     |
@@ -38,13 +38,10 @@ Feature: Calculations
       When the account round-up is calculated
       Then the result should be 0.93
 
-
-#      TODO instead of requested use a word such as "evaluate" or "calculated" because
-#      we do not spcify the requesting behaviour here.
-    Scenario Outline: account transactions within the last seven days including today are requested
+    Scenario Outline: start of week-long period is calculated from current time
       Given the current local date and time is <now>
-      When account transactions are requested
-      Then the ones <since> date and time should be requested
+      When the week-long period is evaluated
+      Then the start of the period should be <since> date and time
       Examples:
         | now                    | since                  | note                       |
         | 2025-05-11T12:15:08+01 | 2025-05-05T00:00:00+01 | Local time in BST (UTC+01) |

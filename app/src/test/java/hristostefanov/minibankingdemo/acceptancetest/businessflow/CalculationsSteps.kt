@@ -53,13 +53,13 @@ class CalculationsSteps {
         this.now = now
     }
 
-    @When("account transactions are requested")
-    fun account_transactions_are_requested() {
+    @When("the week-long period is evaluated")
+    fun the_week_long_period_is_evaluated() {
         since = calcStartOfSevenDayWindowIncludingToday(now)
     }
 
-    @Then("the ones {offsetDateTime} date and time should be requested")
-    fun the_ones_date_and_time_should_be_requested(expectedSince: OffsetDateTime) {
+    @Then("the start of the period should be {offsetDateTime} date and time")
+    fun the_start_of_the_period_should_be(expectedSince: OffsetDateTime) {
         assertThat(since).isEqualTo(expectedSince)
     }
 
