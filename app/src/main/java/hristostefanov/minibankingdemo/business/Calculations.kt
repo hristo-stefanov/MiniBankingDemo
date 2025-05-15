@@ -23,7 +23,7 @@ fun isSpendingTransaction(transaction: Transaction) =
 
 
 @Contract(pure = true)
-private fun calcRoundUp(transaction: Transaction): BigDecimal =
+fun calcTransactionRoundUp(transaction: Transaction): BigDecimal =
     transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
 
 /**
@@ -34,7 +34,7 @@ suspend fun calcAccountRoundUp(
     repository: Repository,
     accountId: String,
     since: OffsetDateTime,
-    calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcRoundUp,
+    calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction
 ): BigDecimal {
     val transactions = repository.findTransactions(accountId, since)
@@ -43,11 +43,3 @@ suspend fun calcAccountRoundUp(
         .map { calcTransactionRoundUpPolicy(it) }
         .fold(ZERO, BigDecimal::add)
 }
-
-/**
- * Implements this FEEL expression: sum(for t in transactions return ceiling(t) - t)
- */
-@Contract(pure = true)
-fun calcRoundup(amounts: List<BigDecimal>): BigDecimal = amounts
-    .map { it.setScale(0, RoundingMode.CEILING).minus(it) }
-    .fold(BigDecimal.ZERO, BigDecimal::add)

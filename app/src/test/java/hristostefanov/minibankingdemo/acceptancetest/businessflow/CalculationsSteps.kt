@@ -1,8 +1,8 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import com.google.common.collect.Multimaps.index
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
+import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
@@ -19,7 +19,6 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito.mock
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import kotlin.String
 
 private const val ACCOUNT_NUM = "12345678"
 
@@ -27,7 +26,7 @@ class CalculationsSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
     private lateinit var isDatedWithinAWeekFlagMap: Map<String, Boolean>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
-    private lateinit var accountRoundup: BigDecimal
+    private lateinit var result: BigDecimal
 
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
@@ -37,6 +36,17 @@ class CalculationsSteps {
 
     @ParameterType(value = ".*", name = "offsetDateTime")
     fun offsetDateTime(value: String) = OffsetDateTime.parse(value)
+
+    @Given("a transaction with amout of {bigdecimal}")
+    fun a_transaction_with_amout_of(amount: BigDecimal) {
+        // Only the amount matters
+        transaction = Transaction(amount = amount, status = Status.SETTLED, source = Source.EXTERNAL)
+    }
+
+    @When("the transaction round-up is calculated")
+    fun the_transaction_round_up_is_calculated() {
+        result = calcTransactionRoundUp(transaction)
+    }
 
     @Given("the current local date and time is {offsetDateTime}")
     fun the_current_local_date_and_time_is(now: OffsetDateTime) {
@@ -109,7 +119,7 @@ class CalculationsSteps {
         }
 
 
-        accountRoundup = calcAccountRoundUp(
+        result = calcAccountRoundUp(
             repository = repository,
             accountId = "1",
             since = OffsetDateTime.now(),
@@ -120,7 +130,7 @@ class CalculationsSteps {
 
     @Then("the result should be {bigdecimal}")
     fun the_result_will_be(expected: BigDecimal) {
-        assertThat(accountRoundup).isEqualTo(expected)
+        assertThat(result).isEqualTo(expected)
     }
 
     // Note: Using Cucumber expressions fails with Scenario outline and steps with

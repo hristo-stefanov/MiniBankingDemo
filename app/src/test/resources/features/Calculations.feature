@@ -6,6 +6,11 @@ Feature: Calculations
   A spending transaction is outbound, settled, and from an external source.
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
+    Scenario: the transaction round-up amount is calculated
+      Given a transaction with amout of 4.35
+      When the transaction round-up is calculated
+      Then the result should be 0.65
+
     Scenario: all transactions are spending and dated withing a week
       Given an account with these transactions:
         | round-up | is spending | is dated within a week |
@@ -33,8 +38,6 @@ Feature: Calculations
       When the account round-up is calculated
       Then the result should be 0.93
 
-#      TODO for 4.35 should return 0.65
-    Scenario: the round-up amount of a transaction is calculated
 
 #      TODO instead of requested use a word such as "evaluate" or "calculated" because
 #      we do not spcify the requesting behaviour here.
