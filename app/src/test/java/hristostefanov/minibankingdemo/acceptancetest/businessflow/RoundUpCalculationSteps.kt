@@ -37,7 +37,7 @@ class RoundUpCalculationSteps {
     @ParameterType(value = ".*", name = "offsetDateTime")
     fun offsetDateTime(value: String) = OffsetDateTime.parse(value)
 
-    @Given("a transaction with amout of {bigdecimal}")
+    @Given("a transaction with amount of {bigdecimal}")
     fun a_transaction_with_amout_of(amount: BigDecimal) {
         // Only the amount matters
         transaction = Transaction(amount = amount, status = Status.SETTLED, source = Source.EXTERNAL)

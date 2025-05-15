@@ -7,7 +7,7 @@ Feature: Calculations
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
     Scenario: the transaction round-up amount is calculated
-      Given a transaction with amout of 4.35
+      Given a transaction with amount of 4.35
       When the transaction round-up is calculated
       Then the result should be 0.65
 
@@ -29,7 +29,7 @@ Feature: Calculations
       When the account round-up is calculated
       Then the result should be 1.45
 
-    Scenario: a transaction is excluded if it is not dated withing a week
+    Scenario: a transaction is excluded if it is not dated within a week
       Given an account with these transactions:
         | round-up | is spending | is dated within a week |
         | 0.65     | yes         | no                     |
