@@ -9,14 +9,12 @@ class PresentAccountsAndRoundupsInteractor constructor(
     private val repository: Repository,
     val output: PresentAccountsAndRoundUpsOutputBoundary,
     val now: OffsetDateTime,
-    val calcAccountRoundUpPolicy: suspend (repository: Repository, accountId: String, since: OffsetDateTime) -> BigDecimal,
+    val calcAccountRoundUpInteractor: suspend Repository.(accountId: String, since: OffsetDateTime) -> BigDecimal,
 ) {
     suspend fun execute() {
 
-        val since = calcStartOfSevenDayWindowIncludingToday(now)
-
         val reportItems = repository.findAllAccounts().map { account ->
-            val roundUp = calcAccountRoundUpPolicy(repository, account.id, since)
+            val roundUp = repository.calcAccountRoundUpInteractor(account.id, now)
 
             AccountsAndRoundUpsModel.Item(
                 accountId =  account.id,

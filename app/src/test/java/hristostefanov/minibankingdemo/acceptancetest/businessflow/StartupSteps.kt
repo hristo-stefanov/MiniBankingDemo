@@ -4,8 +4,8 @@ import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccount
 import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupInteractor
 import hristostefanov.minibankingdemo.business.interactors.startup.StartupOutputBoundary
+import hristostefanov.minibankingdemo.business.calcAccountRoundUpInteractor
 import hristostefanov.minibankingdemo.any
-import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import io.cucumber.java.Before
@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 
 class StartupSteps {
@@ -37,9 +38,14 @@ class StartupSteps {
         mock()
     private val repository: Repository = mock()
 
+    private val cari: suspend Repository.(String, OffsetDateTime) -> BigDecimal = { accountId: String, since: OffsetDateTime ->
+        calcAccountRoundUpInteractor(accountId, since)
+    }
+
     private val presentAccountsAndRoundupsInteractor =
         PresentAccountsAndRoundupsInteractor(repository, presentAccountsAndRoundupsOutputBoundary,
-            OffsetDateTime.now(), ::calcAccountRoundUp)
+//            OffsetDateTime.now(), ::calcAccountRoundUpInteractor)
+            OffsetDateTime.now(), cari)
     private lateinit var startupInteractor: StartupInteractor
 
 

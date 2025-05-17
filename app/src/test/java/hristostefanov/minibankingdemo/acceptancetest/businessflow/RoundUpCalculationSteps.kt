@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.any
-import hristostefanov.minibankingdemo.business.calcAccountRoundUp
+import hristostefanov.minibankingdemo.business.calcAccountRoundUpInteractor
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
@@ -24,7 +24,7 @@ private const val ACCOUNT_NUM = "12345678"
 
 class RoundUpCalculationSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
-    private lateinit var isDatedWithinAWeekFlagMap: Map<String, Boolean>
+    private lateinit var transactionIdToDateMap: Map<String, OffsetDateTime>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
     private lateinit var result: BigDecimal
 
@@ -32,6 +32,7 @@ class RoundUpCalculationSteps {
     private var isSpendingTransaction = false
 
     private lateinit var now: OffsetDateTime
+    private lateinit var accountId: String
     private lateinit var since: OffsetDateTime
 
     @ParameterType(value = ".*", name = "offsetDateTime")
@@ -40,7 +41,8 @@ class RoundUpCalculationSteps {
     @Given("a transaction with amount of {bigdecimal}")
     fun a_transaction_with_amout_of(amount: BigDecimal) {
         // Only the amount matters
-        transaction = Transaction(amount = amount, status = Status.SETTLED, source = Source.EXTERNAL)
+        transaction =
+            Transaction(amount = amount, status = Status.SETTLED, source = Source.EXTERNAL)
     }
 
     @When("the transaction round-up is calculated")
@@ -68,6 +70,8 @@ class RoundUpCalculationSteps {
         // TODO consider using Mockk for stubbing the policy
         // as Mockito cannot do that.
 
+        accountId = "1"
+
         val isSpendingTransactionFlagList = transactionsTable.mapIndexed { index, map ->
             val isSpending = when (map["is spending"]) {
                 "yes" -> true
@@ -78,17 +82,19 @@ class RoundUpCalculationSteps {
         }
         isSpendingTransactionFlagMap = isSpendingTransactionFlagList.toMap()
 
-        val isDatedWithinAWeekFlagList = transactionsTable.mapIndexed { index, it ->
-            val isDatedWithinAWeek = when (it["is dated within a week"]) {
-                "yes" -> true
-                "no" -> false
+        now = OffsetDateTime.parse("2020-05-03T00:00Z")
+        val transactionIdToDateList = transactionsTable.mapIndexed { index, it ->
+            val date = when (it["is dated within a week"]) {
+                "yes" -> OffsetDateTime.parse("2020-05-01T00:00Z")
+                "no" -> OffsetDateTime.parse("2020-04-03T00:00Z")
                 else -> throw IllegalArgumentException()
             }
-            index.toString() to isDatedWithinAWeek
+            index.toString() to date
         }
-        isDatedWithinAWeekFlagMap = isDatedWithinAWeekFlagList.toMap()
+        transactionIdToDateMap = transactionIdToDateList.toMap()
 
-        val transactionRoundPairList = transactionsTable.mapIndexed { index, it -> index.toString() to BigDecimal(it["round-up"]) }
+        val transactionRoundPairList =
+            transactionsTable.mapIndexed { index, it -> index.toString() to BigDecimal(it["round-up"]) }
         transactionRoundUpMap = transactionRoundPairList.toMap()
     }
 
@@ -104,28 +110,33 @@ class RoundUpCalculationSteps {
 
         val repository: Repository = mock()
         given(repository.findTransactions(any(), any())).willAnswer { invocation ->
-            val accountId = invocation.arguments[0] as String
-            val since = invocation.arguments[1] as OffsetDateTime
+            val accountIdArg = invocation.arguments[0] as String
+            val sinceArg = invocation.arguments[1] as OffsetDateTime
 
-            // Only the transaction Id matter since the calculation policies are stubbed
             transactionRoundUpMap.entries
-                .filter { isDatedWithinAWeekFlagMap[it.key]!! }
-                .map{ it -> Transaction(
-                amount = BigDecimal.ZERO,
-                status = Status.SETTLED,
-                source = Source.EXTERNAL,
-                id = it.key
-            )  }
+                .filter {
+                    val txDate = transactionIdToDateMap[it.key]!!
+                    accountId == accountIdArg && txDate > sinceArg
+                }
+                .map { it ->
+                    // Only the transaction Id matter since the calculation policies are stubbed
+                    Transaction(
+                        amount = BigDecimal.ZERO,
+                        status = Status.SETTLED,
+                        source = Source.EXTERNAL,
+                        id = it.key
+                    )
+                }
         }
 
-
-        result = calcAccountRoundUp(
-            repository = repository,
-            accountId = "1",
-            since = OffsetDateTime.now(),
-            calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
-            isSpendingTransactionPolicy = isSpendingTransactionPolicy
-        )
+        with(repository) {
+            result = calcAccountRoundUpInteractor(
+                accountId = "1",
+                now = now,
+                calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
+                isSpendingTransactionPolicy = isSpendingTransactionPolicy,
+            )
+        }
     }
 
     @Then("the result should be {bigdecimal}")

@@ -1,3 +1,4 @@
+@debug
 Feature: Calculations
 
   Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions

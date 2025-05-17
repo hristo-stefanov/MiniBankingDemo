@@ -54,7 +54,7 @@ class PresentAccountsAndRoundUpsSteps {
         presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
             repository = repository,
             output = this@PresentAccountsAndRoundUpsSteps.output,
-            calcAccountRoundUpPolicy = calcAccountRoundUpStub,
+            calcAccountRoundUpInteractor = calcAccountRoundUpStub,
             now = OffsetDateTime.now()
         )
 
