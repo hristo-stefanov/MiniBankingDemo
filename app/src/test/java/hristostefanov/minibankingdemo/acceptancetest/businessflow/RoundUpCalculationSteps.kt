@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.any
-import hristostefanov.minibankingdemo.business.calcAccountRoundUpInteractor
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
@@ -9,6 +8,7 @@ import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
+import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
 import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -129,14 +129,12 @@ class RoundUpCalculationSteps {
                 }
         }
 
-        with(repository) {
-            result = calcAccountRoundUpInteractor(
-                accountId = "1",
-                now = now,
-                calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
-                isSpendingTransactionPolicy = isSpendingTransactionPolicy,
-            )
-        }
+        val interactor = CalcAccountRoundUpInteractor(
+            repository = repository,
+            isSpendingTransactionPolicy = isSpendingTransactionPolicy,
+            calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
+        )
+        result = interactor(accountId = "1", now = now)
     }
 
     @Then("the result should be {bigdecimal}")

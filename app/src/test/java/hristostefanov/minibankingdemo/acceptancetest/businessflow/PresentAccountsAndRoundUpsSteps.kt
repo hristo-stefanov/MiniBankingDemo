@@ -1,10 +1,12 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
+import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.interactors.shared.AccountsAndRoundUpsModel
 import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
 import io.cucumber.java.DataTableType
 import io.cucumber.java.en.And
 import io.cucumber.java.en.Given
@@ -35,6 +37,7 @@ class PresentAccountsAndRoundUpsSteps {
     private lateinit var accounts: List<Account>
     private val output: PresentAccountsAndRoundUpsOutputBoundary = mock()
     private val repository: Repository = mock()
+    private val calcAccountRoundUpInteractor: CalcAccountRoundUpInteractor = mock()
 
     @Given("I have the following accounts")
     fun i_have_the_following_accounts(accounts: List<Account>) = runTest {
@@ -44,17 +47,16 @@ class PresentAccountsAndRoundUpsSteps {
     }
 
     @And("the calculated round-up for each is")
-    fun the_calculated_round_up_for_each_is(calculatedRoundUps: List<Map<String, String>>) {
-
-        val calcAccountRoundUpStub: suspend (Repository, String, OffsetDateTime) -> BigDecimal =
-            { repository: Repository, accountId: String, since: OffsetDateTime ->
-                calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
-            }
+    fun the_calculated_round_up_for_each_is(calculatedRoundUps: List<Map<String, String>>) = runTest {
+        given(calcAccountRoundUpInteractor.invoke(any(), any())).willAnswer { answer ->
+            val accountId = answer.arguments[0] as String
+            calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+        }
 
         presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
             repository = repository,
             output = this@PresentAccountsAndRoundUpsSteps.output,
-            calcAccountRoundUpInteractorArg = calcAccountRoundUpStub,
+            calcAccountRoundUpInteractor = calcAccountRoundUpInteractor,
             now = OffsetDateTime.parse("2025-05-18T00:00Z")
         )
 

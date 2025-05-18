@@ -26,24 +26,7 @@ fun isSpendingTransaction(transaction: Transaction) =
 fun calcTransactionRoundUp(transaction: Transaction): BigDecimal =
     transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
 
-
-/**
- * The is eligibility criteria for transactions is covered by [isSpendingTransaction] and
- * by the combination of [Repository.findAllAccounts] plus [since]
- */
-suspend fun Repository.calcAccountRoundUpInteractor(
-    accountId: String,
-    now: OffsetDateTime,
-    calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
-    isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
-    calcSincePolicy: (OffsetDateTime) -> OffsetDateTime = ::calcStartOfSevenDayWindowIncludingToday
-): BigDecimal {
-    val since = calcSincePolicy(now)
-    val transactions = findTransactions(accountId, since)
-    return calcAccountRoundUp(transactions, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
-}
-
-private fun calcAccountRoundUp(
+fun calcAccountRoundUp(
     transactions: List<Transaction>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction

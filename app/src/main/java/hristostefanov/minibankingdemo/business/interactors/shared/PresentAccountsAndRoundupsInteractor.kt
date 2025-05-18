@@ -1,23 +1,21 @@
 package hristostefanov.minibankingdemo.business.interactors.shared
 
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import java.math.BigDecimal
-import hristostefanov.minibankingdemo.business.calcAccountRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
 import java.time.OffsetDateTime
 
-typealias CalcAccountRoundUpInteractor = suspend Repository.(accountId: String, since: OffsetDateTime) -> BigDecimal
+//typealias CalcAccountRoundUpInteractor = suspend Repository.(accountId: String, since: OffsetDateTime) -> BigDecimal
 
 class PresentAccountsAndRoundupsInteractor constructor(
     private val repository: Repository,
     val output: PresentAccountsAndRoundUpsOutputBoundary,
     val now: OffsetDateTime,
-    val calcAccountRoundUpInteractorArg: CalcAccountRoundUpInteractor
-    = { accountId, since -> calcAccountRoundUpInteractor(accountId, since) },
+    val calcAccountRoundUpInteractor: CalcAccountRoundUpInteractor,
 ) {
     suspend fun execute() {
 
         val reportItems = repository.findAllAccounts().map { account ->
-            val roundUp = repository.calcAccountRoundUpInteractorArg(account.id, now)
+            val roundUp = calcAccountRoundUpInteractor(account.id, now)
 
             AccountsAndRoundUpsModel.Item(
                 accountId =  account.id,
