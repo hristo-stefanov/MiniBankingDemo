@@ -38,14 +38,17 @@ class StartupSteps {
         mock()
     private val repository: Repository = mock()
 
-    private val cari: suspend Repository.(String, OffsetDateTime) -> BigDecimal = { accountId: String, since: OffsetDateTime ->
+    private val calcAccountRoundUpInteractor: suspend Repository.(String, OffsetDateTime) -> BigDecimal = { accountId: String, since: OffsetDateTime ->
         calcAccountRoundUpInteractor(accountId, since)
     }
 
-    private val presentAccountsAndRoundupsInteractor =
-        PresentAccountsAndRoundupsInteractor(repository, presentAccountsAndRoundupsOutputBoundary,
+    private val presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
+        repository,
+        presentAccountsAndRoundupsOutputBoundary,
 //            OffsetDateTime.now(), ::calcAccountRoundUpInteractor)
-            OffsetDateTime.now(), cari)
+            OffsetDateTime.now(),
+        calcAccountRoundUpInteractor
+    )
     private lateinit var startupInteractor: StartupInteractor
 
 

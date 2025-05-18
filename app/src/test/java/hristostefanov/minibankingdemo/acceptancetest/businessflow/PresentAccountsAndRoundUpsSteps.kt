@@ -44,18 +44,18 @@ class PresentAccountsAndRoundUpsSteps {
     }
 
     @And("the calculated round-up for each is")
-    fun the_calculated_round_up_for_each_is(suggestedRoundUps: List<Map<String, String>>) {
+    fun the_calculated_round_up_for_each_is(calculatedRoundUps: List<Map<String, String>>) {
 
         val calcAccountRoundUpStub: suspend (Repository, String, OffsetDateTime) -> BigDecimal =
             { repository: Repository, accountId: String, since: OffsetDateTime ->
-                suggestedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+                calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
             }
 
         presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
             repository = repository,
             output = this@PresentAccountsAndRoundUpsSteps.output,
-            calcAccountRoundUpInteractor = calcAccountRoundUpStub,
-            now = OffsetDateTime.now()
+            calcAccountRoundUpInteractorArg = calcAccountRoundUpStub,
+            now = OffsetDateTime.parse("2025-05-18T00:00Z")
         )
 
     }

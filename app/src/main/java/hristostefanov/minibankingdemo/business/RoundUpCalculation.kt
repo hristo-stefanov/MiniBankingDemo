@@ -26,6 +26,7 @@ fun isSpendingTransaction(transaction: Transaction) =
 fun calcTransactionRoundUp(transaction: Transaction): BigDecimal =
     transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
 
+
 /**
  * The is eligibility criteria for transactions is covered by [isSpendingTransaction] and
  * by the combination of [Repository.findAllAccounts] plus [since]
