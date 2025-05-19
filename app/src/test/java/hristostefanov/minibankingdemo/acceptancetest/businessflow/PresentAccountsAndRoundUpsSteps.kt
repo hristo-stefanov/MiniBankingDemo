@@ -3,16 +3,18 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
+import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsModel
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
-import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
 import io.cucumber.java.DataTableType
 import io.cucumber.java.en.And
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import io.sentry.Breadcrumb.transaction
 import kotlinx.coroutines.test.runTest
+import org.mockito.AdditionalAnswers.answer
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
@@ -37,7 +39,6 @@ class PresentAccountsAndRoundUpsSteps {
     private lateinit var accounts: List<Account>
     private val output: PresentAccountsAndRoundUpsOutputBoundary = mock()
     private val repository: Repository = mock()
-    private val calcAccountRoundUpInteractor: CalcAccountRoundUpInteractor = mock()
 
     @Given("I have the following accounts")
     fun i_have_the_following_accounts(accounts: List<Account>) = runTest {
@@ -48,16 +49,28 @@ class PresentAccountsAndRoundUpsSteps {
 
     @And("the calculated round-up for each is")
     fun the_calculated_round_up_for_each_is(calculatedRoundUps: List<Map<String, String>>) = runTest {
-        given(calcAccountRoundUpInteractor.invoke(any(), any())).willAnswer { answer ->
+        given(repository.findTransactions(any(), any())).willAnswer { answer ->
             val accountId = answer.arguments[0] as String
-            calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+            val accountRoundUp = calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+//            Transaction(
+//                amount
+//            )
         }
+
+//        given(calcAccountRoundUpInteractor.invoke(any(), any())).willAnswer { answer ->
+//            val accountId = answer.arguments[0] as String
+//            calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+//        }
+
+//        val calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = { transaction ->
+//            val accountId = answer.arguments[0] as String
+//            val accountRoundUp = calculatedRoundUps.find { it["number"] == accountId }!!.let { BigDecimal(it["round-up"]) }
+//        }
 
         presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
             repository = repository,
             output = this@PresentAccountsAndRoundUpsSteps.output,
-            calcAccountRoundUpInteractor = calcAccountRoundUpInteractor,
-            now = OffsetDateTime.parse("2025-05-18T00:00Z")
+            now = OffsetDateTime.parse("2025-05-18T00:00Z"),
         )
 
     }

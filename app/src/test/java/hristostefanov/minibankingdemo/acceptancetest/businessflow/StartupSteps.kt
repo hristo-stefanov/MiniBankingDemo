@@ -1,13 +1,12 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
-import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
-import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
-import hristostefanov.minibankingdemo.usecase.StartupInteractor
-import hristostefanov.minibankingdemo.usecase.StartupOutputBoundary
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.usecase.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.StartupOutputBoundary
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -37,16 +36,10 @@ class StartupSteps {
         mock()
     private val repository: Repository = mock()
 
-    private val calcAccountRoundUpInteractor = CalcAccountRoundUpInteractor(
-        repository = repository
-    )
-
     private val presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
         repository,
         presentAccountsAndRoundupsOutputBoundary,
-//            OffsetDateTime.now(), ::calcAccountRoundUpInteractor)
             OffsetDateTime.now(),
-        calcAccountRoundUpInteractor
     )
     private lateinit var startupInteractor: StartupInteractor
 

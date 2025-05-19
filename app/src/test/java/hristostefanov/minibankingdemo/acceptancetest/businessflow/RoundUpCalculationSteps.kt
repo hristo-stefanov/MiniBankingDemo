@@ -4,11 +4,14 @@ import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
+import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsModel
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
 import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -19,6 +22,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito.mock
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.util.Currency
 
 private const val ACCOUNT_NUM = "12345678"
 
@@ -109,6 +113,11 @@ class RoundUpCalculationSteps {
         }
 
         val repository: Repository = mock()
+        given(repository.findAllAccounts()).willReturn(listOf(
+            Account(accountId, accountId, "", Currency.getInstance("GBP"),
+            BigDecimal.ZERO ))
+        )
+
         given(repository.findTransactions(any(), any())).willAnswer { invocation ->
             val accountIdArg = invocation.arguments[0] as String
             val sinceArg = invocation.arguments[1] as OffsetDateTime
@@ -129,12 +138,21 @@ class RoundUpCalculationSteps {
                 }
         }
 
-        val interactor = CalcAccountRoundUpInteractor(
+        val output = object: PresentAccountsAndRoundUpsOutputBoundary {
+            override fun present(model: AccountsAndRoundUpsModel) {
+                result = model.items.find { it.accountId == accountId }!!.roundUp
+            }
+        }
+
+        val interactor = PresentAccountsAndRoundupsInteractor(
+            now = now,
             repository = repository,
             isSpendingTransactionPolicy = isSpendingTransactionPolicy,
             calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
+            output = output,
         )
-        result = interactor(accountId = "1", now = now)
+
+        interactor()
     }
 
     @Then("the result should be {bigdecimal}")

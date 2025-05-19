@@ -3,7 +3,9 @@
 
 |app|
 start
+:Caclulate the start of the week-long period;
 :Fetch accounts and transactions
+for the week-long period.
 (service task);
 :Generate report
 (business rule task);

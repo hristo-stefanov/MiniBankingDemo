@@ -1,5 +1,6 @@
 Feature: Present Accounts and Roundups
 
+  @manual
   Scenario: "Accounts and Round-ups" is presented
     Given I have the following accounts
       | number | currency | balance |
