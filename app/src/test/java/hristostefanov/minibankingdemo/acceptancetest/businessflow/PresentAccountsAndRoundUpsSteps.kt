@@ -64,7 +64,7 @@ class PresentAccountsAndRoundUpsSteps {
 
     @When("I'm presented with Accounts and Round-ups")
     fun i_m_presented_with_accounts_and_roundups() = runTest {
-        presentAccountsAndRoundupsInteractor.execute()
+        presentAccountsAndRoundupsInteractor()
     }
 
     @Then("the following information should be included")

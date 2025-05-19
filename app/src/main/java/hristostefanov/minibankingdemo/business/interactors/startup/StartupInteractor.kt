@@ -20,7 +20,7 @@ class StartupInteractor @Inject constructor(
             output.promptUserToSubmitCredentials()
         } else {
             coroutineScope.launch(dispatcher) {
-                presentAccountsAndRoundupsInteractor.execute()
+                presentAccountsAndRoundupsInteractor()
             }
         }
     }
@@ -29,7 +29,7 @@ class StartupInteractor @Inject constructor(
         tokenStore.token = token
 
         coroutineScope.launch(dispatcher) {
-            presentAccountsAndRoundupsInteractor.execute()
+            presentAccountsAndRoundupsInteractor()
         }
     }
 }

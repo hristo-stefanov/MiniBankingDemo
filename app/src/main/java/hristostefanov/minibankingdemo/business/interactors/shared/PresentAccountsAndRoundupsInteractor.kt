@@ -12,7 +12,7 @@ class PresentAccountsAndRoundupsInteractor constructor(
     val now: OffsetDateTime,
     val calcAccountRoundUpInteractor: CalcAccountRoundUpInteractor,
 ) {
-    suspend fun execute() {
+    suspend operator fun invoke() {
 
         val reportItems = repository.findAllAccounts().map { account ->
             val roundUp = calcAccountRoundUpInteractor(account.id, now)
