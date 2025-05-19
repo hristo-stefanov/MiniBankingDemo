@@ -1,11 +1,14 @@
-package hristostefanov.minibankingdemo.business.interactors.startup
+package hristostefanov.minibankingdemo.usecase
 
-import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+interface StartupOutputBoundary {
+    fun promptUserToSubmitCredentials()
+}
 
 class StartupInteractor @Inject constructor(
     val output: StartupOutputBoundary,

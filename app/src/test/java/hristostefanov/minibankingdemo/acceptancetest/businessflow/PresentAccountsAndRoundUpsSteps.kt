@@ -3,9 +3,9 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.shared.AccountsAndRoundUpsModel
-import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundUpsOutputBoundary
-import hristostefanov.minibankingdemo.business.interactors.shared.PresentAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsModel
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
 import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
 import io.cucumber.java.DataTableType
 import io.cucumber.java.en.And

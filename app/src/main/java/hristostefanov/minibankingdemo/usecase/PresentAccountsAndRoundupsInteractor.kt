@@ -1,10 +1,27 @@
-package hristostefanov.minibankingdemo.business.interactors.shared
+package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.usecase.CalcAccountRoundUpInteractor
+import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.util.Currency
 
 //typealias CalcAccountRoundUpInteractor = suspend Repository.(accountId: String, since: OffsetDateTime) -> BigDecimal
+
+interface PresentAccountsAndRoundUpsOutputBoundary {
+    fun present(model: AccountsAndRoundUpsModel)
+}
+
+data class AccountsAndRoundUpsModel(
+    val items: List<Item>
+) {
+    data class Item(
+        val accountId: String,
+        val number: String,
+        val currency: Currency,
+        val roundUp: BigDecimal,
+        val balance: BigDecimal,
+    )
+}
 
 class PresentAccountsAndRoundupsInteractor constructor(
     private val repository: Repository,

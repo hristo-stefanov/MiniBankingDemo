@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.business
 
-import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
@@ -26,6 +25,7 @@ fun isSpendingTransaction(transaction: Transaction) =
 fun calcTransactionRoundUp(transaction: Transaction): BigDecimal =
     transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
 
+@Contract(pure = true)
 fun calcAccountRoundUp(
     transactions: List<Transaction>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
