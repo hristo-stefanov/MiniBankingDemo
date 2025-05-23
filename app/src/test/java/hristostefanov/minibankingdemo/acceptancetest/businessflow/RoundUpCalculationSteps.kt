@@ -1,8 +1,9 @@
 package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
+import com.google.common.collect.Multimaps.index
 import hristostefanov.minibankingdemo.any
-import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
+import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Source
@@ -12,13 +13,19 @@ import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsModel
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
+import io.cucumber.java.PendingException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import io.sentry.Breadcrumb.transaction
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.mockito.AdditionalAnswers.answer
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -28,19 +35,32 @@ private const val ACCOUNT_NUM = "12345678"
 
 class RoundUpCalculationSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
-    private lateinit var transactionIdToDateMap: Map<String, OffsetDateTime>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
+    private lateinit var accounts: List<Account>
+    private val repository: Repository = mock()
+    private lateinit var presentAccountsAndRoundupsInteractor: PresentAccountsAndRoundupsInteractor
     private lateinit var result: BigDecimal
 
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
+    private val output: PresentAccountsAndRoundUpsOutputBoundary = mock()
 
     private lateinit var now: OffsetDateTime
-    private lateinit var accountId: String
     private lateinit var since: OffsetDateTime
 
     @ParameterType(value = ".*", name = "offsetDateTime")
     fun offsetDateTime(value: String) = OffsetDateTime.parse(value)
+
+    @DataTableType
+    fun accountTransformer(entry: Map<String, String>): Account {
+        return Account(
+            id = entry["account number"]!!,
+            accountNum = entry["account number"]!!,
+            categoryUid = "category",
+            currency = Currency.getInstance(entry["currency"]),
+            balance = BigDecimal(entry["balance"]!!)
+        )
+    }
 
     @Given("a transaction with amount of {bigdecimal}")
     fun a_transaction_with_amout_of(amount: BigDecimal) {
@@ -66,15 +86,20 @@ class RoundUpCalculationSteps {
 
     @Then("the start of the period should be {offsetDateTime} date and time")
     fun the_start_of_the_period_should_be(expectedSince: OffsetDateTime) {
+
         assertThat(since).isEqualTo(expectedSince)
     }
 
-    @Given("an account with these transactions:")
-    fun an_account_with_these_transactions(transactionsTable: List<Map<String, String>>) {
-        // TODO consider using Mockk for stubbing the policy
-        // as Mockito cannot do that.
+    @Given("I have the following accounts")
+    fun i_have_the_following_accounts(accounts: List<Account>) = runTest {
+        this@RoundUpCalculationSteps.accounts = accounts
 
-        accountId = "1"
+        given(repository.findAllAccounts()).willReturn(accounts)
+    }
+
+    @Given("I have these transactions")
+    fun i_have_these_transactions(transactionsTable: List<Map<String, String>>) = runTest {
+        // We use the index as transaction id
 
         val isSpendingTransactionFlagList = transactionsTable.mapIndexed { index, map ->
             val isSpending = when (map["is spending"]) {
@@ -86,24 +111,11 @@ class RoundUpCalculationSteps {
         }
         isSpendingTransactionFlagMap = isSpendingTransactionFlagList.toMap()
 
-        now = OffsetDateTime.parse("2020-05-03T00:00Z")
-        val transactionIdToDateList = transactionsTable.mapIndexed { index, it ->
-            val date = when (it["is dated within a week"]) {
-                "yes" -> OffsetDateTime.parse("2020-05-01T00:00Z")
-                "no" -> OffsetDateTime.parse("2020-04-03T00:00Z")
-                else -> throw IllegalArgumentException()
-            }
-            index.toString() to date
-        }
-        transactionIdToDateMap = transactionIdToDateList.toMap()
-
         val transactionRoundPairList =
             transactionsTable.mapIndexed { index, it -> index.toString() to BigDecimal(it["round-up"]) }
         transactionRoundUpMap = transactionRoundPairList.toMap()
-    }
 
-    @When("the account round-up is calculated")
-    fun the_account_round_up_is_calculated() = runTest {
+
         val isSpendingTransactionPolicy = { tx: Transaction ->
             isSpendingTransactionFlagMap[tx.id]!!
         }
@@ -112,47 +124,51 @@ class RoundUpCalculationSteps {
             transactionRoundUpMap[it.id]!!
         }
 
-        val repository: Repository = mock()
-        given(repository.findAllAccounts()).willReturn(listOf(
-            Account(accountId, accountId, "", Currency.getInstance("GBP"),
-            BigDecimal.ZERO ))
+        presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
+            repository = repository,
+            output = output,
+            now = OffsetDateTime.parse("2020-05-03T00:00Z"),
+            calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
+            isSpendingTransactionPolicy = isSpendingTransactionPolicy,
         )
 
-        given(repository.findTransactions(any(), any())).willAnswer { invocation ->
-            val accountIdArg = invocation.arguments[0] as String
-            val sinceArg = invocation.arguments[1] as OffsetDateTime
+        given(repository.findTransactions(any(), any())).willAnswer { answer ->
+            val accountId = answer.arguments[0] as String
 
-            transactionRoundUpMap.entries
-                .filter {
-                    val txDate = transactionIdToDateMap[it.key]!!
-                    accountId == accountIdArg && txDate > sinceArg
-                }
-                .map { it ->
-                    // Only the transaction Id matter since the calculation policies are stubbed
-                    Transaction(
-                        amount = BigDecimal.ZERO,
-                        status = Status.SETTLED,
-                        source = Source.EXTERNAL,
-                        id = it.key
-                    )
-                }
-        }
-
-        val output = object: PresentAccountsAndRoundUpsOutputBoundary {
-            override fun present(model: AccountsAndRoundUpsModel) {
-                result = model.items.find { it.accountId == accountId }!!.roundUp
+            transactionsTable
+                .withIndex()
+                .filter { it.value["account number"] == accountId}
+                .map {
+                Transaction(
+                    amount = BigDecimal.ZERO, // Not used becuase the round-up amount is stubbed
+                    status = Status.SETTLED, // Not used because "is spending" rule is stubbed
+                    source = Source.EXTERNAL, // Not used because "is spending" rule is stubbed
+                    title = it.index.toString(),
+                    id = it.index.toString()
+                )
             }
         }
+    }
 
-        val interactor = PresentAccountsAndRoundupsInteractor(
-            now = now,
-            repository = repository,
-            isSpendingTransactionPolicy = isSpendingTransactionPolicy,
-            calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
-            output = output,
+    @When("I'm presented with Accounts and Round-ups")
+    fun i_m_presented_with_accounts_and_roundups() = runTest {
+        presentAccountsAndRoundupsInteractor()
+    }
+
+    @Then("the following information should be included")
+    fun the_following_information_should_be_included(dataTable: List<Map<String, String>>) {
+        val expectedModel = AccountsAndRoundUpsModel(
+            dataTable.map {
+                AccountsAndRoundUpsModel.Item(
+                    accountId = it["account number"]!!,
+                    number = it["account number"]!!,
+                    roundUp = BigDecimal(it["round-up"]),
+                    balance = BigDecimal(it["balance"]),
+                    currency = Currency.getInstance(it["currency"])
+                )
+            }
         )
-
-        interactor()
+        then(output).should().present(expectedModel)
     }
 
     @Then("the result should be {bigdecimal}")

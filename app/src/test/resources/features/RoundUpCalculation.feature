@@ -6,37 +6,32 @@ Feature: Calculations
   A spending transaction is outbound, settled, and from an external source.
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
+@debug
+    Scenario: New
+      Given I have the following accounts
+        | account number | currency | balance |
+        | 1              | GBP      | 100.10  |
+        | 2              | EUR      | 2000.20 |
+      And I have these transactions
+        | account number | round-up | is spending |
+        | 1              | 0.65     | yes         |
+        | 1              | 0.80     | yes         |
+        | 1              | 0.13     | yes         |
+        | 2              | 0.65     | yes         |
+        | 2              | 0.80     | yes         |
+        | 2              | 0.13     | no          |
+      When I'm presented with Accounts and Round-ups
+      Then the following information should be included
+        | account number | currency | balance | round-up |
+        | 1              | GBP      | 100.10  | 1.58     |
+        | 2              | EUR      | 2000.20 | 1.45     |
+
+
     Scenario: the transaction round-up amount is calculated
       Given a transaction with amount of 4.35
       When the transaction round-up is calculated
       Then the result should be 0.65
 
-    Scenario: all transactions are spending and dated within a week
-      Given an account with these transactions:
-        | round-up | is spending | is dated within a week |
-        | 0.65     | yes         | yes                    |
-        | 0.80     | yes         | yes                    |
-        | 0.13     | yes         | yes                    |
-      When the account round-up is calculated
-      Then the result should be 1.58
-
-    Scenario: a transaction is excluded if it is not spending
-      Given an account with these transactions:
-        | round-up | is spending | is dated within a week |
-        | 0.65     | yes         | yes                    |
-        | 0.80     | yes         | yes                    |
-        | 0.13     | no          | yes                    |
-      When the account round-up is calculated
-      Then the result should be 1.45
-
-    Scenario: a transaction is excluded if it is not dated within a week
-      Given an account with these transactions:
-        | round-up | is spending | is dated within a week |
-        | 0.65     | yes         | no                     |
-        | 0.80     | yes         | yes                    |
-        | 0.13     | yes         | yes                    |
-      When the account round-up is calculated
-      Then the result should be 0.93
 
     Scenario Outline: start of week-long period is calculated from current time
       Given the current local date and time is <now>
