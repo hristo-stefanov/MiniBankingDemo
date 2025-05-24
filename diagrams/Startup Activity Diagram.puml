@@ -8,14 +8,11 @@ end note
 if (Has saved login credentials?) then (yes)
 else (no)
     |user|
-    :Submit login credentials
-    (user task);
+    :☺ Submit login credentials;
     |app|
     :Save login credentials;
 endif
-    :Present Accounts and Roundups
-    (subprocess);
-
+    :⊞ Present Accounts and Roundups;
 stop
 
 @enduml

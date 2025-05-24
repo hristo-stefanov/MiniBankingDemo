@@ -3,14 +3,19 @@
 
 |app|
 start
-:Caclulate the start of the week-long period;
-:Fetch accounts and transactions
-for the week-long period.
-(service task);
-:Generate report
-(business rule task);
-:Show report
-(send task);
+:Get current date and time;
+:Date and time ]
+'<<businessRule>>
+:ƒ Caclulate the start of the week-long period;
+:Date and time ]
+'<<serviceCall>>
+:⚙ Fetch accounts and transactions
+since the start of the period;
+:Dataset ]
+'<<businessRule>>
+:ƒ  Generate report;
+:Report ]
+:Present report >
 stop
 
 @enduml
