@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.usecase
 
-import android.icu.number.Precision.currency
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
@@ -8,7 +7,6 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import io.sentry.util.CollectionUtils.map
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
@@ -35,8 +33,6 @@ class PresentAccountsAndRoundupsInteractor constructor(
     private val repository: Repository,
     val output: PresentAccountsAndRoundUpsOutputBoundary,
     val now: OffsetDateTime,
-    private val calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
-    private val isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
     private val calcSincePolicy: (OffsetDateTime) -> OffsetDateTime = ::calcStartOfSevenDayWindowIncludingToday
 ) {
     suspend operator fun invoke() {
@@ -48,21 +44,31 @@ class PresentAccountsAndRoundupsInteractor constructor(
                 acc + (account to transactions)
             }
 
-        val reportItems = dataset.entries.map { (account, transactions) ->
-            val roundUp = calcAccountRoundUp(
-                transactions = transactions,
-                calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
-                isSpendingTransactionPolicy = isSpendingTransactionPolicy)
-            AccountsAndRoundUpsModel.Item(
-                accountId =  account.id,
-                number = account.accountNum,
-                balance = account.balance,
-                currency = account.currency,
-                roundUp = roundUp,
-            )
-        }
-
-        val model = AccountsAndRoundUpsModel(reportItems)
+        val model = generateReport(dataset)
         output.present(model)
     }
+}
+
+internal fun generateReport(
+    dataset: Map<Account, List<Transaction>>,
+    calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
+    isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
+): AccountsAndRoundUpsModel {
+    val reportItems = dataset.entries.map { (account, transactions) ->
+        val roundUp = calcAccountRoundUp(
+            transactions = transactions,
+            calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
+            isSpendingTransactionPolicy = isSpendingTransactionPolicy
+        )
+        AccountsAndRoundUpsModel.Item(
+            accountId = account.id,
+            number = account.accountNum,
+            balance = account.balance,
+            currency = account.currency,
+            roundUp = roundUp,
+        )
+    }
+
+    val model = AccountsAndRoundUpsModel(reportItems)
+    return model
 }

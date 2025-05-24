@@ -6,8 +6,16 @@ Feature: Calculations
   A spending transaction is outbound, settled, and from an external source.
   A round up of transaction t is: ceiling(t.amount) - t.amount)
 
-@debug
-    Scenario: New
+    Scenario Outline: start of week-long period is calculated from current time
+      Given the current local date and time is <now>
+      When the week-long period is evaluated
+      Then the start of the period should be <since> date and time
+      Examples:
+        | now                 | since               | note                       |
+        | 2025-05-11T12:15+01 | 2025-05-05T00:00+01 | local time in BST (UTC+01) |
+        | 2025-03-10T08:20Z   | 2025-03-04T00:00Z   | local time in GMT (UTC)    |
+
+    Scenario: Accounts and Round-ups report is generated
       Given I have the following accounts
         | account number | currency | balance |
         | 1              | GBP      | 100.10  |
@@ -31,16 +39,6 @@ Feature: Calculations
       Given a transaction with amount of 4.35
       When the transaction round-up is calculated
       Then the result should be 0.65
-
-
-    Scenario Outline: start of week-long period is calculated from current time
-      Given the current local date and time is <now>
-      When the week-long period is evaluated
-      Then the start of the period should be <since> date and time
-      Examples:
-        | now                 | since               | note                       |
-        | 2025-05-11T12:15+01 | 2025-05-05T00:00+01 | local time in BST (UTC+01) |
-        | 2025-03-10T08:20Z   | 2025-03-04T00:00Z   | local time in GMT (UTC)    |
 
     Scenario Outline: A transaction is classified as spending or non-spending
       Given I have a transaction from <source> that is <status> and <direction>
