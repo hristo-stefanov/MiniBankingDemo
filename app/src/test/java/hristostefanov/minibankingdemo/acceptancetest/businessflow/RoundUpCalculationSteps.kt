@@ -7,8 +7,8 @@ import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsModel
-import hristostefanov.minibankingdemo.usecase.generateReport
+import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.summarize
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
@@ -26,13 +26,11 @@ class RoundUpCalculationSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
     private lateinit var accounts: List<Account>
-    private lateinit var reportModel: AccountsAndRoundUpsModel
+    private lateinit var summary: AccountsAndRoundUpsSummary
     private lateinit var dataset: Map<Account, List<Transaction>>
     private lateinit var result: BigDecimal
-
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
-
     private lateinit var now: OffsetDateTime
     private lateinit var since: OffsetDateTime
 
@@ -101,8 +99,6 @@ class RoundUpCalculationSteps {
             transactionsTable.mapIndexed { index, it -> index.toString() to BigDecimal(it["round-up"]) }
         transactionRoundUpMap = transactionRoundPairList.toMap()
 
-
-
         dataset= transactionsTable
             .withIndex()
             .groupBy { it.value["account number"]!! }
@@ -131,14 +127,14 @@ class RoundUpCalculationSteps {
             transactionRoundUpMap[it.id]!!
         }
 
-        reportModel = generateReport(dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
+        summary = summarize(dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
     }
 
     @Then("the following information should be included")
     fun the_following_information_should_be_included(dataTable: List<Map<String, String>>) {
-        val expectedModel = AccountsAndRoundUpsModel(
+        val expectedSummary = AccountsAndRoundUpsSummary(
             dataTable.map {
-                AccountsAndRoundUpsModel.Item(
+                AccountsAndRoundUpsSummary.Item(
                     accountId = it["account number"]!!,
                     number = it["account number"]!!,
                     roundUp = BigDecimal(it["round-up"]),
@@ -148,7 +144,7 @@ class RoundUpCalculationSteps {
             }
         )
 
-        assertThat(reportModel).isEqualTo(expectedModel)
+        assertThat(summary).isEqualTo(expectedSummary)
     }
 
     @Then("the result should be {bigdecimal}")
@@ -190,5 +186,4 @@ class RoundUpCalculationSteps {
         }
         assertThat(isSpendingTransaction).isEqualTo(expectedIsSpendingTransaction)
     }
-
 }

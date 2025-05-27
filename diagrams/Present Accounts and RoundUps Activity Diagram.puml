@@ -6,16 +6,16 @@ start
 :Get current date and time;
 :Date and time ]
 '<<businessRule>>
-:ƒ Caclulate the start of the week-long period;
+:ƒ Calculate the start of the week-long period;
 :Date and time ]
 '<<serviceCall>>
-:⚙ Fetch accounts and transactions
+:⚙ Fetch accounts and thier transactions
 since the start of the period;
-:Dataset ]
+:Result set ]
 '<<businessRule>>
-:ƒ  Generate report;
-:Report ]
-:Present report >
+:ƒ  Summarize;
+:Summary]
+:Present Summary >
 stop
 
 @enduml

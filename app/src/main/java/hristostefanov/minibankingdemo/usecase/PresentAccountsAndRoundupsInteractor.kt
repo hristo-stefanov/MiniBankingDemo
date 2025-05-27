@@ -11,13 +11,11 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
 
-//typealias CalcAccountRoundUpInteractor = suspend Repository.(accountId: String, since: OffsetDateTime) -> BigDecimal
-
 interface PresentAccountsAndRoundUpsOutputBoundary {
-    fun present(model: AccountsAndRoundUpsModel)
+    fun present(model: AccountsAndRoundUpsSummary)
 }
 
-data class AccountsAndRoundUpsModel(
+data class AccountsAndRoundUpsSummary(
     val items: List<Item>
 ) {
     data class Item(
@@ -44,23 +42,23 @@ class PresentAccountsAndRoundupsInteractor constructor(
                 acc + (account to transactions)
             }
 
-        val model = generateReport(dataset)
-        output.present(model)
+        val summary = summarize(dataset)
+        output.present(summary)
     }
 }
 
-internal fun generateReport(
+internal fun summarize(
     dataset: Map<Account, List<Transaction>>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
-): AccountsAndRoundUpsModel {
-    val reportItems = dataset.entries.map { (account, transactions) ->
+): AccountsAndRoundUpsSummary {
+    val items = dataset.entries.map { (account, transactions) ->
         val roundUp = calcAccountRoundUp(
             transactions = transactions,
             calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
             isSpendingTransactionPolicy = isSpendingTransactionPolicy
         )
-        AccountsAndRoundUpsModel.Item(
+        AccountsAndRoundUpsSummary.Item(
             accountId = account.id,
             number = account.accountNum,
             balance = account.balance,
@@ -69,6 +67,5 @@ internal fun generateReport(
         )
     }
 
-    val model = AccountsAndRoundUpsModel(reportItems)
-    return model
+    return AccountsAndRoundUpsSummary(items)
 }
