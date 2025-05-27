@@ -78,8 +78,8 @@ class RoundUpCalculationSteps {
         assertThat(since).isEqualTo(expectedSince)
     }
 
-    @Given("I have the following accounts")
-    fun i_have_the_following_accounts(accounts: List<Account>) = runTest {
+    @Given("I have the following accounts for a week-long period")
+    fun i_have_the_following_accounts_for_a_week_long_period(accounts: List<Account>) = runTest {
         this@RoundUpCalculationSteps.accounts = accounts
     }
 

@@ -1,10 +1,6 @@
 Feature: Calculations
 
-  Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions
-  dated within a week.
-  A week-long period is the last seven days including today.
-  A spending transaction is outbound, settled, and from an external source.
-  A round up of transaction t is: ceiling(t.amount) - t.amount)
+  Rule: A week-long period is the last seven days including today.
 
     Scenario Outline: start of week-long period is calculated from current time
       Given the current local date and time is <now>
@@ -15,8 +11,11 @@ Feature: Calculations
         | 2025-05-11T12:15+01 | 2025-05-05T00:00+01 | local time in BST (UTC+01) |
         | 2025-03-10T08:20Z   | 2025-03-04T00:00Z   | local time in GMT (UTC)    |
 
+  Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions
+  dated within a week.
+
     Scenario: Accounts and Round-ups report is generated
-      Given I have the following accounts
+      Given I have the following accounts for a week-long period
         | account number | currency | balance |
         | 1              | GBP      | 100.10  |
         | 2              | EUR      | 2000.20 |
@@ -34,12 +33,14 @@ Feature: Calculations
         | 1              | GBP      | 100.10  | 1.58     |
         | 2              | EUR      | 2000.20 | 1.45     |
 
+  Rule: A round up of transaction t is: ceiling(t.amount) - t.amount)
 
-    Scenario: the transaction round-up amount is calculated
+    Scenario: The transaction round-up amount is calculated
       Given a transaction with amount of 4.35
       When the transaction round-up is calculated
       Then the result should be 0.65
 
+  Rule: A spending transaction is outbound, settled, and from an external source.
     Scenario Outline: A transaction is classified as spending or non-spending
       Given I have a transaction from <source> that is <status> and <direction>
       When it is evaluated
