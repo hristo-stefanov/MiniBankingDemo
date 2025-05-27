@@ -13,7 +13,7 @@ interface StartupOutputBoundary {
 class StartupInteractor @Inject constructor(
     val output: StartupOutputBoundary,
     val tokenStore: TokenStore,
-    val presentAccountsAndRoundupsInteractor: PresentAccountsAndRoundupsInteractor,
+    val presentAccountsAndRoundupsSummaryInteractor: PresentAccountsAndRoundupsSummaryInteractor,
     val dispatcher: CoroutineDispatcher,
 ) {
     private val coroutineScope = CoroutineScope(dispatcher)
@@ -23,7 +23,7 @@ class StartupInteractor @Inject constructor(
             output.promptUserToSubmitCredentials()
         } else {
             coroutineScope.launch(dispatcher) {
-                presentAccountsAndRoundupsInteractor()
+                presentAccountsAndRoundupsSummaryInteractor()
             }
         }
     }
@@ -32,7 +32,7 @@ class StartupInteractor @Inject constructor(
         tokenStore.token = token
 
         coroutineScope.launch(dispatcher) {
-            presentAccountsAndRoundupsInteractor()
+            presentAccountsAndRoundupsSummaryInteractor()
         }
     }
 }

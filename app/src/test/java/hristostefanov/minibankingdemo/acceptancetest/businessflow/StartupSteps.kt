@@ -4,7 +4,7 @@ import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
-import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsInteractor
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.StartupInteractor
 import hristostefanov.minibankingdemo.usecase.StartupOutputBoundary
 import io.cucumber.java.Before
@@ -36,7 +36,7 @@ class StartupSteps {
         mock()
     private val repository: Repository = mock()
 
-    private val presentAccountsAndRoundupsInteractor = PresentAccountsAndRoundupsInteractor(
+    private val presentAccountsAndRoundupsSummaryInteractor = PresentAccountsAndRoundupsSummaryInteractor(
         repository,
         presentAccountsAndRoundupsOutputBoundary,
             OffsetDateTime.now(),
@@ -49,7 +49,7 @@ class StartupSteps {
 //        TestApp.component.inject(this)
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         startupInteractor =
-            StartupInteractor(startupOutputBoundary, tokenStore, presentAccountsAndRoundupsInteractor, testDispatcher)
+            StartupInteractor(startupOutputBoundary, tokenStore, presentAccountsAndRoundupsSummaryInteractor, testDispatcher)
     }
 
     @Given("my login credentials have not been saved")

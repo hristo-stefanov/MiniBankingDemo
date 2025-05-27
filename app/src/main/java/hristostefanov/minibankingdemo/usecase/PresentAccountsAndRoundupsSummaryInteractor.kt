@@ -27,7 +27,7 @@ data class AccountsAndRoundUpsSummary(
     )
 }
 
-class PresentAccountsAndRoundupsInteractor constructor(
+class PresentAccountsAndRoundupsSummaryInteractor constructor(
     private val repository: Repository,
     val output: PresentAccountsAndRoundUpsOutputBoundary,
     val now: OffsetDateTime,
