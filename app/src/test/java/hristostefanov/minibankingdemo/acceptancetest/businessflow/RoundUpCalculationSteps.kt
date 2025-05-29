@@ -7,7 +7,7 @@ import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.summarize
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType

@@ -3,10 +3,9 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 import hristostefanov.minibankingdemo.any
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundUpsOutputBoundary
 import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.StartupInteractor
-import hristostefanov.minibankingdemo.usecase.StartupOutputBoundary
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -31,14 +30,12 @@ class StartupSteps {
 
     private val tokenStore: TokenStore = mock()
 
-    private val startupOutputBoundary: StartupOutputBoundary = mock()
-    private val presentAccountsAndRoundupsOutputBoundary: PresentAccountsAndRoundUpsOutputBoundary =
-        mock()
+    private val userInterface: UserInterface = mock()
     private val repository: Repository = mock()
 
     private val presentAccountsAndRoundupsSummaryInteractor = PresentAccountsAndRoundupsSummaryInteractor(
         repository,
-        presentAccountsAndRoundupsOutputBoundary,
+        userInterface,
             OffsetDateTime.now(),
     )
     private lateinit var startupInteractor: StartupInteractor
@@ -49,7 +46,7 @@ class StartupSteps {
 //        TestApp.component.inject(this)
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         startupInteractor =
-            StartupInteractor(startupOutputBoundary, tokenStore, presentAccountsAndRoundupsSummaryInteractor, testDispatcher)
+            StartupInteractor(userInterface, tokenStore, presentAccountsAndRoundupsSummaryInteractor, testDispatcher)
     }
 
     @Given("my login credentials have not been saved")
@@ -65,7 +62,7 @@ class StartupSteps {
 
     @Then("I should be prompted to submit my login credentials")
     fun i_should_be_prompted_to_submit_my_login_credentials() {
-        then(startupOutputBoundary).should().promptUserToSubmitCredentials()
+        then(userInterface).should().promptUserToSubmitCredentials()
     }
 
     @Given("my login credentials have been saved")
@@ -76,6 +73,6 @@ class StartupSteps {
     @Then("I should be shown the Accounts and Roundups report")
     fun i_should_be_shown_the_accounts_and_roundups_report() = runTest {
         advanceUntilIdle()
-        then(presentAccountsAndRoundupsOutputBoundary).should().present(any())
+        then(userInterface).should().present(any())
     }
 }

@@ -1,38 +1,37 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
+import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-interface StartupOutputBoundary {
-    fun promptUserToSubmitCredentials()
-}
-
-class StartupInteractor @Inject constructor(
-    val output: StartupOutputBoundary,
+internal class StartupInteractor @Inject constructor(
+    val userInterface: UserInterface,
     val tokenStore: TokenStore,
-    val presentAccountsAndRoundupsSummaryInteractor: PresentAccountsAndRoundupsSummaryInteractor,
+    val presentAccountsAndRoundupsSummary: PresentAccountsAndRoundupsSummary,
     val dispatcher: CoroutineDispatcher,
-) {
+) : Startup {
     private val coroutineScope = CoroutineScope(dispatcher)
 
-    fun launchApp() {
+    override fun launchApp() {
         if (tokenStore.token.isEmpty()) {
-            output.promptUserToSubmitCredentials()
+            userInterface.promptUserToSubmitCredentials()
         } else {
             coroutineScope.launch(dispatcher) {
-                presentAccountsAndRoundupsSummaryInteractor()
+                presentAccountsAndRoundupsSummary()
             }
         }
     }
 
-    fun submitLoginCredentials(token: String) {
+    override fun submitLoginCredentials(token: String) {
         tokenStore.token = token
 
         coroutineScope.launch(dispatcher) {
-            presentAccountsAndRoundupsSummaryInteractor()
+            presentAccountsAndRoundupsSummary()
         }
     }
 }

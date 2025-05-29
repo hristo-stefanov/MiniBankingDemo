@@ -1,0 +1,21 @@
+package hristostefanov.minibankingdemo.usecase.output
+
+import java.math.BigDecimal
+import java.util.Currency
+
+interface UserInterface {
+    fun promptUserToSubmitCredentials()
+    fun present(summary: AccountsAndRoundUpsSummary)
+}
+
+data class AccountsAndRoundUpsSummary(
+    val items: List<Item>
+) {
+    data class Item(
+        val accountId: String,
+        val number: String,
+        val currency: Currency,
+        val roundUp: BigDecimal,
+        val balance: BigDecimal,
+    )
+}

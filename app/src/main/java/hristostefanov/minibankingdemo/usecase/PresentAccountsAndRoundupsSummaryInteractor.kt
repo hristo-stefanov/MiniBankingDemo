@@ -7,43 +7,30 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
+import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
+import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
 
-interface PresentAccountsAndRoundUpsOutputBoundary {
-    fun present(model: AccountsAndRoundUpsSummary)
-}
-
-data class AccountsAndRoundUpsSummary(
-    val items: List<Item>
-) {
-    data class Item(
-        val accountId: String,
-        val number: String,
-        val currency: Currency,
-        val roundUp: BigDecimal,
-        val balance: BigDecimal,
-    )
-}
-
-class PresentAccountsAndRoundupsSummaryInteractor constructor(
+internal class PresentAccountsAndRoundupsSummaryInteractor constructor(
     private val repository: Repository,
-    val output: PresentAccountsAndRoundUpsOutputBoundary,
+    val userInterface: UserInterface,
     val now: OffsetDateTime,
     private val calcSincePolicy: (OffsetDateTime) -> OffsetDateTime = ::calcStartOfSevenDayWindowIncludingToday
-) {
-    suspend operator fun invoke() {
+) : PresentAccountsAndRoundupsSummary {
+    override suspend operator fun invoke() {
         val since = calcSincePolicy(now)
 
         val dataset = repository.findAllAccounts()
-            .fold(emptyMap<Account,List<Transaction>>()) { acc, account ->
+            .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
                 val transactions = repository.findTransactions(account.id, since)
                 acc + (account to transactions)
             }
 
         val summary = summarize(dataset)
-        output.present(summary)
+        userInterface.present(summary)
     }
 }
 
