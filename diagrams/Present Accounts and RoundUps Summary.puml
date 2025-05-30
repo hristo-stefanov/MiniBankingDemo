@@ -3,18 +3,18 @@
 
 |app|
 start
-:Get current date and time;
-:Date and time ]
+:<&script> Get current date and time;
+-> [Date and time];
 '<<businessRule>>
-:ƒ Calculate the start of the week-long period;
-:Date and time ]
+:<&spreadsheet> Calculate the start of the week-long period;
+-> [Date and time];
 '<<serviceCall>>
-:⚙ Fetch accounts and thier transactions
+:<&cog> Fetch accounts and thier transactions
 since the start of the period;
-:Result set ]
+-> [Result set];
 '<<businessRule>>
-:ƒ  Summarize;
-:Summary]
+:<&spreadsheet> Summarize;
+-> [Summary];
 :Present Summary >
 stop
 

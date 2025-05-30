@@ -5,14 +5,22 @@ start
 note left
 Launch app event
 end note
-if (Has saved login credentials?) then (yes)
-else (no)
+:<&script> Query "has saved login credentials";
+-> [flag];
+if (has saved login credentials) then (flag == yes)
+else (flag == no)
     |user|
-    :☺ Submit login credentials;
+    :<&person> Submit login credentials;
+    -> [Login credentials];
     |app|
-    :Save login credentials;
+    : <&script> Save login credentials;
 endif
-    :⊞ Present Accounts and Roundups;
+    :⊞ Present Accounts and Roundups
+    Summary;
+note left
+This will fail if login
+credentials are invalid
+end note
 stop
 
 @enduml
