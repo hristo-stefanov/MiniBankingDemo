@@ -5,14 +5,18 @@
 start
 :<&script> Get current date and time;
 -> [Date and time];
-'<<businessRule>>
 :<&spreadsheet> Calculate the start of the week-long period;
 -> [Date and time];
-'<<serviceCall>>
-:<&cog> Fetch accounts and thier transactions
+repeat
+ :<&cog> Fetch accounts and thier transactions
 since the start of the period;
+-> [result];
+backward: <&person> Confrirm retry recover from [Error];
+repeat while (result type?) is (Netwrok Error or Service Error)
+if (result type?) then (Auth Error)
+end
+endif
 -> [Result set];
-'<<businessRule>>
 :<&spreadsheet> Summarize;
 -> [Summary];
 :Present Summary >
