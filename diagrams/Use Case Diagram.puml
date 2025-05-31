@@ -8,22 +8,19 @@ actor Bank <<Service>>
 rectangle System {
 usecase Startup
 usecase Logout
-usecase "Save Round-ups"
+usecase "Transfer Round-up"
 usecase "Create Savings Goal"
 usecase "Present 'Accounts and Round-ups'"
-usecase "Transfer Round-up"
 }
 
 User -- Startup
-User -- "Save Round-ups"
+User -- "Transfer Round-up"
 User -- "Create Savings Goal"
 User -- "Logout"
-User -- "Transfer Round-up"
 
 Startup .> "Present 'Accounts and Round-ups'"
-"Save Round-ups" .> "Present 'Accounts and Round-ups'"
+"Transfer Round-up" .> "Present 'Accounts and Round-ups'"
 "Present 'Accounts and Round-ups'" -- "Bank"
-"Save Round-ups" -- "Bank"
-"Create Savings Goal" -- "Bank"
 "Transfer Round-up" -- "Bank"
+"Create Savings Goal" -- "Bank"
 @enduml
