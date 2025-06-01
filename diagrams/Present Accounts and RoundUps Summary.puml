@@ -10,16 +10,23 @@ start
 repeat
  :<&cog> Fetch accounts and thier transactions
 since the start of the period;
--> [result];
-backward: <&person> Confrirm retry recover from [Error];
-repeat while (result type?) is (Netwrok Error or Service Error)
-if (result type?) then (Auth Error)
-end
-endif
--> [Result set];
-:<&spreadsheet> Summarize;
--> [Summary];
-:Present Summary >
-stop
+-> [Result];
 
+if () then ([is Auth Error])
+    end
+endif
+
+if () then ([is Network Error or is Service Error])
+    :<&person> Confirm retrying recovery;
+else ([is Result set])
+    :<&spreadsheet> Summarize;
+    -> [Summary];
+    :Present Summary >
+    stop
+endif
+
+-> [Confirmation result];
+repeat while () is ([is Confired])
+-> [is Cancelled];
+end
 @enduml
