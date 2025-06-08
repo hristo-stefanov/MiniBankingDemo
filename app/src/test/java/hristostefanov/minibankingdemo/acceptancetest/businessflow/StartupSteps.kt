@@ -17,6 +17,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mockito.mock
 import java.time.OffsetDateTime
+import javax.inject.Provider
 
 class StartupSteps {
 //    @Inject
@@ -36,7 +37,7 @@ class StartupSteps {
     private val presentAccountsAndRoundupsSummaryInteractor = PresentAccountsAndRoundupsSummaryInteractor(
         repository,
         userInterface,
-            OffsetDateTime.now(),
+        Provider { OffsetDateTime.now() }
     )
     private lateinit var startupInteractor: StartupInteractor
 

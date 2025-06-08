@@ -1,3 +1,9 @@
 package hristostefanov.minibankingdemo.business.dependences
 
-class ServiceException(message: String?): Exception(message)
+open class ServiceException(message: String?): Exception(message)
+
+class AuthException(message: String? = null): ServiceException(message)
+
+class NetworkException(message: String?): ServiceException(message)
+
+class APIException(message: String?): ServiceException(message)

@@ -16,7 +16,7 @@ if () then ([is Auth Error])
     end
 endif
 
-if () then ([is Network Error or is Service Error])
+if () then ([is Network Error or is API Error])
     :<&person> Confirm retrying recovery;
 else ([is Result set])
     :<&spreadsheet> Summarize;

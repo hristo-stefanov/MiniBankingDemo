@@ -23,7 +23,15 @@ fun isSpendingTransaction(transaction: Transaction) =
 
 @Contract(pure = true)
 fun calcTransactionRoundUp(transaction: Transaction): BigDecimal =
-    transaction.amount.setScale(0, RoundingMode.CEILING).minus(transaction.amount)
+    transaction.amount
+        // TODO remove abs() when negative tx ammounts issue is sorted
+        .abs()
+        .setScale(0, RoundingMode.CEILING)
+        .minus(
+            transaction.amount
+                // TODO remove abs() when negative tx ammounts issue is sorted
+                .abs()
+        )
 
 @Contract(pure = true)
 fun calcAccountRoundUp(

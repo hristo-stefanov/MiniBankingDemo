@@ -2,6 +2,9 @@ package hristostefanov.minibankingdemo.data
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import hristostefanov.minibankingdemo.business.dependences.APIException
+import hristostefanov.minibankingdemo.business.dependences.AuthException
+import hristostefanov.minibankingdemo.business.dependences.NetworkException
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.*
@@ -9,6 +12,7 @@ import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.data.models.*
 import okhttp3.ResponseBody
 import retrofit2.HttpException
+import java.io.IOException
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -117,14 +121,14 @@ class RepositoryImpl @Inject constructor(
 }
 
 private fun Exception.toServiceException(gson: Gson): ServiceException =
-    ServiceException(
         when (this) {
             is HttpException -> {
-                toMessage(gson)
+                if (this.code() == 401) AuthException(localizedMessage) else APIException(toMessage(gson))
             }
-            else -> localizedMessage
+            is JsonSyntaxException -> APIException(message)
+            is IOException -> NetworkException(localizedMessage)
+            else -> ServiceException(localizedMessage)
         }
-    )
 
 private fun HttpException.toMessage(gson: Gson) =
     response()?.errorBody()?.use {
