@@ -82,7 +82,7 @@ class `When presenting Accounts and Round-up Summary` {
     }
 
     @Test
-    fun `should cancel flow when auth fails`() = runTest {
+    fun `should cancel flow and return error when auth fails`() = runTest {
         given(repository.findAllAccounts()).willThrow(AuthException())
 
         val result = interactor.invoke()
