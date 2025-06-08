@@ -117,8 +117,8 @@ class RoundUpCalculationSteps {
             }.toMap()
     }
 
-    @When("I'm presented with Accounts and Round-ups")
-    fun i_m_presented_with_accounts_and_roundups() = runTest {
+    @When("I'm presented with Accounts and Round-ups summary")
+    fun i_m_presented_with_accounts_and_roundups_summary() = runTest {
         val isSpendingTransactionPolicy = { tx: Transaction ->
             isSpendingTransactionFlagMap[tx.id]!!
         }

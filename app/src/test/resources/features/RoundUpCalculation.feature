@@ -14,7 +14,7 @@ Feature: Calculations
   Rule: The round-up amount for an account is the sum of round-up amounts of spending transactions
   dated within a week.
 
-    Scenario: Accounts and Round-ups report is generated
+    Scenario: Accounts and Round-ups summary is generated
       Given I have the following accounts for a week-long period
         | account number | currency | balance |
         | 1              | GBP      | 100.10  |
@@ -27,7 +27,7 @@ Feature: Calculations
         | 2              | 0.65     | yes         |
         | 2              | 0.80     | yes         |
         | 2              | 0.13     | no          |
-      When I'm presented with Accounts and Round-ups
+      When I'm presented with Accounts and Round-ups summary
       Then the following information should be included
         | account number | currency | balance | round-up |
         | 1              | GBP      | 100.10  | 1.58     |
