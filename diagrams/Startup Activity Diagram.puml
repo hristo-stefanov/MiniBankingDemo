@@ -1,26 +1,35 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
-|app|
+|system|
 start
-note left
-Launch app event
-end note
+repeat
 :<&script> Query "has saved login credentials";
 -> [flag];
-if (has saved login credentials) then (flag == yes)
-else (flag == no)
+if () then ([flag == yes])
+else ([flag == no])
     |user|
     :<&person> Submit login credentials;
     -> [Login credentials];
-    |app|
+    |system|
     : <&script> Save login credentials;
 endif
     :⊞ Present Accounts and Roundups
     Summary;
-note left
-This will fail if login
-credentials are invalid
-end note
-stop
+    -> [Result];
 
+    if () then  ([is Auth Error])
+        :<&script> Clear user data;
+        :Present error message >
+        -> [auth error];
+        |user|
+        :<&person> Confirm submit again;
+        |system|
+    elseif () then  ([is other error])
+        end
+    else (is ok)
+        stop
+    endif
+    |system|
+repeat while () is ([is Confired])
+end
 @enduml

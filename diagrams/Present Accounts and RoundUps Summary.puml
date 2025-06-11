@@ -1,7 +1,7 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
 
-|app|
+|system|
 start
 :<&script> Get current date and time;
 -> [Date and time];
@@ -17,7 +17,9 @@ if () then ([is Auth Error])
 endif
 
 if () then ([is Network Error or is API Error])
+    |user|
     :<&person> Confirm retrying recovery;
+    |system|
 else ([is Result set])
     :<&spreadsheet> Summarize;
     -> [Summary];
@@ -27,6 +29,6 @@ endif
 
 -> [Confirmation result];
 repeat while () is ([is Confired])
--> [is Cancelled];
+-> [is Refused] - [Error];
 end
 @enduml
