@@ -2,7 +2,7 @@
 'https://plantuml.com/activity-diagram-beta
 |system|
 start
-repeat
+while ()
 :<&script> Query "has saved login credentials";
 -> [flag];
 if () then ([flag == yes])
@@ -16,20 +16,14 @@ endif
     :⊞ Present Accounts and Roundups
     Summary;
     -> [Result];
-
     if () then  ([is Auth Error])
-        :<&script> Clear user data;
         :Present error message >
-        -> [auth error];
-        |user|
-        :<&person> Confirm submit again;
-        |system|
-    elseif () then  ([is other error])
-        end
-    else (is ok)
+        :<&script> Clear user data and credentials;
+    elseif () then ([is OK])
         stop
+    else
+        end
     endif
-    |system|
-repeat while () is ([is Confired])
-end
+end while
+-[hidden]->
 @enduml
