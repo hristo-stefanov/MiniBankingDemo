@@ -8,9 +8,7 @@ import javax.inject.Singleton
 @Component(modules = [TestApplicationModule::class])
 interface TestApplicationComponent {
     fun inject(target: RoundUpCalculationSteps)
-    fun inject(target: LoginSteps)
     fun inject(target: LogoutSteps)
     fun inject(target: SaveRoundUps)
     fun inject(target: CommonPresentationSteps)
-    fun inject(target: AutoLoginSteps)
 }
