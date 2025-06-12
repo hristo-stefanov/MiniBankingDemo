@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.util.Currency
 
 interface UserInterface {
-    fun promptUserToSubmitCredentials()
+    suspend fun promptUserToSubmitCredentials(): String
     fun present(summary: AccountsAndRoundUpsSummary)
     suspend fun promptUserToRetryRecovery(message: String): Boolean
 }

@@ -10,6 +10,7 @@ import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -42,6 +43,7 @@ class StartupSteps {
     private lateinit var startupInteractor: StartupInteractor
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before("@steps:startup")
     fun beforeEachScenario() = runTest {
 //        TestApp.component.inject(this)
@@ -62,7 +64,7 @@ class StartupSteps {
     }
 
     @Then("I should be prompted to submit my login credentials")
-    fun i_should_be_prompted_to_submit_my_login_credentials() {
+    fun i_should_be_prompted_to_submit_my_login_credentials() = runTest {
         then(userInterface).should().promptUserToSubmitCredentials()
     }
 

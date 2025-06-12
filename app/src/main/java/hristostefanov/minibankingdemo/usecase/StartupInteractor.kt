@@ -17,21 +17,12 @@ internal class StartupInteractor @Inject constructor(
 ) : Startup {
     private val coroutineScope = CoroutineScope(dispatcher)
 
-    override fun launchApp() {
+    override suspend fun launchApp() {
         if (tokenStore.token.isEmpty()) {
-            userInterface.promptUserToSubmitCredentials()
-        } else {
-            coroutineScope.launch(dispatcher) {
-                presentAccountsAndRoundupsSummary()
-            }
-        }
-    }
+            val token = userInterface.promptUserToSubmitCredentials()
 
-    override fun submitLoginCredentials(token: String) {
-        tokenStore.token = token
-
-        coroutineScope.launch(dispatcher) {
-            presentAccountsAndRoundupsSummary()
+            tokenStore.token = token
         }
+        val result = presentAccountsAndRoundupsSummary()
     }
 }
