@@ -10,8 +10,11 @@ import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.input.Startup
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.Locale
 import javax.inject.Singleton
@@ -52,6 +55,9 @@ abstract class ApplicationModule {
 
         @Provides
         fun provideGson() = Gson()
+
+        @Provides
+        fun provideNow(): OffsetDateTime = OffsetDateTime.now()
     }
 
     @Binds
@@ -60,4 +66,8 @@ abstract class ApplicationModule {
     @Singleton
     @Binds
     abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
+
+    @Singleton
+    @Binds
+    abstract fun bindStartup(impl: StartupInteractor): Startup
 }

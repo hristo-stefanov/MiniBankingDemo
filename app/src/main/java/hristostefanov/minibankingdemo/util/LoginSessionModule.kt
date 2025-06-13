@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import hristostefanov.minibankingdemo.BuildConfig
+import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
@@ -13,6 +14,9 @@ import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteracto
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
+import hristostefanov.minibankingdemo.usecase.PresentAccountsAndRoundupsSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -20,6 +24,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
+import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 @DisableInstallInCheck
@@ -81,6 +86,10 @@ abstract class LoginSessionModule {
                 return retrofit.create(Service::class.java)
             }
         }
+
+        @Provides
+        fun provideCalcSincePolicy(): CalcSincePolicy = ::calcStartOfSevenDayWindowIncludingToday
+
     }
 
     // Repositories may cache session specific data, hence the scoping to session
@@ -95,4 +104,8 @@ abstract class LoginSessionModule {
     @LoginSessionScope
     @Binds
     abstract fun bindListAccountsInteractor(impl: ListAccountsInteractorImpl): ListAccountsInteractor
+
+    @LoginSessionScope
+    @Binds
+    abstract fun bindPresentAccountsAndRoundupsSummary(impl: PresentAccountsAndRoundupsSummaryInteractor): PresentAccountsAndRoundupsSummary
 }

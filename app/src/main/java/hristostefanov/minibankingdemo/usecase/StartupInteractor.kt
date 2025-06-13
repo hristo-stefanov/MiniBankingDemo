@@ -4,25 +4,27 @@ import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import hristostefanov.minibankingdemo.usecase.input.Startup
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class StartupInteractor @Inject constructor(
-    val userInterface: UserInterface,
+class StartupInteractor @Inject constructor(
+    private val sessionRegistry: LoginSessionRegistry,
     val tokenStore: TokenStore,
-    val presentAccountsAndRoundupsSummary: PresentAccountsAndRoundupsSummary,
-    val dispatcher: CoroutineDispatcher,
 ) : Startup {
-    private val coroutineScope = CoroutineScope(dispatcher)
-
-    override suspend fun launchApp() {
+    override suspend fun launchApp(userInterface: UserInterface) {
         if (tokenStore.token.isEmpty()) {
             val token = userInterface.promptUserToSubmitCredentials()
 
             tokenStore.token = token
         }
-        val result = presentAccountsAndRoundupsSummary()
+        sessionRegistry.createSession(tokenStore.token, "Bearer")
+        // TODO createSession() can return the component to avoid handling the case of null
+        // component here
+        val result = sessionRegistry.component!!.presentAccountsAndRoundupsSummary(userInterface)
+
+        // TODO return result
     }
 }

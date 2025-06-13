@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.any
+import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.APIException
 import hristostefanov.minibankingdemo.business.dependences.AuthException
 import hristostefanov.minibankingdemo.business.dependences.NetworkException
@@ -62,8 +63,8 @@ class `When presenting Accounts and Round-up Summary` {
 
     private val interactor = PresentAccountsAndRoundupsSummaryInteractor(
         repository = repository,
-        userInterface = userInterface,
         nowProvider = nowProvider,
+        calcSincePolicy = ::calcStartOfSevenDayWindowIncludingToday
     )
 
     @Before
@@ -76,7 +77,7 @@ class `When presenting Accounts and Round-up Summary` {
         given(repository.findAllAccounts()).willReturn(accounts)
         given(repository.findTransactions(any(), any())).willReturn(spendingTransactions)
 
-        interactor.invoke()
+        interactor.invoke(userInterface)
 
         then(userInterface).should().present(expectedSummary)
     }
@@ -85,7 +86,7 @@ class `When presenting Accounts and Round-up Summary` {
     fun `should cancel flow and return error when auth fails`() = runTest {
         given(repository.findAllAccounts()).willThrow(AuthException())
 
-        val result = interactor.invoke()
+        val result = interactor.invoke(userInterface)
 
         assertThat(result.exceptionOrNull()).isInstanceOf(AuthException::class.java)
     }
@@ -97,7 +98,7 @@ class `When presenting Accounts and Round-up Summary` {
 
         given(userInterface.promptUserToRetryRecovery("500")).willReturn(true)
 
-        interactor.invoke()
+        interactor.invoke(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("500")
         then(userInterface).should().present(expectedSummary)
@@ -110,7 +111,7 @@ class `When presenting Accounts and Round-up Summary` {
 
         given(userInterface.promptUserToRetryRecovery("500")).willReturn(false)
 
-        val result = interactor.invoke()
+        val result = interactor.invoke(userInterface)
         then(userInterface).should().promptUserToRetryRecovery("500")
         assertThat(result.exceptionOrNull()).isInstanceOfSatisfying(APIException::class.java) {
             assertThat(it.message).isEqualTo("500")
@@ -123,7 +124,7 @@ class `When presenting Accounts and Round-up Summary` {
 
         given(userInterface.promptUserToRetryRecovery("No route to host")).willReturn(true)
 
-        interactor.invoke()
+        interactor.invoke(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("No route to host")
         then(userInterface).should().present(expectedSummary)
@@ -136,7 +137,7 @@ class `When presenting Accounts and Round-up Summary` {
 
         given(userInterface.promptUserToRetryRecovery("No route to host")).willReturn(false)
 
-        val result = interactor.invoke()
+        val result = interactor.invoke(userInterface)
         then(userInterface).should().promptUserToRetryRecovery("No route to host")
         assertThat(result.exceptionOrNull()).isInstanceOfSatisfying(NetworkException::class.java) {
             assertThat(it.message).isEqualTo("No route to host")

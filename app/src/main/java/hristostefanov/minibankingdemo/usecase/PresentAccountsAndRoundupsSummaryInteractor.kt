@@ -17,15 +17,17 @@ import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
+import javax.inject.Inject
 import javax.inject.Provider
 
-internal class PresentAccountsAndRoundupsSummaryInteractor constructor(
+typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
+
+class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     private val repository: Repository,
-    val userInterface: UserInterface,
     val nowProvider: Provider<OffsetDateTime>,
-    private val calcSincePolicy: (OffsetDateTime) -> OffsetDateTime = ::calcStartOfSevenDayWindowIncludingToday
+    private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy
 ) : PresentAccountsAndRoundupsSummary {
-    override suspend operator fun invoke(): Result<Unit> {
+    override suspend operator fun invoke(userInterface: UserInterface): Result<Unit> {
         val now = nowProvider.get()
         val since = calcSincePolicy(now)
 

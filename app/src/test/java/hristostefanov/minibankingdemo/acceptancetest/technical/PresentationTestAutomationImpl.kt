@@ -10,6 +10,7 @@ import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
@@ -63,6 +64,8 @@ class PresentationTestAutomationImpl @Inject constructor(
                     get() = throw AssertionError()
                 override val accessToken: String
                     get() = token
+                override val presentAccountsAndRoundupsSummary: PresentAccountsAndRoundupsSummary
+                    get() = TODO("Not yet implemented")
             }
         }
     }
