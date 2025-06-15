@@ -11,12 +11,17 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.databinding.LoginFragmentBinding
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
+import hristostefanov.minibankingdemo.presentation.MainViewModel
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
     private lateinit var binding: LoginFragmentBinding
 
     private val viewModel: LoginViewModel by viewModels()
+
+    private val mainViewModel: MainViewModel by viewModels(
+        ownerProducer = { requireActivity() }
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -70,17 +70,19 @@ class AccountsViewModelTest {
     private val state = SavedStateHandle()
 
     @Suppress("UNCHECKED_CAST")
-    private val viewModel by lazy {
-        AccountsViewModel(
-            state,
-            Locale.UK,
-            stringSupplier,
-            amountFormatter,
-            eventBus,
-            navigationChannel,
-            tokenStore,
-            loginSessionRegistry
-        )
+    private val viewModel: AccountsViewModel by lazy {
+        // TODO
+//        AccountsViewModel(
+//            state,
+//            Locale.UK,
+//            stringSupplier,
+//            amountFormatter,
+//            eventBus,
+//            navigationChannel,
+//            tokenStore,
+//            loginSessionRegistry
+//        )
+        throw NotImplementedError()
     }
 
     @Before

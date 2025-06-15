@@ -116,24 +116,27 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     override fun openAccountScreen(): AccountsViewModel {
         val state = SavedStateHandle()
-        return AccountsViewModel(
-            state,
-            Locale.UK,
-            stringSupplier,
-            amountFormatter,
-            eventBus,
-            navigationChannel,
-            tokenStore,
-            sessionRegistry
-        )
+        // TODO
+//        return AccountsViewModel(
+//            state,
+//            Locale.UK,
+//            stringSupplier,
+//            amountFormatter,
+//            eventBus,
+//            navigationChannel,
+//            tokenStore,
+//            sessionRegistry
+//        )
+        throw NotImplementedError()
     }
 
     override fun openLoginScreen(): LoginViewModel {
-        return LoginViewModel(
-            tokenStore,
-            sessionRegistry,
-            navigationChannel,
-            eventBus
-        )
+//        return LoginViewModel(
+//            tokenStore,
+//            sessionRegistry,
+//            navigationChannel,
+//            eventBus
+//        )
+        throw NotImplementedError()
     }
 }

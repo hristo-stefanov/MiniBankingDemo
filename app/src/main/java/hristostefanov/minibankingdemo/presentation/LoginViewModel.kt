@@ -9,36 +9,39 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val tokenStore: TokenStore,
-    private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val eventBus: EventBus,
+    private val userInterface: UserInterfaceImpl
 ) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)
     val acceptCommandEnabled: LiveData<Boolean> = _acceptCommandEnabled
 
+    private var accessToken: String? = null
+
     fun onAccessTokenChanged(accessToken: String) {
         // SECURITY: do not save the token in SavedStateHandle, which is saved in the
         // "saved instance state" by ActivityManager service
         // this also requires EditText#saveEnabled = false !!!
-        if (tokenStore.token != accessToken) {
-            tokenStore.token = accessToken
-            _acceptCommandEnabled.value = accessToken.isNotBlank()
-        }
+
+        // TODO validation rule
+        _acceptCommandEnabled.value = accessToken.isNotBlank()
+
+        this.accessToken = accessToken
     }
 
     fun onAcceptCommand() {
-        // the user is logged in (fake session)
-        loginSessionRegistry.createSession(tokenStore.token, "Bearer")
-        eventBus.post(AuthenticatedEvent())
-
         viewModelScope.launch {
             navigationChannel.send(Navigation.Backward)
+        }
+
+        accessToken?.let {
+            userInterface.promptUserToSubmitCredentialsContinuation.resume(it)
         }
     }
 

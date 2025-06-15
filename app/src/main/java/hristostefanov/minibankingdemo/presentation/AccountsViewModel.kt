@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.presentation
 
+import android.R.attr.value
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
@@ -10,6 +11,8 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
+import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -20,11 +23,14 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.math.BigDecimal
+import java.nio.file.Files.find
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
 
 const val ACCOUNT_ID_KEY = "accountId"
 
@@ -39,6 +45,7 @@ class AccountsViewModel @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
+    private val userInterface: UserInterfaceImpl
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
@@ -46,8 +53,6 @@ class AccountsViewModel @Inject constructor(
 
     // TODO this business logic shouldn't be here
     private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
-    private var accounts = MutableStateFlow<List<Account>>(emptyList())
-    private val roundUpAmountFlow = MutableStateFlow<BigDecimal?>(null)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
@@ -64,30 +69,24 @@ class AccountsViewModel @Inject constructor(
     private val _transferCommandEnabled = MutableStateFlow(false)
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
-    private val selectedAccountFlow: Flow<Account?> =
-        combine(_selectedAccountPosition, accounts) { position: Int, accounts: List<Account> ->
-            accounts.getOrNull(position)
+    private val selectedAccountFlow: Flow<AccountsAndRoundUpsSummary.Item?> =
+        combine(_selectedAccountPosition, userInterface.summary) { position: Int, summary: AccountsAndRoundUpsSummary? ->
+            summary?.items?.getOrNull(position)
         }.distinctUntilChanged()
 
     fun onTransferCommand() {
-        combine(
-            selectedAccountFlow,
-            roundUpAmountFlow
-        ) { account: Account?, roundUpAmount: BigDecimal? ->
-            if (account != null && roundUpAmount != null) {
-                Navigation.Forward(
-                    AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                        account.id,
-                        account.currency,
-                        roundUpAmount
-                    )
-                )
-            } else {
-                null
-            }
-        }
+        selectedAccountFlow
             .take(1)
             .filterNotNull()
+            .map {
+                Navigation.Forward(
+                    AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                        it.accountId,
+                        it.currency,
+                        it.roundUp
+                    )
+                )
+            }
             .onEach {
                 navigationChannel.send(it)
             }
@@ -95,7 +94,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val accountId = accounts.value.getOrNull(position)?.id
+        val accountId = userInterface.summary.value?.items?.getOrNull(position)?.accountId
         state[ACCOUNT_ID_KEY] = accountId
     }
 
@@ -104,29 +103,25 @@ class AccountsViewModel @Inject constructor(
         eventBus.register(this)
 
         // map Account to DisplayAccount
-        accounts
-            .map {
-                it.map { account ->
-                    val displayBalance = amountFormatter.format(
-                        account.balance,
-                        account.currency.currencyCode
-                    )
-                    DisplayAccount(
-                        account.accountNum,
-                        account.currency.currencyCode,
-                        displayBalance
-                    )
-                }
+        userInterface.summary.filterNotNull().map { it ->
+            it.items.map { item ->
+                val displayBalance = amountFormatter.format(
+                    item.balance,
+                    item.currency.currencyCode
+                )
+                DisplayAccount(
+                    item.number,
+                    item.currency.currencyCode,
+                    displayBalance
+                )
             }
-            .onEach {
-                _accountList.value = it
-            }
+        }
+            .onEach { _accountList.value = it }
             .launchIn(viewModelScope)
 
-
-        combine(savedAccountIdFlow, accounts) { accountId: String?, accounts: List<Account> ->
-            val selectedAccount = accounts.find { it.id == accountId } ?: accounts.getOrNull(0)
-            accounts.indexOf(selectedAccount)
+        combine(savedAccountIdFlow, userInterface.summary.filterNotNull()) { accountId: String?, summary: AccountsAndRoundUpsSummary ->
+            val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
+            summary.items.indexOf(selectedAccount)
         }
             .onEach {
                 _selectedAccountPosition.value = it
@@ -134,53 +129,28 @@ class AccountsViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         selectedAccountFlow
-            .map { account ->
-                account?.let {
-                    loginSessionRegistry.component?.calcRoundUpInteractor?.execute(it.id, roundUpSinceDate)
-                }
-            }
-            .catch { exception ->
-                exception.message?.also {
-                    navigationChannel.send(
-                        Navigation.Forward(
-                            NavGraphXmlDirections.toErrorDialog(it)
-                        )
+            .map {
+                if (it != null) {
+                    amountFormatter.format(
+                        it.roundUp,
+                        it.currency.currencyCode
                     )
+                } else {
+                    stringSupplier.get(R.string.no_account)
                 }
-                emit(null)
             }
-            .onEach {
-                roundUpAmountFlow.value = it
-            }
-            .launchIn(viewModelScope)
-
-        combine(
-            selectedAccountFlow,
-            roundUpAmountFlow
-        ) { account: Account?, roundUpAmount: BigDecimal? ->
-            if (account != null && roundUpAmount != null) {
-                amountFormatter.format(
-                    roundUpAmount,
-                    account.currency.currencyCode
-                )
-            } else {
-                stringSupplier.get(R.string.no_account)
-            }
-        }
             .onEach {
                 _roundUpAmountText.value = it
             }
             .launchIn(viewModelScope)
 
-
-        roundUpAmountFlow
-            .map {
-                it?.signum() == 1 // if positive
-            }
+        selectedAccountFlow
+            .map { it != null }
             .onEach {
                 _transferCommandEnabled.value = it
             }
             .launchIn(viewModelScope)
+
     }
 
     public override fun onCleared() {
@@ -199,20 +169,6 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun load() {
-        if (loginSessionRegistry.component == null) {
-            val token = tokenStore.token
-            if (token.isBlank()) {
-                viewModelScope.launch {
-                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
-                }
-                return
-            } else {
-                // Auto-login
-                loginSessionRegistry.createSession(token, "Bearer")
-                eventBus.post(AuthenticatedEvent())
-            }
-        }
-
         val formatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 .withLocale(locale)
@@ -220,21 +176,6 @@ class AccountsViewModel @Inject constructor(
 
         _roundUpInfo.value =
             stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
-
-        viewModelScope.launch {
-            accounts.value = try {
-                loginSessionRegistry.component?.listAccountsInteractor?.execute()
-            } catch (e: ServiceException) {
-                e.message?.also {
-                    navigationChannel.send(
-                        Navigation.Forward(
-                            NavGraphXmlDirections.toErrorDialog(it)
-                        )
-                    )
-                }
-                null
-            } ?: emptyList()
-        }
     }
 
     fun onLogout() {
