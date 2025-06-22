@@ -40,7 +40,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
                         acc + (account to transactions)
                     }
 
-                val summary = summarize(dataset)
+                val summary = summarize(since, dataset)
                 userInterface.present(summary)
             } catch (e: ServiceException) {
                 when (e) {
@@ -63,6 +63,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
 }
 
 internal fun summarize(
+    since: OffsetDateTime,
     dataset: Map<Account, List<Transaction>>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
@@ -82,5 +83,5 @@ internal fun summarize(
         )
     }
 
-    return AccountsAndRoundUpsSummary(items)
+    return AccountsAndRoundUpsSummary(since, items)
 }

@@ -50,7 +50,8 @@ class `When presenting Accounts and Round-up Summary` {
     )
 
     private val expectedSummary = AccountsAndRoundUpsSummary(
-        listOf(
+       roundUpSice = OffsetDateTime.parse("2025-05-05T00:00+01"),
+        items = listOf(
             AccountsAndRoundUpsSummary.Item(
                 accountId = "1",
                 number = "111",
@@ -69,7 +70,7 @@ class `When presenting Accounts and Round-up Summary` {
 
     @Before
     fun beforeEach() = runTest {
-        given(nowProvider.get()).willReturn(OffsetDateTime.parse("2025-06-01T10:20Z"))
+        given(nowProvider.get()).willReturn(OffsetDateTime.parse("2025-05-11T12:15+01"))
     }
 
     @Test

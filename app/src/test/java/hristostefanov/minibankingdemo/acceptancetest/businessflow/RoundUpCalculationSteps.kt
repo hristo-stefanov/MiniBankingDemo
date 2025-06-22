@@ -127,12 +127,14 @@ class RoundUpCalculationSteps {
             transactionRoundUpMap[it.id]!!
         }
 
-        summary = summarize(dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
+        summary = summarize(since, dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
     }
 
     @Then("the following information should be included")
     fun the_following_information_should_be_included(dataTable: List<Map<String, String>>) {
+        // TODO add a row to the table about the round-up since date-time
         val expectedSummary = AccountsAndRoundUpsSummary(
+            OffsetDateTime.parse("TODO"),
             dataTable.map {
                 AccountsAndRoundUpsSummary.Item(
                     accountId = it["account number"]!!,

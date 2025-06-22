@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.usecase.output
 
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.util.Currency
 
 interface UserInterface {
@@ -10,6 +11,7 @@ interface UserInterface {
 }
 
 data class AccountsAndRoundUpsSummary(
+    val roundUpSice: OffsetDateTime,
     val items: List<Item>
 ) {
     data class Item(

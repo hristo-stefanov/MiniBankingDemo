@@ -1,36 +1,34 @@
 package hristostefanov.minibankingdemo.presentation
 
-import android.R.attr.value
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
-import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.business.entities.Account
-import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.input.Startup
 import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
-import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
-import java.math.BigDecimal
-import java.nio.file.Files.find
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.suspendCoroutine
 
 const val ACCOUNT_ID_KEY = "accountId"
 
@@ -40,7 +38,6 @@ class AccountsViewModel @Inject constructor(
     private val locale: Locale,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
-    private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
@@ -50,9 +47,6 @@ class AccountsViewModel @Inject constructor(
 
     private val savedAccountIdFlow: Flow<String?> =
         state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
-
-    // TODO this business logic shouldn't be here
-    private val roundUpSinceDate: LocalDate = LocalDate.now().minusWeeks(1)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
@@ -99,9 +93,6 @@ class AccountsViewModel @Inject constructor(
     }
 
     init {
-        load()
-        eventBus.register(this)
-
         // map Account to DisplayAccount
         userInterface.summary.filterNotNull().map { it ->
             it.items.map { item ->
@@ -117,6 +108,16 @@ class AccountsViewModel @Inject constructor(
             }
         }
             .onEach { _accountList.value = it }
+            .launchIn(viewModelScope)
+
+        userInterface.summary.filterNotNull().map { it ->
+            // TODO consider externalizing similarly to AmountFormatter
+            val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+            it.roundUpSice.format(formatter)
+        }
+            .onEach { sinceDateFormatted ->
+                _roundUpInfo.value = stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
+            }
             .launchIn(viewModelScope)
 
         combine(savedAccountIdFlow, userInterface.summary.filterNotNull()) { accountId: String?, summary: AccountsAndRoundUpsSummary ->
@@ -151,31 +152,6 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-    }
-
-    public override fun onCleared() {
-        eventBus.unregister(this)
-        super.onCleared()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onDataSourceChanged(event: DataSourceChangedEvent) {
-        load()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onAuthenticated(event: AuthenticatedEvent) {
-        load()
-    }
-
-    private fun load() {
-        val formatter =
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                .withLocale(locale)
-        val sinceDateFormatted = roundUpSinceDate.format(formatter)
-
-        _roundUpInfo.value =
-            stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
     }
 
     fun onLogout() {
