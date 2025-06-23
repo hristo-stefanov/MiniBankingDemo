@@ -76,8 +76,8 @@ class RoundUpCalculationSteps {
         assertThat(since).isEqualTo(expectedSince)
     }
 
-    @Given("I have the following accounts for a week-long period {offsetDateTime}")
-    fun i_have_the_following_accounts_for_a_week_long_period(since: OffsetDateTime, accounts: List<Account>) = runTest {
+    @Given("I have the following accounts for a week-long period starting {offsetDateTime}")
+    fun i_have_the_following_accounts_for_a_week_long_period_starting(since: OffsetDateTime, accounts: List<Account>) = runTest {
         this@RoundUpCalculationSteps.since = since
         this@RoundUpCalculationSteps.accounts = accounts
     }
@@ -131,8 +131,11 @@ class RoundUpCalculationSteps {
         summary = summarize(since, dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
     }
 
-    @Then("the following information should be included {offsetDateTime}")
-    fun the_following_information_should_be_included(expectedSince: OffsetDateTime, dataTable: List<Map<String, String>>) {
+    @Then("the summary should include the following account details for the period starting {offsetDateTime}")
+    fun the_summary_should_include_the_following_account_details_for_the_period_starting(
+        expectedSince: OffsetDateTime,
+        dataTable: List<Map<String, String>>
+    ) {
         val expectedSummary = AccountsAndRoundUpsSummary(
             expectedSince,
             dataTable.map {

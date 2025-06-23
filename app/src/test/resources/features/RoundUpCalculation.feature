@@ -15,7 +15,7 @@ Feature: Calculations
   dated within a week.
 
     Scenario: Accounts and Round-ups summary is generated
-      Given I have the following accounts for a week-long period 2025-03-10T08:20Z
+      Given I have the following accounts for a week-long period starting 2025-03-10T08:20Z
         | account number | currency | balance |
         | 1              | GBP      | 100.10  |
         | 2              | EUR      | 2000.20 |
@@ -28,7 +28,7 @@ Feature: Calculations
         | 2              | 0.80     | yes         |
         | 2              | 0.13     | no          |
       When I'm presented with Accounts and Round-ups summary
-      Then the following information should be included 2025-03-10T08:20Z
+      Then the summary should include the following account details for the period starting 2025-03-10T08:20Z
         | account number | currency | balance | round-up |
         | 1              | GBP      | 100.10  | 1.58     |
         | 2              | EUR      | 2000.20 | 1.45     |
