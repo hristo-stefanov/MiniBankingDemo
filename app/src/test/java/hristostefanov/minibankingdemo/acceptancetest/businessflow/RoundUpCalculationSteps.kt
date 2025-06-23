@@ -35,7 +35,7 @@ class RoundUpCalculationSteps {
     private lateinit var since: OffsetDateTime
 
     @ParameterType(value = ".*", name = "offsetDateTime")
-    fun offsetDateTime(value: String) = OffsetDateTime.parse(value)
+    fun offsetDateTime(value: String): OffsetDateTime = OffsetDateTime.parse(value)
 
     @DataTableType
     fun accountTransformer(entry: Map<String, String>): Account {
@@ -76,8 +76,9 @@ class RoundUpCalculationSteps {
         assertThat(since).isEqualTo(expectedSince)
     }
 
-    @Given("I have the following accounts for a week-long period")
-    fun i_have_the_following_accounts_for_a_week_long_period(accounts: List<Account>) = runTest {
+    @Given("I have the following accounts for a week-long period {offsetDateTime}")
+    fun i_have_the_following_accounts_for_a_week_long_period(since: OffsetDateTime, accounts: List<Account>) = runTest {
+        this@RoundUpCalculationSteps.since = since
         this@RoundUpCalculationSteps.accounts = accounts
     }
 
@@ -130,11 +131,10 @@ class RoundUpCalculationSteps {
         summary = summarize(since, dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
     }
 
-    @Then("the following information should be included")
-    fun the_following_information_should_be_included(dataTable: List<Map<String, String>>) {
-        // TODO add a row to the table about the round-up since date-time
+    @Then("the following information should be included {offsetDateTime}")
+    fun the_following_information_should_be_included(expectedSince: OffsetDateTime, dataTable: List<Map<String, String>>) {
         val expectedSummary = AccountsAndRoundUpsSummary(
-            OffsetDateTime.parse("TODO"),
+            expectedSince,
             dataTable.map {
                 AccountsAndRoundUpsSummary.Item(
                     accountId = it["account number"]!!,
@@ -155,7 +155,7 @@ class RoundUpCalculationSteps {
     }
 
     // Note: Using Cucumber expressions fails with Scenario outline and steps with
-    // multiple paramaters, hence using the old regex syntax.
+    // multiple parameters, hence using the old regex syntax.
     @Given("^I have a transaction from (.+) that is (.+) and (.+)$")
     fun i_have_a_transaction_from_external_with_settled_and_outbound(
         source: String,
