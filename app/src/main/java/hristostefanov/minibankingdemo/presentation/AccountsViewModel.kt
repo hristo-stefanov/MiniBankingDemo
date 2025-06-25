@@ -113,10 +113,10 @@ class AccountsViewModel @Inject constructor(
         userInterface.summary.filterNotNull().map { it ->
             // TODO consider externalizing similarly to AmountFormatter
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
-            it.roundUpSice.format(formatter)
+            it.roundUpSince.format(formatter)
         }
-            .onEach { sinceDateFormatted ->
-                _roundUpInfo.value = stringSupplier.get(R.string.roundUpInfo).format(sinceDateFormatted)
+            .onEach {
+                _roundUpInfo.value = stringSupplier.get(R.string.roundUpInfo).format(it)
             }
             .launchIn(viewModelScope)
 

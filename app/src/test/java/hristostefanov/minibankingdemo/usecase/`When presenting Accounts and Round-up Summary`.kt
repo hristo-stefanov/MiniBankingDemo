@@ -50,7 +50,7 @@ class `When presenting Accounts and Round-up Summary` {
     )
 
     private val expectedSummary = AccountsAndRoundUpsSummary(
-       roundUpSice = OffsetDateTime.parse("2025-05-05T00:00+01"),
+       roundUpSince = OffsetDateTime.parse("2025-05-05T00:00+01"),
         items = listOf(
             AccountsAndRoundUpsSummary.Item(
                 accountId = "1",

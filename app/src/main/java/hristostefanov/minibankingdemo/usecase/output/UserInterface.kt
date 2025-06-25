@@ -11,7 +11,7 @@ interface UserInterface {
 }
 
 data class AccountsAndRoundUpsSummary(
-    val roundUpSice: OffsetDateTime,
+    val roundUpSince: OffsetDateTime,
     val items: List<Item>
 ) {
     data class Item(

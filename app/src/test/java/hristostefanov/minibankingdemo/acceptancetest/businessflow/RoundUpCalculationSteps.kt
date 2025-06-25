@@ -11,6 +11,7 @@ import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.summarize
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
+import io.cucumber.java.en.And
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -32,6 +33,7 @@ class RoundUpCalculationSteps {
     private lateinit var transaction: Transaction
     private var isSpendingTransaction = false
     private lateinit var now: OffsetDateTime
+    private lateinit var start: OffsetDateTime
     private lateinit var since: OffsetDateTime
 
     @ParameterType(value = ".*", name = "offsetDateTime")
@@ -65,21 +67,24 @@ class RoundUpCalculationSteps {
         this.now = now
     }
 
-    @When("the week-long period is evaluated")
-    fun the_week_long_period_is_evaluated() {
-        since = calcStartOfSevenDayWindowIncludingToday(now)
+    @When("the round-up period is evaluated")
+    fun the_round_up_period_is_evaluated() {
+        start = calcStartOfSevenDayWindowIncludingToday(now)
     }
 
-    @Then("the start of the period should be {offsetDateTime} date and time")
-    fun the_start_of_the_period_should_be(expectedSince: OffsetDateTime) {
-
-        assertThat(since).isEqualTo(expectedSince)
+    @Then("the round-up period should start at {offsetDateTime}")
+    fun the_round_up_period_should_start_at(expectedStart: OffsetDateTime) {
+        assertThat(start).isEqualTo(expectedStart)
     }
 
-    @Given("I have the following accounts for a week-long period starting {offsetDateTime}")
-    fun i_have_the_following_accounts_for_a_week_long_period_starting(since: OffsetDateTime, accounts: List<Account>) = runTest {
-        this@RoundUpCalculationSteps.since = since
+    @Given("I have the following accounts")
+    fun i_have_the_following_accounts( accounts: List<Account>) = runTest {
         this@RoundUpCalculationSteps.accounts = accounts
+    }
+
+    @And("the round-up period starts at {offsetDateTime}")
+    fun the_round_up_period_starts_at(since: OffsetDateTime) {
+        this@RoundUpCalculationSteps.since = since
     }
 
     @Given("I have these transactions")
@@ -118,8 +123,8 @@ class RoundUpCalculationSteps {
             }.toMap()
     }
 
-    @When("I'm presented with Accounts and Round-ups summary")
-    fun i_m_presented_with_accounts_and_roundups_summary() = runTest {
+    @When("I'm presented with the Accounts and Round-ups summary")
+    fun i_m_presented_with_the_accounts_and_roundups_summary() = runTest {
         val isSpendingTransactionPolicy = { tx: Transaction ->
             isSpendingTransactionFlagMap[tx.id]!!
         }
@@ -131,14 +136,11 @@ class RoundUpCalculationSteps {
         summary = summarize(since, dataset, calcTransactionRoundUpPolicy, isSpendingTransactionPolicy)
     }
 
-    @Then("the summary should include the following account details for the period starting {offsetDateTime}")
-    fun the_summary_should_include_the_following_account_details_for_the_period_starting(
-        expectedSince: OffsetDateTime,
+    @Then("the summary should include the following account details")
+    fun the_summary_should_include_the_following_account_details(
         dataTable: List<Map<String, String>>
     ) {
-        val expectedSummary = AccountsAndRoundUpsSummary(
-            expectedSince,
-            dataTable.map {
+        val expectedAccounts = dataTable.map {
                 AccountsAndRoundUpsSummary.Item(
                     accountId = it["account number"]!!,
                     number = it["account number"]!!,
@@ -147,9 +149,13 @@ class RoundUpCalculationSteps {
                     currency = Currency.getInstance(it["currency"])
                 )
             }
-        )
 
-        assertThat(summary).isEqualTo(expectedSummary)
+        assertThat(summary.items).isEqualTo(expectedAccounts)
+    }
+
+    @And("the summary should report the round-up period start as {offsetDateTime}")
+    fun the_summary_should_report_the_round_up_period_start_as(expectedStart: OffsetDateTime) {
+        assertThat(summary.roundUpSince).isEqualTo(expectedStart)
     }
 
     @Then("the result should be {bigdecimal}")
