@@ -32,6 +32,8 @@ class LogoutSteps {
     private fun i_am_logged_in() = runTest {
         automation.correctAccessTokenIs("correctToken")
 
+        automation.startUp()
+
         automation.openLoginScreen().run {
             onAccessTokenChanged("correctToken")
             onAcceptCommand()

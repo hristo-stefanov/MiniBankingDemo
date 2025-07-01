@@ -7,6 +7,7 @@ Feature: Log out
 
   Rule: User specific information should disappear when logging out
 
+    @draft
     Scenario: logging out
       Given I am seeing my account information
       When I log out

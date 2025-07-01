@@ -13,7 +13,6 @@ import kotlin.coroutines.resume
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val tokenStore: TokenStore,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val userInterface: UserInterfaceImpl

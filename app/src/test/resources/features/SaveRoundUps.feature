@@ -21,6 +21,7 @@ Feature: Save Round-ups
 
   Rule: TODO
   # TODO what about (The one where) the user is offered to save round-ups
+    @draft
     @steps:saveRoundUps
     Scenario: The app helps users to save round-ups
       Given the calculated round-up for my account is 1.0

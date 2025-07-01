@@ -22,6 +22,7 @@ interface PresentationTestAutomation {
     fun thereIsNoInternetConnection()
 
     // exercising
+    suspend fun startUp()
     fun openAccountScreen(): AccountsViewModel
     fun openLoginScreen(): LoginViewModel
 }

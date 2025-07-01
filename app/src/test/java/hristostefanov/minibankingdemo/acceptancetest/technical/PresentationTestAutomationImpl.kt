@@ -8,12 +8,15 @@ import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.StartupInteractor
 import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
+import org.robolectric.shadows.ShadowSystemProperties.override
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -72,6 +75,13 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
+    private val startupInteractor = StartupInteractor(sessionRegistry, tokenStore, eventBus)
+
+    private val userInterface = UserInterfaceImpl(navigationChannel)
+
+    override suspend fun startUp() {
+        startupInteractor.launchApp(userInterface)
+    }
     override fun correctAccessTokenIs(accessToken: String) {
         correctAccessToken = accessToken
     }
@@ -117,26 +127,22 @@ class PresentationTestAutomationImpl @Inject constructor(
     override fun openAccountScreen(): AccountsViewModel {
         val state = SavedStateHandle()
         // TODO
-//        return AccountsViewModel(
-//            state,
-//            Locale.UK,
-//            stringSupplier,
-//            amountFormatter,
-//            eventBus,
-//            navigationChannel,
-//            tokenStore,
-//            sessionRegistry
-//        )
-        throw NotImplementedError()
+        return AccountsViewModel(
+            state,
+            Locale.UK,
+            stringSupplier,
+            amountFormatter,
+            navigationChannel,
+            tokenStore,
+            sessionRegistry,
+            userInterface
+        )
     }
 
     override fun openLoginScreen(): LoginViewModel {
-//        return LoginViewModel(
-//            tokenStore,
-//            sessionRegistry,
-//            navigationChannel,
-//            eventBus
-//        )
-        throw NotImplementedError()
+        return LoginViewModel(
+            navigationChannel,
+            userInterface
+        )
     }
 }
