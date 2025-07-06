@@ -21,14 +21,8 @@ class UserInterfaceImpl @Inject constructor(
     private val _summary = MutableStateFlow<AccountsAndRoundUpsSummary?>(null)
     val summary = _summary.asStateFlow()
 
-    lateinit var promptUserToSubmitCredentialsContinuation: Continuation<String>
-
-    override suspend fun promptUserToSubmitCredentials(): String {
+    override suspend fun promptUserToSubmitCredentials() {
         navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
-
-        return suspendCoroutine { continuation ->
-            promptUserToSubmitCredentialsContinuation = continuation
-        }
     }
 
     override fun present(summary: AccountsAndRoundUpsSummary) {

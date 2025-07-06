@@ -15,12 +15,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
+import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 
@@ -31,6 +35,12 @@ class MainActivity : AppCompatActivity() {
     @Inject
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
+
+    @Inject
+    internal lateinit var startup: Startup
+
+    @Inject
+    internal lateinit var userInterface: UserInterfaceImpl
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 
@@ -62,6 +72,13 @@ class MainActivity : AppCompatActivity() {
 
         // launch the view model
         viewModel
+
+        val isResumingAppState = savedInstanceState != null
+        if (!isResumingAppState) {
+            lifecycleScope.launch {
+                startup.launchApp(userInterface)
+            }
+        }
     }
 
     private fun onNavigation(navigation: Navigation, navController: NavController) {

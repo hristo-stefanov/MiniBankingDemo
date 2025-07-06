@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import java.util.Currency
 
 interface UserInterface {
-    suspend fun promptUserToSubmitCredentials(): String
+    suspend fun promptUserToSubmitCredentials()
     fun present(summary: AccountsAndRoundUpsSummary)
     suspend fun promptUserToRetryRecovery(message: String): Boolean
 }

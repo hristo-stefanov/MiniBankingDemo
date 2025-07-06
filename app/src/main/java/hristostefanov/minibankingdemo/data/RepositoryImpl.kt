@@ -101,7 +101,7 @@ class RepositoryImpl @Inject constructor(
     override suspend fun createSavingsGoal(name: String, accountId: String, currency: Currency) {
         try {
             service.createSavingsGoal(accountId, SavingsGoalRequestV2(name, currency.currencyCode))
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             throw e.toServiceException(gson)
         }
     }
@@ -114,9 +114,19 @@ class RepositoryImpl @Inject constructor(
         amount: BigDecimal,
         transferId: UUID
     ) {
-        val minorUnits = amount.scaleByPowerOfTen(currency.defaultFractionDigits).longValueExact()
-        val request = TopUpRequestV2(CurrencyAndAmount(currency.currencyCode, minorUnits))
-        service.addMoneyIntoSavingsGoal(accountId, savingsGoalId, transferId.toString(), request)
+        try {
+            val minorUnits =
+                amount.scaleByPowerOfTen(currency.defaultFractionDigits).longValueExact()
+            val request = TopUpRequestV2(CurrencyAndAmount(currency.currencyCode, minorUnits))
+            service.addMoneyIntoSavingsGoal(
+                accountId,
+                savingsGoalId,
+                transferId.toString(),
+                request
+            )
+        } catch (e: Exception) {
+            throw e.toServiceException(gson)
+        }
     }
 }
 
@@ -127,6 +137,8 @@ private fun Exception.toServiceException(gson: Gson): ServiceException =
             }
             is JsonSyntaxException -> APIException(message)
             is IOException -> NetworkException(localizedMessage)
+            // TODO catch only the exception that Service can throw and let the rest
+            // "creash" the app, like JobCancelledException
             else -> ServiceException(localizedMessage)
         }
 

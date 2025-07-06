@@ -43,6 +43,7 @@ class LoginFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Do not allow dismissing
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             requireActivity().finish()
         }

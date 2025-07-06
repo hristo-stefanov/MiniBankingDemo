@@ -32,7 +32,6 @@ interface LoginSessionComponent {
     val accessToken: String
 
     val calcRoundUpInteractor: CalcRoundUpInteractor
-    val listAccountsInteractor: ListAccountsInteractor
     val listSavingGoalInteractor: ListSavingGoalsInteractor
     val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
     val createSavingGoalsInteractor: CreateSavingsGoalInteractor
