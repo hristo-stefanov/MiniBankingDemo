@@ -6,4 +6,5 @@ import java.util.Currency
 
 interface PresentAccountsAndRoundupsSummary {
     suspend operator fun invoke(userInterface: UserInterface): Result<Unit>
+    suspend fun onRetryLoading(userInterface: UserInterface)
 }

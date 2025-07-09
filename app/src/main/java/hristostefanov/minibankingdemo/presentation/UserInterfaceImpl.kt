@@ -5,12 +5,10 @@ import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
-import kotlin.coroutines.Continuation
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Singleton
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class UserInterfaceImpl @Inject constructor(
@@ -29,8 +27,18 @@ class UserInterfaceImpl @Inject constructor(
         _summary.value = summary
     }
 
-    override suspend fun promptUserToRetryRecovery(message: String): Boolean {
-        // TODO("Not yet implemented")
-        return true
+    override suspend fun promptUserToRetryRecovery(message: String, continuationId: String) {
+        navigationChannel.send(
+            Navigation.Forward(
+                NavGraphXmlDirections.toRetryDialog(
+                    // TODO pass this as parameter for cases like swipe-to-refresh
+                    // and explicit commands that should be cancellable
+                    // TODO alternatively cancelling uncancelable use case can close the app
+                    isCancelable = false,
+                    message = message,
+                    continuationId = continuationId
+                )
+            )
+        )
     }
 }

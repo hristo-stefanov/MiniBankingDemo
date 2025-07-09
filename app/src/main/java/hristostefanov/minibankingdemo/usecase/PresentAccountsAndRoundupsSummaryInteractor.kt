@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
-import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.dependences.APIException
 import hristostefanov.minibankingdemo.business.dependences.AuthException
@@ -16,7 +15,6 @@ import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.Currency
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -27,38 +25,37 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     val nowProvider: Provider<OffsetDateTime>,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy
 ) : PresentAccountsAndRoundupsSummary {
+
     override suspend operator fun invoke(userInterface: UserInterface): Result<Unit> {
         val now = nowProvider.get()
         val since = calcSincePolicy(now)
 
-        do {
-            var isRetryConfirmed = false
-            try {
-                val dataset = repository.findAllAccounts()
-                    .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
-                        val transactions = repository.findTransactions(account.id, since)
-                        acc + (account to transactions)
-                    }
-
-                val summary = summarize(since, dataset)
-                userInterface.present(summary)
-            } catch (e: ServiceException) {
-                when (e) {
-                    is AuthException -> return Result.failure(e)
-                    is APIException, is NetworkException -> {
-                        isRetryConfirmed =
-                            userInterface.promptUserToRetryRecovery(e.localizedMessage)
-                        if (!isRetryConfirmed)
-                        // TODO shoudn't return a cancellation flag?
-                            return Result.failure(e)
-                    }
-
-                    else -> throw e
+        try {
+            val dataset = repository.findAllAccounts()
+                .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
+                    val transactions = repository.findTransactions(account.id, since)
+                    acc + (account to transactions)
                 }
+
+            val summary = summarize(since, dataset)
+            userInterface.present(summary)
+        } catch (e: ServiceException) {
+            when (e) {
+                is AuthException -> return Result.failure(e)
+                is APIException, is NetworkException -> {
+                        userInterface.promptUserToRetryRecovery(e.localizedMessage, ContinuationId.PresentSummary_RetryLoading.name)
+                    // TODO return restult
+                }
+
+                else -> throw e
             }
-        } while (isRetryConfirmed)
+        }
 
         return Result.success(Unit)
+    }
+
+    override suspend fun onRetryLoading(userInterface: UserInterface) {
+        invoke(userInterface)
     }
 }
 

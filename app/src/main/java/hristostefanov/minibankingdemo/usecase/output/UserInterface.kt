@@ -7,7 +7,7 @@ import java.util.Currency
 interface UserInterface {
     suspend fun promptUserToSubmitCredentials()
     fun present(summary: AccountsAndRoundUpsSummary)
-    suspend fun promptUserToRetryRecovery(message: String): Boolean
+    suspend fun promptUserToRetryRecovery(message: String, continuationId: String)
 }
 
 data class AccountsAndRoundUpsSummary(
