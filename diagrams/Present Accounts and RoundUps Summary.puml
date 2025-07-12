@@ -13,12 +13,14 @@ since the start of the period;
 -> [Result];
 
 if () then ([is Auth Error])
-    end
+    :Present unrecoverable error message and ask to Log out >
+    stop
 endif
 
 if () then ([is Network Error or is API Error])
     |user|
-    :<&person> Confirm retrying recovery;
+    :<&person> Confirm retrying recovery
+    from error;
     |system|
 else ([is Result set])
     :<&spreadsheet> Summarize;
@@ -28,7 +30,7 @@ else ([is Result set])
 endif
 
 -> [Confirmation result];
-repeat while () is ([is Confired])
--> [is Refused] - [Error];
-end
+repeat while () is ([is OK])
+-> [is Cancel] - [Error];
+stop
 @enduml
