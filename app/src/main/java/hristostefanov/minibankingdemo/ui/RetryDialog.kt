@@ -3,9 +3,11 @@ package hristostefanov.minibankingdemo.ui
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import hristostefanov.minibankingdemo.presentation.MainViewModel
 
 class RetryDialog : DialogFragment() {
     private val args: RetryDialogArgs by navArgs()
@@ -18,7 +20,8 @@ class RetryDialog : DialogFragment() {
             .setMessage(args.message)
             .setTitle("Retry?")
             .setPositiveButton("Retry") { _, _ ->
-                (requireActivity() as MainActivity).executeAction(args.continuationId)
+                val mainViewModel by activityViewModels<MainViewModel>()
+                mainViewModel.executeContinuation(args.continuationId)
                 // This is a must when using the navigation library
                 findNavController().popBackStack()
             }

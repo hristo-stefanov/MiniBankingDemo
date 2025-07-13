@@ -13,6 +13,9 @@ import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import javax.inject.Inject
@@ -26,10 +29,19 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy
 ) : PresentAccountsAndRoundupsSummary {
 
-    override suspend operator fun invoke(userInterface: UserInterface): Result<Unit> {
+    private val _status = MutableStateFlow(InteractorStatus.Created)
+    override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
+
+    override suspend fun start(userInterface: UserInterface) {
+        if (status.value != InteractorStatus.Created)
+            throw IllegalStateException()
+        _status.emit(InteractorStatus.Started)
+        execute(userInterface)
+    }
+
+    private suspend fun execute(userInterface: UserInterface) {
         val now = nowProvider.get()
         val since = calcSincePolicy(now)
-
         try {
             val dataset = repository.findAllAccounts()
                 .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
@@ -38,24 +50,27 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
                 }
 
             val summary = summarize(since, dataset)
-            userInterface.present(summary)
+            userInterface.presentSummary(summary)
         } catch (e: ServiceException) {
+            _status.emit(InteractorStatus.Failed)
             when (e) {
-                is AuthException -> return Result.failure(e)
-                is APIException, is NetworkException -> {
-                        userInterface.promptUserToRetryRecovery(e.localizedMessage, ContinuationId.PresentSummary_RetryLoading.name)
-                    // TODO return restult
+                is AuthException -> {
+                    userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
                 }
-
+                is APIException, is NetworkException -> {
+                    userInterface.promptUserToRetryRecovery(
+                        message = e.localizedMessage,
+                        isCancellable = false,
+                        continuationId = ContinuationId.PresentSummary_RetryLoading
+                    )
+                }
                 else -> throw e
             }
         }
-
-        return Result.success(Unit)
     }
 
     override suspend fun onRetryLoading(userInterface: UserInterface) {
-        invoke(userInterface)
+        execute(userInterface)
     }
 }
 

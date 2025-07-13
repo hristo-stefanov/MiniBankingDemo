@@ -16,7 +16,6 @@ import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSu
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
-import org.robolectric.shadows.ShadowSystemProperties.override
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -80,7 +79,7 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val userInterface = UserInterfaceImpl(navigationChannel)
 
     override suspend fun startUp() {
-        startupInteractor.launchApp(userInterface)
+        startupInteractor.onAppStart(userInterface)
     }
     override fun correctAccessTokenIs(accessToken: String) {
         correctAccessToken = accessToken

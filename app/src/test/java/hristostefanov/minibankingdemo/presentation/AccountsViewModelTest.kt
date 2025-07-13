@@ -17,7 +17,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.fail
 import org.greenrobot.eventbus.EventBus
 import org.junit.Before
 import org.junit.Rule
@@ -99,7 +98,7 @@ class AccountsViewModelTest {
         given(amountFormatter.format("100".toBigDecimal(), "GBP")).willReturn("£100")
         given(amountFormatter.format("0.10".toBigDecimal(), "GBP")).willReturn("£0.10")
 
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
@@ -114,7 +113,7 @@ class AccountsViewModelTest {
 
     @Test
     fun `Should update outputs when summary changes`() = runTest {
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
@@ -126,7 +125,7 @@ class AccountsViewModelTest {
         // provide another summary
 
 
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-07-07T00:00Z"), listOf(account2)
             )
@@ -137,7 +136,7 @@ class AccountsViewModelTest {
 
     @Test
     fun `Should handle Transfer command`() = runTest {
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
@@ -161,7 +160,7 @@ class AccountsViewModelTest {
 
     @Test
     fun `Initially should select the first account`() = runTest {
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(
                     account1,
@@ -185,7 +184,7 @@ class AccountsViewModelTest {
             account2
         )
 
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"),
                 accounts
@@ -198,7 +197,7 @@ class AccountsViewModelTest {
 
     @Test
     fun `Should enable Transfer command when an account is selected`() = runTest {
-        userInterface.present(
+        userInterface.presentSummary(
             AccountsAndRoundUpsSummary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )

@@ -15,17 +15,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
-import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.usecase.input.Startup
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,15 +30,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
-
-    @Inject
-    internal lateinit var startup: Startup
-
-    @Inject
-    internal lateinit var sessionRegistry: LoginSessionRegistry
-
-    @Inject
-    internal lateinit var userInterface: UserInterfaceImpl
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 
@@ -73,15 +59,8 @@ class MainActivity : AppCompatActivity() {
             }
             .launchIn(lifecycleScope)
 
-        // launch the view model
+        // start the view model
         viewModel
-
-        val isResumingAppState = savedInstanceState != null
-        if (!isResumingAppState) {
-            lifecycleScope.launch {
-                startup.launchApp(userInterface)
-            }
-        }
     }
 
     private fun onNavigation(navigation: Navigation, navController: NavController) {
@@ -126,12 +105,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.navHostFragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    internal fun executeAction(continuationId: String) = lifecycleScope.launch {
-        when (ContinuationId.valueOf(continuationId)) {
-            ContinuationId.PresentSummary_RetryLoading ->
-                sessionRegistry.component?.presentAccountsAndRoundupsSummary?.onRetryLoading(userInterface)
-        }
     }
 }

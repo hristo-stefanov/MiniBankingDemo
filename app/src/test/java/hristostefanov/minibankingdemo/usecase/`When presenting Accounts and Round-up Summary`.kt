@@ -78,16 +78,16 @@ class `When presenting Accounts and Round-up Summary` {
         given(repository.findAllAccounts()).willReturn(accounts)
         given(repository.findTransactions(any(), any())).willReturn(spendingTransactions)
 
-        interactor.invoke(userInterface)
+        interactor.start(userInterface)
 
-        then(userInterface).should().present(expectedSummary)
+        then(userInterface).should().presentSummary(expectedSummary)
     }
 
     @Test
     fun `should cancel flow and return error when auth fails`() = runTest {
         given(repository.findAllAccounts()).willThrow(AuthException())
 
-        val result = interactor.invoke(userInterface)
+        val result = interactor.start(userInterface)
 
         assertThat(result.exceptionOrNull()).isInstanceOf(AuthException::class.java)
     }
@@ -102,7 +102,7 @@ class `When presenting Accounts and Round-up Summary` {
         interactor.invoke(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("500")
-        then(userInterface).should().present(expectedSummary)
+        then(userInterface).should().presentSummary(expectedSummary)
     }
 
     @Test
@@ -128,7 +128,7 @@ class `When presenting Accounts and Round-up Summary` {
         interactor.invoke(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("No route to host")
-        then(userInterface).should().present(expectedSummary)
+        then(userInterface).should().presentSummary(expectedSummary)
     }
 
     @Test

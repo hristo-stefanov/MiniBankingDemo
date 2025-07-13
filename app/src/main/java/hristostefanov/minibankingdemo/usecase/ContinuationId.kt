@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.usecase
 
 enum class ContinuationId {
-    PresentSummary_RetryLoading
+    Startup_LoginCredentialsSubmit,
+    PresentSummary_RetryLoading,
 }
