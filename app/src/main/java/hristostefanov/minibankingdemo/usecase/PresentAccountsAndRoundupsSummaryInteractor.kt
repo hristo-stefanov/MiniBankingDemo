@@ -29,6 +29,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy
 ) : PresentAccountsAndRoundupsSummary {
 
+    // TODO the status needs to be saved
     private val _status = MutableStateFlow(InteractorStatus.Created)
     override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
 

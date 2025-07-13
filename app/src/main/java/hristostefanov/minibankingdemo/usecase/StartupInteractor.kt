@@ -18,6 +18,7 @@ class StartupInteractor @Inject constructor(
     val tokenStore: TokenStore,
 ) : Startup {
 
+    // TODO the status needs to be saved
     private val _status = MutableStateFlow(InteractorStatus.Created)
     override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
 
