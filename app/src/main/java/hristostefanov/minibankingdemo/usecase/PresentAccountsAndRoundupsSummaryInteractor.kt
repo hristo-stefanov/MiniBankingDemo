@@ -70,6 +70,10 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     }
 
     override suspend fun onRetryLoading(userInterface: UserInterface) {
+        // TODO retry confirmation result? When to cancel the interactor?
+        // what would happen to the status of StartupInteractor when
+        // called from there? And what about the status tracking in
+        // MainViewModel?
         execute(userInterface)
     }
 }
