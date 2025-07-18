@@ -30,18 +30,21 @@ class StartupInteractor @Inject constructor(
         if (sessionRegistry.component == null) {
             userInterface.promptUserToSubmitCredentials(ContinuationId.Startup_LoginCredentialsSubmit)
         } else {
-            startSummaryInteractorAndEmitItsStatus(userInterface)
+            val status = startSummaryInteractorAndJoin(userInterface)
+            status?.let { _status.emit(it) }
         }
     }
 
-    // TODO I need a better name or single responsibility
-    private suspend fun startSummaryInteractorAndEmitItsStatus(userInterface: UserInterface) {
+    private suspend fun startSummaryInteractorAndJoin(userInterface: UserInterface): InteractorStatus? {
         sessionRegistry.component?.presentAccountsAndRoundupsSummary?.let { interactor ->
             interactor.start(userInterface)
-            val childFinishedStatus = interactor.status.filter { it.isFinished() }.first()
-            _status.emit(childFinishedStatus)
+            return join(interactor.status)
         }
+        return null
     }
+
+    private suspend fun join(statusFlow: StateFlow<InteractorStatus>): InteractorStatus =
+        status.filter { it.isFinished() }.first()
 
     override suspend fun onLoginCredentialsSubmit(
         loginCredentials: String,
@@ -51,6 +54,7 @@ class StartupInteractor @Inject constructor(
         tokenStore.token = loginCredentials
         sessionRegistry.createSession(tokenStore.token, "Bearer")
 
-        startSummaryInteractorAndEmitItsStatus(userInterface)
+        val status = startSummaryInteractorAndJoin(userInterface)
+        status?.let { _status.emit(it) }
     }
 }
