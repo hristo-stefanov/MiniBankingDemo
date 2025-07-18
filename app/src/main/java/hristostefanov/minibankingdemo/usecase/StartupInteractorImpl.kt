@@ -22,7 +22,7 @@ class StartupInteractorImpl @Inject constructor(
     private val _status = MutableStateFlow(InteractorStatus.Created)
     override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
 
-    override suspend fun onAppStart(userInterface: UserInterface) {
+    override suspend fun start(userInterface: UserInterface) {
         if (status.value != InteractorStatus.Created)
             throw IllegalStateException()
         _status.emit(InteractorStatus.Started)

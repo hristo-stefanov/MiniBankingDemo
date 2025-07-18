@@ -16,13 +16,17 @@ private const val IS_STARTUP_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    val startupInteractor: StartupInteractor,
-    val userInterface: UserInterfaceImpl,
-    val sessionRegistry: LoginSessionRegistry
+    private val savedStateHandle: SavedStateHandle,
+    private val startupInteractor: StartupInteractor,
+    private val userInterface: UserInterfaceImpl,
+    private val sessionRegistry: LoginSessionRegistry
 ) : ViewModel() {
 
     init {
+        startStartupInteractorIfNotActive()
+    }
+
+    private fun startStartupInteractorIfNotActive() {
         val isStartupInteractorActive: Boolean? = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY]
 
         startupInteractor.status
@@ -33,10 +37,9 @@ class MainViewModel @Inject constructor(
 
         if (isStartupInteractorActive != true) {
             viewModelScope.launch {
-                startupInteractor.onAppStart(userInterface)
+                startupInteractor.start(userInterface)
             }
         }
-
     }
 
     internal fun executeContinuation(continuationId: String, param: String? = null) =
