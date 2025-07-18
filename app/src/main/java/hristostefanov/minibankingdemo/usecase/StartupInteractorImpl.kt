@@ -1,7 +1,7 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,10 +13,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StartupInteractor @Inject constructor(
+class StartupInteractorImpl @Inject constructor(
     private val sessionRegistry: LoginSessionRegistry,
     val tokenStore: TokenStore,
-) : Startup {
+) : StartupInteractor {
 
     // TODO the status needs to be saved
     private val _status = MutableStateFlow(InteractorStatus.Created)

@@ -2,22 +2,18 @@ package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
 import hristostefanov.minibankingdemo.util.NavigationChannel
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
-import kotlin.coroutines.resume
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val userInterface: UserInterfaceImpl,
-    private val startupInteractor: StartupInteractor,
+    private val startupInteractor: StartupInteractor
 ) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)

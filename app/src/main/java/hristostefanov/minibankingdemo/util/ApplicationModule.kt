@@ -10,8 +10,8 @@ import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.StartupInteractor
-import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.StartupInteractorImpl
+import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -69,5 +69,5 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindStartup(impl: StartupInteractor): Startup
+    abstract fun bindStartup(impl: StartupInteractorImpl): StartupInteractor
 }

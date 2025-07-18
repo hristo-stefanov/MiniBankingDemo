@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.StartupInteractorImpl
 import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
@@ -74,7 +74,7 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
-    private val startupInteractor = StartupInteractor(sessionRegistry, tokenStore, eventBus)
+    private val startupInteractor = StartupInteractorImpl(sessionRegistry, tokenStore, eventBus)
 
     private val userInterface = UserInterfaceImpl(navigationChannel)
 

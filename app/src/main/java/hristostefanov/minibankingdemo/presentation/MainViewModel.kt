@@ -2,11 +2,10 @@ package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.usecase.input.Startup
+import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -18,7 +17,7 @@ private const val IS_STARTUP_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
 @HiltViewModel
 class MainViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val startup: Startup,
+    val startupInteractor: StartupInteractor,
     val userInterface: UserInterfaceImpl,
     val sessionRegistry: LoginSessionRegistry
 ) : ViewModel() {
@@ -26,7 +25,7 @@ class MainViewModel @Inject constructor(
     init {
         val isStartupInteractorActive: Boolean? = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY]
 
-        startup.status
+        startupInteractor.status
             .onEach {
                 savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
@@ -34,7 +33,7 @@ class MainViewModel @Inject constructor(
 
         if (isStartupInteractorActive != true) {
             viewModelScope.launch {
-                startup.onAppStart(userInterface)
+                startupInteractor.onAppStart(userInterface)
             }
         }
 
@@ -43,7 +42,7 @@ class MainViewModel @Inject constructor(
     internal fun executeContinuation(continuationId: String, param: String? = null) =
         viewModelScope.launch {
             when (ContinuationId.valueOf(continuationId)) {
-                ContinuationId.Startup_LoginCredentialsSubmit -> startup.onLoginCredentialsSubmit(
+                ContinuationId.Startup_LoginCredentialsSubmit -> startupInteractor.onLoginCredentialsSubmit(
                     param!!,
                     userInterface
                 )
