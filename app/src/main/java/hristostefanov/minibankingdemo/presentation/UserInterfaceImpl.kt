@@ -44,9 +44,7 @@ class UserInterfaceImpl @Inject constructor(
     override suspend fun presentMessage(message: String) {
         // TODO make it not navigate - display a temp
         navigationChannel.send(
-            Navigation.Forward(
-                NavGraphXmlDirections.toErrorDialog(message)
-            )
+            Navigation.Message(message)
         )
     }
 }

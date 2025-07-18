@@ -52,6 +52,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
 
             val summary = summarize(since, dataset)
             userInterface.presentSummary(summary)
+            _status.emit(InteractorStatus.Completed)
         } catch (e: ServiceException) {
             _status.emit(InteractorStatus.Failed)
             when (e) {

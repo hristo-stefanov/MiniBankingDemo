@@ -3,6 +3,7 @@ package hristostefanov.minibankingdemo.ui
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -11,6 +12,7 @@ import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
@@ -86,6 +88,10 @@ class MainActivity : AppCompatActivity() {
                 navigation.destinationId,
                 true
             )
+            is Navigation.Message -> {
+                val view = findViewById<ConstraintLayout>(R.id.rootLayout)
+                Snackbar.make(view, navigation.message, Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 

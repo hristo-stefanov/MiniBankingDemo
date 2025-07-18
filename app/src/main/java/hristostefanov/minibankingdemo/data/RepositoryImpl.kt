@@ -133,7 +133,7 @@ class RepositoryImpl @Inject constructor(
 private fun Exception.toServiceException(gson: Gson): ServiceException =
         when (this) {
             is HttpException -> {
-                if (this.code() == 401) AuthException(localizedMessage) else APIException(toMessage(gson))
+                if (this.code() == 401 || this.code() == 403) AuthException(localizedMessage) else APIException(toMessage(gson))
             }
             is JsonSyntaxException -> APIException(message)
             is IOException -> NetworkException(localizedMessage)

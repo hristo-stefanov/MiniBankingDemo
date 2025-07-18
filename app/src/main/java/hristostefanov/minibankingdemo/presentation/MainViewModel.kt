@@ -8,7 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import hristostefanov.minibankingdemo.usecase.input.Startup
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,23 +25,33 @@ class MainViewModel @Inject constructor(
 
     init {
         val isStartupInteractorActive: Boolean? = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY]
+
+        startup.status
+            .onEach {
+                savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] = it.isActive()
+            }
+            .launchIn(viewModelScope)
+
         if (isStartupInteractorActive != true) {
             viewModelScope.launch {
-                startup.status.filter { it.isFinished() }.collect {
-                    savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] = false
-                }
                 startup.onAppStart(userInterface)
             }
-            savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] = true
         }
 
     }
 
-    internal fun executeContinuation(continuationId: String, param: String? = null) = viewModelScope.launch {
-        when (ContinuationId.valueOf(continuationId)) {
-            ContinuationId.Startup_LoginCredentialsSubmit -> startup.onLoginCredentialsSubmit(param!!, userInterface)
-            ContinuationId.PresentSummary_RetryLoading ->
-                sessionRegistry.component?.presentAccountsAndRoundupsSummary?.onRetryLoading(userInterface)
+    internal fun executeContinuation(continuationId: String, param: String? = null) =
+        viewModelScope.launch {
+            when (ContinuationId.valueOf(continuationId)) {
+                ContinuationId.Startup_LoginCredentialsSubmit -> startup.onLoginCredentialsSubmit(
+                    param!!,
+                    userInterface
+                )
+
+                ContinuationId.PresentSummary_RetryLoading ->
+                    sessionRegistry.component?.presentAccountsAndRoundupsSummary?.onRetryLoading(
+                        userInterface
+                    )
+            }
         }
-    }
 }

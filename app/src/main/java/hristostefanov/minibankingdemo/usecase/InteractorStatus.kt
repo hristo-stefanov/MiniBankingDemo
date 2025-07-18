@@ -9,4 +9,5 @@ enum class InteractorStatus {
     Cancelled;
 
     fun isFinished() = this in Completed .. Cancelled
+    fun isActive() = this == Started
 }

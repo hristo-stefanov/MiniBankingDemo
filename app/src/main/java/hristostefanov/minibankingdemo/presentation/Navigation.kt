@@ -6,8 +6,8 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 
 sealed class Navigation {
-    object Backward : Navigation()
-    object Restart: Navigation()
+    data object Backward : Navigation()
+    data object Restart: Navigation()
     class BackTo(@IdRes val destinationId: Int) : Navigation()
     class Before(@IdRes val destinationId: Int): Navigation()
     // This is used with nav actions only
@@ -18,4 +18,5 @@ sealed class Navigation {
         val
         navOptions: NavOptions? = null
     ): Navigation()
+    data class Message(val message: String): Navigation()
 }

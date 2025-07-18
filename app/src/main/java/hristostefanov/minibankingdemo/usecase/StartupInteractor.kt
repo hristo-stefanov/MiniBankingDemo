@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,14 +30,15 @@ class StartupInteractor @Inject constructor(
         if (sessionRegistry.component == null) {
             userInterface.promptUserToSubmitCredentials(ContinuationId.Startup_LoginCredentialsSubmit)
         } else {
-            startAndJoinChild(userInterface)
+            startSummaryInteractorAndEmitItsStatus(userInterface)
         }
     }
 
-    private suspend fun startAndJoinChild(userInterface: UserInterface) {
-        sessionRegistry.component?.presentAccountsAndRoundupsSummary?.let {
-            it.start(userInterface)
-            val childFinishedStatus = it.status.filter { it.isFinished() }.single()
+    // TODO I need a better name or single responsibility
+    private suspend fun startSummaryInteractorAndEmitItsStatus(userInterface: UserInterface) {
+        sessionRegistry.component?.presentAccountsAndRoundupsSummary?.let { interactor ->
+            interactor.start(userInterface)
+            val childFinishedStatus = interactor.status.filter { it.isFinished() }.first()
             _status.emit(childFinishedStatus)
         }
     }
@@ -50,6 +51,6 @@ class StartupInteractor @Inject constructor(
         tokenStore.token = loginCredentials
         sessionRegistry.createSession(tokenStore.token, "Bearer")
 
-        startAndJoinChild(userInterface)
+        startSummaryInteractorAndEmitItsStatus(userInterface)
     }
 }
