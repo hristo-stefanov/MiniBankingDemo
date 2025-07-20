@@ -34,7 +34,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
     override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
 
     override suspend fun start(userInterface: UserInterface) {
-        if (status.value != InteractorStatus.Created)
+        if (status.value == InteractorStatus.Started)
             throw IllegalStateException()
         _status.emit(InteractorStatus.Started)
         execute(userInterface)
