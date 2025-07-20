@@ -15,6 +15,8 @@ import javax.inject.Inject
 
 private const val IS_STARTUP_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
 private const val IS_PRESENT_SUMMARY_INTERACTIVE_KEY = "isPresentSummaryInteractorActive"
+private const val IS_FRESH_START_KEY = "isFreshStart"
+
 private val LOG_TAG = MainViewModel::class.simpleName
 
 @HiltViewModel
@@ -27,10 +29,15 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     init {
-        val isStartupInteractorActive: Boolean? = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY]
+        val isFreshStart: Boolean = savedStateHandle.get<Boolean?>(IS_FRESH_START_KEY) == null
+        Log.d(LOG_TAG, "isFreshStart = $isFreshStart")
+
+        savedStateHandle[IS_FRESH_START_KEY] = false
+
+        val isStartupInteractorActive: Boolean = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] ?: false
         Log.d(LOG_TAG, "Init: isStartupInteractorActive = $isStartupInteractorActive")
 
-        val isPresentSummaryInteractorActive: Boolean? = savedStateHandle[IS_PRESENT_SUMMARY_INTERACTIVE_KEY]
+        val isPresentSummaryInteractorActive: Boolean = savedStateHandle[IS_PRESENT_SUMMARY_INTERACTIVE_KEY] ?: false
         Log.d(LOG_TAG, "Init: isPresentSummaryInteractorActive - $isPresentSummaryInteractorActive")
 
         // Should be exactly here - after getting the saved values and before
@@ -38,14 +45,16 @@ class MainViewModel @Inject constructor(
         keepSavingFlagsForActiveInteractors()
 
         viewModelScope.launch {
-            if (isStartupInteractorActive == true) {
+            if (isStartupInteractorActive) {
                 startupInteractor.resume()
-            } else {
-                startupInteractor.start(userInterface)
             }
 
-            if (isPresentSummaryInteractorActive == true) {
+            if (isPresentSummaryInteractorActive) {
                 loginSessionRegistry.component?.presentAccountsAndRoundupsSummary?.resume()
+            }
+
+            if (isFreshStart) {
+                startupInteractor.start(userInterface)
             }
         }
     }
