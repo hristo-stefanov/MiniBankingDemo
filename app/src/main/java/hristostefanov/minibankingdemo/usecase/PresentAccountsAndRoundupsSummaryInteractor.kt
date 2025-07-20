@@ -40,6 +40,10 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
         execute(userInterface)
     }
 
+    override suspend fun resume() {
+        _status.emit(InteractorStatus.Started)
+    }
+
     private suspend fun execute(userInterface: UserInterface) {
         val now = nowProvider.get()
         val since = calcSincePolicy(now)

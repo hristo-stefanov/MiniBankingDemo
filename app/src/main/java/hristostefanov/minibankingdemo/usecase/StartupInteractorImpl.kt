@@ -35,6 +35,10 @@ class StartupInteractorImpl @Inject constructor(
         }
     }
 
+    override suspend fun resume() {
+        _status.emit(InteractorStatus.Started)
+    }
+
     private suspend fun startSummaryInteractorAndJoin(userInterface: UserInterface): InteractorStatus? {
         sessionRegistry.component?.presentAccountsAndRoundupsSummary?.let { interactor ->
             interactor.start(userInterface)

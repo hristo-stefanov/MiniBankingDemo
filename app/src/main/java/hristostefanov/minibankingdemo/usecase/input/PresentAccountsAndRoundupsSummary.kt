@@ -11,4 +11,5 @@ interface PresentAccountsAndRoundupsSummary {
     val status: StateFlow<InteractorStatus>
     suspend fun start(userInterface: UserInterface)
     suspend fun onRetryLoading(userInterface: UserInterface)
+    suspend fun resume()
 }

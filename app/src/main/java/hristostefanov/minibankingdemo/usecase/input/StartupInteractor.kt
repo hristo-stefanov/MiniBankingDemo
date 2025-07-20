@@ -7,5 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface StartupInteractor {
     val status: StateFlow<InteractorStatus>
     suspend fun start(userInterface: UserInterface)
+    suspend fun resume()
     suspend fun onLoginCredentialsSubmit(loginCredentials: String, userInterface: UserInterface)
 }
