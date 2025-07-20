@@ -42,7 +42,7 @@ class AccountsViewModel @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
-    private val userInterface: UserInterfaceImpl
+    private val userInterface: UserInterfaceImpl,
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
@@ -161,6 +161,12 @@ class AccountsViewModel @Inject constructor(
         // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
             navigationChannel.send(Navigation.Restart)
+        }
+    }
+
+    fun onRefresh() {
+        viewModelScope.launch {
+            loginSessionRegistry.component?.presentAccountsAndRoundupsSummary?.start(userInterface)
         }
     }
 }

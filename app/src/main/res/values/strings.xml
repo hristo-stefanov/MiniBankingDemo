@@ -12,5 +12,6 @@
     <string name="create_savings_goal">Create Savings Goal</string>
     <string name="confirm">Confirm</string>
     <string name="logout">Logout</string>
+    <string name="refresh">Refresh</string>
     <string name="login_title">Login</string>
 </resources>

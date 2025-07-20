@@ -38,11 +38,20 @@ class AccountsFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (item.itemId == R.id.logout) {
-            viewModel.onLogout()
-            true
-        } else {
-            super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.logout -> {
+                viewModel.onLogout()
+                true
+            }
+
+            R.id.refresh -> {
+                viewModel.onRefresh()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
     }
 }
