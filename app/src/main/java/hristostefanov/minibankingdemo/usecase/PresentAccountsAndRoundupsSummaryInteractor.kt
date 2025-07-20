@@ -54,7 +54,6 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
             userInterface.presentSummary(summary)
             _status.emit(InteractorStatus.Completed)
         } catch (e: ServiceException) {
-            _status.emit(InteractorStatus.Failed)
             when (e) {
                 is AuthException -> {
                     userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
@@ -66,7 +65,10 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
                         continuationId = ContinuationId.PresentSummary_RetryLoading
                     )
                 }
-                else -> throw e
+                else -> {
+                    _status.emit(InteractorStatus.Failed)
+                    throw e
+                }
             }
         }
     }
