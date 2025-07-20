@@ -7,8 +7,6 @@ import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,8 +28,8 @@ class StartupInteractorImpl @Inject constructor(
         if (sessionRegistry.component == null) {
             userInterface.promptUserToSubmitCredentials(ContinuationId.Startup_LoginCredentialsSubmit)
         } else {
-            val status = startSummaryInteractorAndJoin(userInterface)
-            status?.let { _status.emit(it) }
+            startPresentSummaryInteractor(userInterface)
+            _status.emit(InteractorStatus.Completed)
         }
     }
 
@@ -39,16 +37,11 @@ class StartupInteractorImpl @Inject constructor(
         _status.emit(InteractorStatus.Started)
     }
 
-    private suspend fun startSummaryInteractorAndJoin(userInterface: UserInterface): InteractorStatus? {
-        sessionRegistry.component?.presentAccountsAndRoundupsSummary?.let { interactor ->
-            interactor.start(userInterface)
-            return join(interactor.status)
-        }
-        return null
+    private suspend fun startPresentSummaryInteractor(userInterface: UserInterface) {
+        // TODO make it send a start event so as the apropriate UI context can be set,
+        // via navigation or so
+        sessionRegistry.component?.presentAccountsAndRoundupsSummary?.start(userInterface)
     }
-
-    private suspend fun join(statusFlow: StateFlow<InteractorStatus>): InteractorStatus =
-        status.filter { it.isFinished() }.first()
 
     override suspend fun onLoginCredentialsSubmit(
         loginCredentials: String,
@@ -58,7 +51,7 @@ class StartupInteractorImpl @Inject constructor(
         tokenStore.token = loginCredentials
         sessionRegistry.createSession(tokenStore.token, "Bearer")
 
-        val status = startSummaryInteractorAndJoin(userInterface)
-        status?.let { _status.emit(it) }
+        startPresentSummaryInteractor(userInterface)
+        _status.emit(InteractorStatus.Completed)
     }
 }
