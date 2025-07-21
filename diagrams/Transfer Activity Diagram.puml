@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|system|
+start
+'passed to SavingsGoalsFragment
+-> Dataset: accountId,
+accountCurrency,
+roundUpAmount;
+
+'ListSavingGoalsInteractor
+: <&cog> Fetch savings goals;
+-> [Result];
+
+'SavingsGoalsViewModel
+if () then ([is Service Error])
+'TODO make it clear that it is not a transient message - it displays a dialog, not a snackbar
+    :Present unrecoverable error message <<output>>;
+    'TODO make it clear that it doesn't return to the main screen
+    stop
+endif
+-> [is Result set];
+
+:Present savings goals; <<output>>
+:TODO creating new savings goal;
+|user|
+:Select savings goal;
+|system|
+'passed to TransferConfirmationFragment
+->Dataset: savingsGoal,
+roundUpAmount,
+accountCurrency,
+accountId
+;
+
+repeat
+'TransferConfirmationViewModel
+:Summarize transfer;
+
+|user|
+:Confirm transfer;
+|system|
+'AddMoneyIntoGoalInteractor
+: <&cog> Add money into goal;
+-> [Result];
+
+'TODO make it clear that it is not a transient message - it displays a dialog, not a snackbar
+backward: Present unrecoverable error message; <<output>>
+
+repeat while () is ([is Service Error])
+-> [OK];
+
+'TransferConfirmationViewModel
+:Send success acknowledgement;
+
+'TransferConfirmationViewModel
+'TODO model returning to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+stop
+
+@enduml
