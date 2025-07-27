@@ -1,6 +1,8 @@
 @startuml
 'https://plantuml.com/use-case-diagram
 
+' Level: User Goals
+
 left to right direction
 actor User <<Human>>
 actor Bank <<Service>>
