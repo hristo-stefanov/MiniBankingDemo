@@ -3,10 +3,20 @@
 
 |system|
 start
+note right
+Start event trigger:
+User selects "Transfer Round-up"?
+endnote
+
+|user|
+:Select an account from Accounts and Round-ups Summary
+to transfer Round-up from;
 'passed to SavingsGoalsFragment
--> Dataset: accountId,
+-> [accountId,
 accountCurrency,
-roundUpAmount;
+roundUpAmount];
+
+|system|
 
 'ListSavingGoalsInteractor
 : <&cog> Fetch savings goals;
@@ -14,23 +24,23 @@ roundUpAmount;
 
 'SavingsGoalsViewModel
 if () then ([is Service Error])
-'TODO make it clear that it is not a transient message - it displays a dialog, not a snackbar
-    :Present unrecoverable error message <<output>>;
-    'TODO make it clear that it doesn't return to the main screen
+    'displays a dialog, not a snackbar
+    'doesn't return to the main screen
+    :Present unrecoverable error message; <<sendSignal>>
     stop
 endif
 -> [is Result set];
 
-:Present savings goals; <<output>>
-:TODO creating new savings goal;
+:Present Savings Goals Summary; <<sendSignal>>
 |user|
-:Select savings goal;
+:Select savings goal
+(extension point: Savings Goals CRUD);
 |system|
 'passed to TransferConfirmationFragment
-->Dataset: savingsGoal,
+->[savingsGoal,
 roundUpAmount,
 accountCurrency,
-accountId
+accountId]
 ;
 
 repeat
@@ -39,22 +49,25 @@ repeat
 
 |user|
 :Confirm transfer;
+-> [accountId,
+savingsGoalId,
+accountCurrency,
+roundUpAmount];
 |system|
 'AddMoneyIntoGoalInteractor
 : <&cog> Add money into goal;
 -> [Result];
 
-'TODO make it clear that it is not a transient message - it displays a dialog, not a snackbar
-backward: Present unrecoverable error message; <<output>>
+'displays a dialog, not a snackbar
+backward: Present unrecoverable error message; <<sendSignal>>
 
 repeat while () is ([is Service Error])
 -> [OK];
 
 'TransferConfirmationViewModel
-:Send success acknowledgement;
+'and returns to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+:Send success acknowledgement; <<sendSignal>>
 
-'TransferConfirmationViewModel
-'TODO model returning to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
 stop
 
 @enduml
