@@ -3,10 +3,12 @@
 
 |system|
 start
+
 note right
 Start event trigger:
 User selects "Transfer Round-up"?
 endnote
+
 
 |user|
 :Select an account from Accounts and Round-ups Summary
