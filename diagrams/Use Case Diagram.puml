@@ -10,17 +10,18 @@ usecase Startup
 usecase Logout
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
-usecase "Present 'Accounts and Round-ups'"
+usecase "Present Summary"
 }
 
 User -- Startup
 User -- "Transfer Round-up"
-User -- "Create Savings Goal"
 User -- "Logout"
+User -- "Present Summary"
 
-Startup .> "Present 'Accounts and Round-ups'"
-"Transfer Round-up" .> "Present 'Accounts and Round-ups'"
-"Present 'Accounts and Round-ups'" -- "Bank"
+Startup .> "Present Summary" : <<include>>
+"Transfer Round-up" .> "Present Summary" : <<include>>
+"Create Savings Goal" .> "Transfer Round-up" : <<extend>>
+"Present Summary" -- "Bank"
 "Transfer Round-up" -- "Bank"
 "Create Savings Goal" -- "Bank"
 @enduml
