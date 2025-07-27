@@ -6,22 +6,19 @@ actor User <<Human>>
 actor Bank <<Service>>
 
 rectangle System {
-usecase Startup
-usecase Logout
+usecase "Get Accounts and Round-up Summary"
+usecase "Log out"
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
-usecase "Present Summary"
 }
 
-User -- Startup
+User -- "Get Accounts and Round-up Summary"
 User -- "Transfer Round-up"
-User -- "Logout"
-User -- "Present Summary"
+User -- "Create Savings Goal"
+User -- "Log out"
 
-Startup .> "Present Summary" : <<include>>
-"Transfer Round-up" .> "Present Summary" : <<include>>
+"Get Accounts and Round-up Summary" -- "Bank"
 "Create Savings Goal" .> "Transfer Round-up" : <<extend>>
-"Present Summary" -- "Bank"
 "Transfer Round-up" -- "Bank"
 "Create Savings Goal" -- "Bank"
 @enduml
