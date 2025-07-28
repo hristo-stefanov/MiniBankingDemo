@@ -1,14 +1,25 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
 
+
 |system|
 start
+
+floating note left
+Level: User goal
+Trigger: User launches the app
+    or selects to refresh summary
+Primary Actor: User
+endnote
+
+: <&plus> Ensure Login Credentials;
+
 :<&script> Get current date and time;
 -> [Date and time];
 :<&spreadsheet> Calculate the start of the week-long period;
 -> [Date and time];
 repeat
- :<&cog> Fetch accounts and thier transactions
+ :<&cog> Fetch accounts and their transactions
 since the start of the period;
 -> [Result];
 

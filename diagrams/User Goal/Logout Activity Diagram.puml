@@ -4,8 +4,15 @@
 'TODO refine
 |user|
 start
-floating note left: Preconditions: The user\n\
-has already logged in
+
+floating note left
+Level: User Goal
+Trigger: User selects to log out
+Primary Actor: User
+Precondition: The user has provided
+    login credentials
+end note
+
 |app|
 :Erases saved credentials;
 :Erases any user specific data;

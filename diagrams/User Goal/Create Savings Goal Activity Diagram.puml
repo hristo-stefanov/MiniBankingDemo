@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|user|
+start
+
+'This is the case of "Two levels of blue"
+floating note left
+Level: User goal
+Trigger: User selects to create a savings goal
+    or during Transfer Round-up before selecting Savings Goal
+Primary Actor: User
+end note
+
+|app|
+:Provides a form;
+|user|
+:Submits goal name;
+|app|
+:Calls createSavingsGoal;
+:TODO provide a report?;
+
+stop
+
+@enduml
