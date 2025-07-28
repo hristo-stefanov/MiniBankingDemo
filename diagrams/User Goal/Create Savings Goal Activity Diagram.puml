@@ -7,9 +7,17 @@ start
 'This is the case of "Two levels of blue"
 floating note left
 Level: User goal
-Trigger: User selects to create a savings goal
-    or during Transfer Round-up before selecting Savings Goal
+Trigger: User selects to
+    create a savings goal after
+    being presented with Accounts
+    and Round-up Summary,
+    or during Transfer Round-up
+    before selecting Savings Goal
 Primary Actor: User
+Precondition: User has been presented with
+  Accounts and Round-ups Summary
+  or Transfer Round-up extension
+  point has been reached.
 end note
 
 |app|

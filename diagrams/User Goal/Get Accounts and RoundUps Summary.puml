@@ -1,15 +1,26 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
 
-
 |system|
 start
 
 floating note left
+TODO this use case can be
+about a broader personal finance summary
+including savings goals and
+their balance which would allow
+to user to make informed
+financial decisions, e.g.
+creating additional savings
+goals or transferring to
+savings goals that
+are lagging behind.
+
 Level: User goal
 Trigger: User launches the app
     or selects to refresh summary
 Primary Actor: User
+Precondition: none
 endnote
 
 : <&plus> Ensure Login Credentials;

@@ -4,15 +4,16 @@
 |system|
 start
 
-note right
-Start event trigger:
-User selects "Transfer Round-up"
+floating note left
+Level: User Goal
+Trigger: User selects an account
+  from Accounts and Round-ups
+  Summary to transfer round-ups from
+Primary Actor: User
+Precondition: Accounts and Round-ups
+  Summary has been presented
 endnote
 
-
-|user|
-:Select an account from Accounts and Round-ups Summary
-to transfer Round-up from;
 'passed to SavingsGoalsFragment
 -> [accountId,
 accountCurrency,
@@ -35,7 +36,7 @@ endif
 
 :Present Savings Goals Summary; <<sendSignal>>
 |user|
-:Select savings goal
+:Select a savings goal
 (extension point: Savings Goals CRUD);
 |system|
 'passed to TransferConfirmationFragment
