@@ -13,7 +13,7 @@ since the start of the period;
 -> [Result];
 
 if () then ([is Auth Error])
-    :Present unrecoverable error message and ask to Log out >
+    :Present unrecoverable error message and ask to Log out; <<sendSignal>>
     stop
 endif
 
@@ -25,7 +25,7 @@ if () then ([is Network Error or is API Error])
 else ([is Result set])
     :<&spreadsheet> Summarize;
     -> [Summary];
-    :Present Summary >
+    :Present Summary; <<sendSignal>>
     stop
 endif
 
