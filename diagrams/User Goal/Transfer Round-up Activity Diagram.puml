@@ -19,8 +19,6 @@ endnote
 accountCurrency,
 roundUpAmount];
 
-|system|
-
 'ListSavingGoalsInteractor
 : <&cog> Fetch savings goals;
 -> [Result];
@@ -32,12 +30,13 @@ if () then ([is Service Error])
     :Present unrecoverable error message; <<sendSignal>>
     stop
 endif
--> [is Result set];
 
-:Present Savings Goals Summary; <<sendSignal>>
+-> [list of Savings Goals];
+
 |user|
 :Select a savings goal
 (extension point: Savings Goals CRUD);
+
 |system|
 'passed to TransferConfirmationFragment
 ->[savingsGoal,
@@ -48,7 +47,7 @@ accountId]
 
 repeat
 'TransferConfirmationViewModel
-:Summarize transfer;
+:<&spreadsheet> Summarize transfer;
 
 |user|
 :Confirm transfer;
