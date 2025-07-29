@@ -6,15 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.ContinuationService
+import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val IS_STARTUP_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
-private const val IS_PRESENT_SUMMARY_INTERACTIVE_KEY = "isPresentSummaryInteractorActive"
+private const val IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
+private const val IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY = "isPresentSummaryInteractorActive"
 private const val IS_FRESH_START_KEY = "isFreshStart"
 
 private val LOG_TAG = MainViewModel::class.simpleName
@@ -22,10 +24,10 @@ private val LOG_TAG = MainViewModel::class.simpleName
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val startupInteractor: StartupInteractor,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
     private val userInterface: UserInterfaceImpl,
-    private val sessionRegistry: LoginSessionRegistry
+    private val continuationService: ContinuationService,
+    private val getSummaryInteractor: GetSummaryInteractor
 ) : ViewModel() {
 
     init {
@@ -34,61 +36,52 @@ class MainViewModel @Inject constructor(
 
         savedStateHandle[IS_FRESH_START_KEY] = false
 
-        val isStartupInteractorActive: Boolean = savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] ?: false
-        Log.d(LOG_TAG, "Init: isStartupInteractorActive = $isStartupInteractorActive")
+        val isEnsureLoginCredentialsInteractorActive: Boolean =
+            savedStateHandle[IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY] ?: false
+        Log.d(LOG_TAG, "Init: isStartupInteractorActive = $isEnsureLoginCredentialsInteractorActive")
 
-        val isPresentSummaryInteractorActive: Boolean = savedStateHandle[IS_PRESENT_SUMMARY_INTERACTIVE_KEY] ?: false
-        Log.d(LOG_TAG, "Init: isPresentSummaryInteractorActive - $isPresentSummaryInteractorActive")
+        val isGetSummaryInteractorActive: Boolean =
+            savedStateHandle[IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY] ?: false
+        Log.d(LOG_TAG, "Init: isPresentSummaryInteractorActive - $isGetSummaryInteractorActive")
 
         // Should be exactly here - after getting the saved values and before
         // starting interactors.
         keepSavingFlagsForActiveInteractors()
 
         viewModelScope.launch {
-            if (isStartupInteractorActive) {
-                startupInteractor.resume()
+            if (isEnsureLoginCredentialsInteractorActive) {
+                ensureLoginCredentialsInteractor.resume()
             }
 
-            if (isPresentSummaryInteractorActive) {
-                loginSessionRegistry.component?.presentAccountsAndRoundupsSummary?.resume()
+            if (isGetSummaryInteractorActive) {
+                getSummaryInteractor.resume()
             }
 
             if (isFreshStart) {
-                startupInteractor.start(userInterface)
+                getSummaryInteractor.start(userInterface)
             }
         }
     }
 
     private fun keepSavingFlagsForActiveInteractors() {
-        startupInteractor.status
+        ensureLoginCredentialsInteractor.status
             .onEach {
                 Log.d(LOG_TAG, "StartupInteractor.status = $it")
-                savedStateHandle[IS_STARTUP_INTERACTOR_ACTIVE_KEY] = it.isActive()
+                savedStateHandle[IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
 
-        loginSessionRegistry.component?.presentAccountsAndRoundupsSummary?.status
-            ?.onEach {
+        getSummaryInteractor.status
+            .onEach {
                 Log.d(LOG_TAG, "PresentSummaryInteractor.status = $it")
-                savedStateHandle[IS_PRESENT_SUMMARY_INTERACTIVE_KEY] = it.isActive()
+                savedStateHandle[IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
-            ?.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
+    // TODO replace with using the channel directly
     internal fun executeContinuation(continuationId: String, param: String? = null) =
         viewModelScope.launch {
-            Log.d(LOG_TAG, "executeContinuation: continuationId = $continuationId param = $param")
-
-            when (ContinuationId.valueOf(continuationId)) {
-                ContinuationId.Startup_LoginCredentialsSubmit -> startupInteractor.onLoginCredentialsSubmit(
-                    param!!,
-                    userInterface
-                )
-
-                ContinuationId.PresentSummary_RetryLoading ->
-                    sessionRegistry.component?.presentAccountsAndRoundupsSummary?.onRetryLoading(
-                        userInterface
-                    )
-            }
+            continuationService.executeContinuation(ContinuationId.valueOf(continuationId), param)
         }
 }

@@ -17,6 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.ContinuationService
+import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
@@ -33,6 +36,13 @@ class MainActivity : AppCompatActivity() {
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
 
+    @Inject
+    @ContinuationChannel
+    internal lateinit var continuationChannel: Channel<Continuation>
+
+    @Inject
+    internal lateinit var continuationService: ContinuationService
+
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 
     private val sentryNavListener = SentryNavigationListener(
@@ -41,7 +51,6 @@ class MainActivity : AppCompatActivity() {
     )
 
     private val viewModel: MainViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +67,14 @@ class MainActivity : AppCompatActivity() {
             .flowWithLifecycle(lifecycle)
             .onEach { navigation ->
                 onNavigation(navigation, navController)
+            }
+            .launchIn(lifecycleScope)
+
+        continuationChannel
+            .receiveAsFlow()
+            .flowWithLifecycle(lifecycle)
+            .onEach {
+                continuationService.executeContinuation(it.id, it.param)
             }
             .launchIn(lifecycleScope)
 

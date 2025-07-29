@@ -8,6 +8,7 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
+import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
@@ -43,6 +44,7 @@ class AccountsViewModel @Inject constructor(
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val userInterface: UserInterfaceImpl,
+    private val getSummaryInteractor: GetSummaryInteractor
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
@@ -166,7 +168,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onRefresh() {
         viewModelScope.launch {
-            loginSessionRegistry.component?.presentAccountsAndRoundupsSummary?.start(userInterface)
+            getSummaryInteractor.start(userInterface)
         }
     }
 }

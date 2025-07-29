@@ -10,9 +10,11 @@ import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
+import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,11 +25,12 @@ import javax.inject.Provider
 
 typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
 
-class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
-    private val repository: Repository,
+class GetSummaryInteractorImpl @Inject constructor(
+    val loginSessionRegistry: LoginSessionRegistry,
     val nowProvider: Provider<OffsetDateTime>,
-    private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy
-) : PresentAccountsAndRoundupsSummary {
+    private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
+    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
+) : GetSummaryInteractor {
 
     // TODO the status needs to be saved
     private val _status = MutableStateFlow(InteractorStatus.Created)
@@ -37,6 +40,11 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
         if (status.value == InteractorStatus.Started)
             throw IllegalStateException()
         _status.emit(InteractorStatus.Started)
+
+        ensureLoginCredentialsInteractor.start(userInterface, ContinuationId.GetSummary_LoginCredentialsEnsured)
+    }
+
+    override suspend fun onLoginCredentialsEnsured(userInterface: UserInterface) {
         execute(userInterface)
     }
 
@@ -48,14 +56,16 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
         val now = nowProvider.get()
         val since = calcSincePolicy(now)
         try {
-            val dataset = repository.findAllAccounts()
-                .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
-                    val transactions = repository.findTransactions(account.id, since)
-                    acc + (account to transactions)
-                }
+            loginSessionRegistry.component?.repository?.let { repository ->
+                val dataset = repository.findAllAccounts()
+                    .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
+                        val transactions = repository.findTransactions(account.id, since)
+                        acc + (account to transactions)
+                    }
 
-            val summary = summarize(since, dataset)
-            userInterface.presentSummary(summary)
+                val summary = summarize(since, dataset)
+                userInterface.presentSummary(summary)
+            }
             _status.emit(InteractorStatus.Completed)
         } catch (e: ServiceException) {
             when (e) {
@@ -66,7 +76,7 @@ class PresentAccountsAndRoundupsSummaryInteractor @Inject constructor(
                     userInterface.promptUserToRetryRecovery(
                         message = e.localizedMessage,
                         isCancellable = false,
-                        continuationId = ContinuationId.PresentSummary_RetryLoading
+                        continuationId = ContinuationId.GetSummary_RetryLoading
                     )
                 }
                 else -> {

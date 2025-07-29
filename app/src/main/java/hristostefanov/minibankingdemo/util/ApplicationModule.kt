@@ -7,11 +7,16 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.StartupInteractorImpl
-import hristostefanov.minibankingdemo.usecase.input.StartupInteractor
+import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
+import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
+import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
+import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -31,6 +36,10 @@ abstract class ApplicationModule {
         @Singleton
         @Provides @NavigationChannel
         fun provideNavigationChannel(): Channel<Navigation> = Channel()
+
+        @Singleton
+        @Provides @ContinuationChannel
+        fun provideContinuationChannel(): Channel<Continuation> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()
@@ -58,6 +67,9 @@ abstract class ApplicationModule {
 
         @Provides
         fun provideNow(): OffsetDateTime = OffsetDateTime.now()
+
+        @Provides
+        fun provideCalcSincePolicy(): CalcSincePolicy = ::calcStartOfSevenDayWindowIncludingToday
     }
 
     @Binds
@@ -69,5 +81,10 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindStartup(impl: StartupInteractorImpl): StartupInteractor
+    abstract fun bindStartup(impl: EnsureLoginCredentialsInteractorImpl): EnsureLoginCredentialsInteractor
+
+    // TODO how to handle recreation of the interactor when triggered again?
+    @Singleton
+    @Binds
+    abstract fun bindGetSummaryInteractor(impl: GetSummaryInteractorImpl): GetSummaryInteractor
 }

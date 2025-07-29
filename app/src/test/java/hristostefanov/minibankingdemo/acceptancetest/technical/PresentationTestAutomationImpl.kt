@@ -11,8 +11,8 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.StartupInteractorImpl
-import hristostefanov.minibankingdemo.usecase.input.PresentAccountsAndRoundupsSummary
+import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
+import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
@@ -66,7 +66,7 @@ class PresentationTestAutomationImpl @Inject constructor(
                     get() = throw AssertionError()
                 override val accessToken: String
                     get() = token
-                override val presentAccountsAndRoundupsSummary: PresentAccountsAndRoundupsSummary
+                override val accountsAndRoundupsSummary: GetSummaryInteractor
                     get() = TODO("Not yet implemented")
             }
         }
@@ -74,12 +74,12 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
 
-    private val startupInteractor = StartupInteractorImpl(sessionRegistry, tokenStore, eventBus)
+    private val startupInteractor = EnsureLoginCredentialsInteractorImpl(sessionRegistry, tokenStore, eventBus)
 
     private val userInterface = UserInterfaceImpl(navigationChannel)
 
     override suspend fun startUp() {
-        startupInteractor.start(userInterface)
+        startupInteractor.start(userInterface,)
     }
     override fun correctAccessTokenIs(accessToken: String) {
         correctAccessToken = accessToken

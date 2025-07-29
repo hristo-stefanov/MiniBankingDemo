@@ -62,7 +62,7 @@ class `When presenting Accounts and Round-up Summary` {
         )
     )
 
-    private val interactor = PresentAccountsAndRoundupsSummaryInteractor(
+    private val interactor = GetSummaryInteractorImpl(
         repository = repository,
         nowProvider = nowProvider,
         calcSincePolicy = ::calcStartOfSevenDayWindowIncludingToday

@@ -2,5 +2,7 @@ package hristostefanov.minibankingdemo.usecase
 
 enum class ContinuationId {
     Startup_LoginCredentialsSubmit,
-    PresentSummary_RetryLoading,
+    GetSummary_RetryLoading,
+    TransferRoundUp_AccountSelected,
+    GetSummary_LoginCredentialsEnsured
 }
