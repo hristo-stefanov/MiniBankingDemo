@@ -3,6 +3,7 @@ package hristostefanov.minibankingdemo.usecase
 import android.util.Log
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
+import hristostefanov.minibankingdemo.ui.LOG_INTERACTORS_TAG
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
@@ -20,7 +21,7 @@ class ContinuationService @Inject constructor(
 ) {
 
     suspend fun executeContinuation(continuationId: ContinuationId, param: String? = null) {
-        Log.d(LOG_TAG, "executeContinuation: continuationId = $continuationId param = $param")
+        Log.d(LOG_INTERACTORS_TAG, "executeContinuation: continuationId = $continuationId param = $param")
 
         when (continuationId) {
             ContinuationId.Startup_LoginCredentialsSubmit -> ensureLoginCredentialsInteractor.onLoginCredentialsSubmit(
@@ -44,5 +45,3 @@ class ContinuationService @Inject constructor(
         }
     }
 }
-
-private const val LOG_TAG = "MainActivity"
