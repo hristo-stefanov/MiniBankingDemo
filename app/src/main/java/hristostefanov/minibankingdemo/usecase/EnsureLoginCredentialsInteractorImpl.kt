@@ -29,7 +29,7 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private lateinit var stopContinuationId: ContinuationId
 
     override suspend fun start(userInterface: UserInterface, stopContinuationId: ContinuationId) {
-        if (status.value != InteractorStatus.Created)
+        if (status.value == InteractorStatus.Started)
             throw IllegalStateException()
         _status.emit(InteractorStatus.Started)
 
