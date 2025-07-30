@@ -104,9 +104,5 @@ abstract class LoginSessionModule {
 
     @LoginSessionScope
     @Binds
-    abstract fun bindPresentAccountsAndRoundupsSummary(impl: GetSummaryInteractorImpl): GetSummaryInteractor
-
-    @LoginSessionScope
-    @Binds
     abstract fun bind(impl: TransferRoundUpInteractorImpl): TransferRoundUpInteractor
 }
