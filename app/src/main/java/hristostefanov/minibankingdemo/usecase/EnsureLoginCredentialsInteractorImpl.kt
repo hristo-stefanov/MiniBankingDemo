@@ -1,15 +1,11 @@
 package hristostefanov.minibankingdemo.usecase
 
-import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,20 +14,18 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val sessionRegistry: LoginSessionRegistry,
     val tokenStore: TokenStore,
     @ContinuationChannel
-    val continuationChannel: Channel<Continuation>
-) : EnsureLoginCredentialsInteractor {
-
-    // TODO the status needs to be saved
-    private val _status = MutableStateFlow(InteractorStatus.Created)
-    override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
+    val continuationChannel: Channel<Continuation>,
+    private val lifecycle: InteractorLifecycleImpl,
+) : EnsureLoginCredentialsInteractor, InteractorLifecycle by lifecycle {
 
     // TODO needs to be saved
     private lateinit var stopContinuationId: ContinuationId
 
     override suspend fun start(userInterface: UserInterface, stopContinuationId: ContinuationId) {
-        if (status.value == InteractorStatus.Started)
+        if (lifecycle.status == InteractorStatus.Started)
             throw IllegalStateException()
-        _status.emit(InteractorStatus.Started)
+
+        lifecycle.setStatus(InteractorStatus.Started)
 
         this.stopContinuationId = stopContinuationId
 
@@ -39,13 +33,8 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
             userInterface.promptUserToSubmitCredentials(ContinuationId.Startup_LoginCredentialsSubmit)
         } else {
             continuationChannel.send(Continuation(stopContinuationId))
-
-            _status.emit(InteractorStatus.Completed)
+            lifecycle.setStatus(InteractorStatus.Completed)
         }
-    }
-
-    override suspend fun resume() {
-        _status.emit(InteractorStatus.Started)
     }
 
     override suspend fun onLoginCredentialsSubmit(
@@ -58,6 +47,6 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
 
         continuationChannel.send(Continuation(stopContinuationId))
 
-        _status.emit(InteractorStatus.Completed)
+        lifecycle.setStatus(InteractorStatus.Completed)
     }
 }

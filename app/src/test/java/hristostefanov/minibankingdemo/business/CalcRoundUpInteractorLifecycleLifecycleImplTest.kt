@@ -22,7 +22,7 @@ import java.time.Month
 import java.time.ZoneId
 
 @ExperimentalCoroutinesApi
-class CalcRoundUpInteractorImplTest {
+class CalcRoundUpInteractorLifecycleLifecycleImplTest {
 
     private val repository = mock(Repository::class.java)
 

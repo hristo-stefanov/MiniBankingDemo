@@ -63,14 +63,14 @@ class MainViewModel @Inject constructor(
     }
 
     private fun keepSavingFlagsForActiveInteractors() {
-        ensureLoginCredentialsInteractor.status
+        ensureLoginCredentialsInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "EnsureLoginCredentials.status = $it")
                 savedStateHandle[IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
 
-        getSummaryInteractor.status
+        getSummaryInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "GetSummaryInteractor.status = $it")
                 savedStateHandle[IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY] = it.isActive()

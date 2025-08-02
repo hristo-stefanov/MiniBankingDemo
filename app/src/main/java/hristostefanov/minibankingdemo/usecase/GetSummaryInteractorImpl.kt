@@ -5,7 +5,6 @@ import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.dependences.APIException
 import hristostefanov.minibankingdemo.business.dependences.AuthException
 import hristostefanov.minibankingdemo.business.dependences.NetworkException
-import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Transaction
@@ -15,9 +14,6 @@ import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import javax.inject.Inject
@@ -30,26 +26,19 @@ class GetSummaryInteractorImpl @Inject constructor(
     val nowProvider: Provider<OffsetDateTime>,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
-) : GetSummaryInteractor {
-
-    // TODO the status needs to be saved
-    private val _status = MutableStateFlow(InteractorStatus.Created)
-    override val status: StateFlow<InteractorStatus> = _status.asStateFlow()
+    private val lifecycle: InteractorLifecycleImpl,
+) : GetSummaryInteractor, InteractorLifecycle by lifecycle  {
 
     override suspend fun start(userInterface: UserInterface) {
-        if (status.value == InteractorStatus.Started)
+        if (lifecycle.status == InteractorStatus.Started)
             throw IllegalStateException()
-        _status.emit(InteractorStatus.Started)
+        lifecycle.setStatus(InteractorStatus.Started)
 
         ensureLoginCredentialsInteractor.start(userInterface, ContinuationId.GetSummary_LoginCredentialsEnsured)
     }
 
     override suspend fun onLoginCredentialsEnsured(userInterface: UserInterface) {
         execute(userInterface)
-    }
-
-    override suspend fun resume() {
-        _status.emit(InteractorStatus.Started)
     }
 
     private suspend fun execute(userInterface: UserInterface) {
@@ -66,7 +55,7 @@ class GetSummaryInteractorImpl @Inject constructor(
                 val summary = summarize(since, dataset)
                 userInterface.presentSummary(summary)
             }
-            _status.emit(InteractorStatus.Completed)
+            lifecycle.setStatus(InteractorStatus.Completed)
         } catch (e: ServiceException) {
             when (e) {
                 is AuthException -> {
@@ -80,7 +69,7 @@ class GetSummaryInteractorImpl @Inject constructor(
                     )
                 }
                 else -> {
-                    _status.emit(InteractorStatus.Failed)
+                    lifecycle.setStatus(InteractorStatus.Failed)
                     throw e
                 }
             }
