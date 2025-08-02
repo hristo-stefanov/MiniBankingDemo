@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import java.math.BigDecimal
@@ -90,14 +90,14 @@ internal fun summarize(
     dataset: Map<Account, List<Transaction>>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
-): AccountsAndRoundUpsSummary {
+): Summary {
     val items = dataset.entries.map { (account, transactions) ->
         val roundUp = calcAccountRoundUp(
             transactions = transactions,
             calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
             isSpendingTransactionPolicy = isSpendingTransactionPolicy
         )
-        AccountsAndRoundUpsSummary.Item(
+        Summary.Item(
             accountId = account.id,
             number = account.accountNum,
             balance = account.balance,
@@ -106,5 +106,5 @@ internal fun summarize(
         )
     }
 
-    return AccountsAndRoundUpsSummary(since, items)
+    return Summary(since, items)
 }

@@ -8,7 +8,7 @@ import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionComponent
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -48,7 +48,7 @@ class AccountsViewModelTest {
 
     private val userInterface = UserInterfaceImpl(navigationChannel)
 
-    private val account1 = AccountsAndRoundUpsSummary.Item(
+    private val account1 = Summary.Item(
         "1",
         "111",
         Currency.getInstance("GBP"),
@@ -56,7 +56,7 @@ class AccountsViewModelTest {
         "100".toBigDecimal()
     )
 
-    private val account2 = AccountsAndRoundUpsSummary.Item(
+    private val account2 = Summary.Item(
         "2",
         "222",
         Currency.getInstance("EUR"),
@@ -99,7 +99,7 @@ class AccountsViewModelTest {
         given(amountFormatter.format("0.10".toBigDecimal(), "GBP")).willReturn("£0.10")
 
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
         )
@@ -114,7 +114,7 @@ class AccountsViewModelTest {
     @Test
     fun `Should update outputs when summary changes`() = runTest {
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
         )
@@ -126,7 +126,7 @@ class AccountsViewModelTest {
 
 
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-07-07T00:00Z"), listOf(account2)
             )
         )
@@ -137,7 +137,7 @@ class AccountsViewModelTest {
     @Test
     fun `Should handle Transfer command`() = runTest {
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
         )
@@ -161,7 +161,7 @@ class AccountsViewModelTest {
     @Test
     fun `Initially should select the first account`() = runTest {
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(
                     account1,
                     account2
@@ -185,7 +185,7 @@ class AccountsViewModelTest {
         )
 
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"),
                 accounts
             )
@@ -198,7 +198,7 @@ class AccountsViewModelTest {
     @Test
     fun `Should enable Transfer command when an account is selected`() = runTest {
         userInterface.presentSummary(
-            AccountsAndRoundUpsSummary(
+            Summary(
                 OffsetDateTime.parse("2025-06-01T00:00Z"), listOf(account1)
             )
         )

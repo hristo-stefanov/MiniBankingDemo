@@ -28,7 +28,7 @@ interface UserInterface {
      * Will not make savable state changes, such a navigation or displaying a dialog,
      * to keep the UI state and interactor state in sync in case of process death.
      */
-    fun presentSummary(summary: AccountsAndRoundUpsSummary)
+    fun presentSummary(summary: Summary)
 
     /**
      * The UI will not prompt for acknowledgement nor will make savable state changes
@@ -39,7 +39,8 @@ interface UserInterface {
      */
     suspend fun presentMessage(message: String)
 }
-data class AccountsAndRoundUpsSummary(
+
+data class Summary(
     val roundUpSince: OffsetDateTime,
     val items: List<Item>
 ) {

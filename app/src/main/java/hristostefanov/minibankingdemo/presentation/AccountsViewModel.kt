@@ -9,7 +9,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -65,8 +65,8 @@ class AccountsViewModel @Inject constructor(
     private val _transferCommandEnabled = MutableStateFlow(false)
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
-    private val selectedAccountFlow: Flow<AccountsAndRoundUpsSummary.Item?> =
-        combine(_selectedAccountPosition, userInterface.summary) { position: Int, summary: AccountsAndRoundUpsSummary? ->
+    private val selectedAccountFlow: Flow<Summary.Item?> =
+        combine(_selectedAccountPosition, userInterface.summary) { position: Int, summary: Summary? ->
             summary?.items?.getOrNull(position)
         }.distinctUntilChanged()
 
@@ -122,7 +122,7 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        combine(savedAccountIdFlow, userInterface.summary.filterNotNull()) { accountId: String?, summary: AccountsAndRoundUpsSummary ->
+        combine(savedAccountIdFlow, userInterface.summary.filterNotNull()) { accountId: String?, summary: Summary ->
             val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
             summary.items.indexOf(selectedAccount)
         }

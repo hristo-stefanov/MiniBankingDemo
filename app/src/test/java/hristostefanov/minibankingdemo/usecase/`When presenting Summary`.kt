@@ -10,7 +10,7 @@ import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -25,7 +25,7 @@ import javax.inject.Provider
 import org.assertj.core.api.Assertions.assertThat
 import kotlin.jvm.java
 
-class `When presenting Accounts and Round-up Summary` {
+class `When presenting Summary` {
     private val repository: Repository = mock()
     private val userInterface: UserInterface = mock()
     private val nowProvider: Provider<OffsetDateTime> = mock()
@@ -49,10 +49,10 @@ class `When presenting Accounts and Round-up Summary` {
         )
     )
 
-    private val expectedSummary = AccountsAndRoundUpsSummary(
+    private val expectedSummary = Summary(
        roundUpSince = OffsetDateTime.parse("2025-05-05T00:00+01"),
         items = listOf(
-            AccountsAndRoundUpsSummary.Item(
+            Summary.Item(
                 accountId = "1",
                 number = "111",
                 currency = Currency.getInstance("GBP"),

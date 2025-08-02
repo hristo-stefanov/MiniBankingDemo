@@ -1,6 +1,6 @@
 package hristostefanov.minibankingdemo.presentation
 
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -17,14 +17,14 @@ class UserInterfaceImpl @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
 ) : UserInterface {
 
-    private val _summary = MutableStateFlow<AccountsAndRoundUpsSummary?>(null)
+    private val _summary = MutableStateFlow<Summary?>(null)
     val summary = _summary.asStateFlow()
 
     override suspend fun promptUserToSubmitCredentials(continuationId: ContinuationId) {
         navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination(continuationId.name)))
     }
 
-    override fun presentSummary(summary: AccountsAndRoundUpsSummary) {
+    override fun presentSummary(summary: Summary) {
         _summary.value = summary
     }
 

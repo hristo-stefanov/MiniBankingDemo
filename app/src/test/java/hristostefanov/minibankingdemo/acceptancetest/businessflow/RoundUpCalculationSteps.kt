@@ -7,7 +7,7 @@ import hristostefanov.minibankingdemo.business.entities.Source
 import hristostefanov.minibankingdemo.business.entities.Status
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.output.AccountsAndRoundUpsSummary
+import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.usecase.summarize
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
@@ -27,7 +27,7 @@ class RoundUpCalculationSteps {
     private lateinit var isSpendingTransactionFlagMap: Map<String, Boolean>
     private lateinit var transactionRoundUpMap: Map<String, BigDecimal>
     private lateinit var accounts: List<Account>
-    private lateinit var summary: AccountsAndRoundUpsSummary
+    private lateinit var summary: Summary
     private lateinit var dataset: Map<Account, List<Transaction>>
     private lateinit var result: BigDecimal
     private lateinit var transaction: Transaction
@@ -141,7 +141,7 @@ class RoundUpCalculationSteps {
         dataTable: List<Map<String, String>>
     ) {
         val expectedAccounts = dataTable.map {
-                AccountsAndRoundUpsSummary.Item(
+                Summary.Item(
                     accountId = it["account number"]!!,
                     number = it["account number"]!!,
                     roundUp = BigDecimal(it["round-up"]),
