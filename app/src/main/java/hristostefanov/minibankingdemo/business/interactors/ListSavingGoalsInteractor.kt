@@ -8,6 +8,7 @@ import javax.inject.Inject
 class ListSavingGoalsInteractor @Inject constructor(private val repository: Repository) {
     @Throws(ServiceException::class)
     suspend fun execute(accountId: String): List<SavingsGoal> {
+        // TODO this does not justify a separate interactor
         return repository.findSavingGoals(accountId)
     }
 }
