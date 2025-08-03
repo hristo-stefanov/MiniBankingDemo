@@ -19,11 +19,9 @@ endnote
 accountCurrency,
 roundUpAmount];
 
-'ListSavingGoalsInteractor
 : <&cog> Fetch savings goals;
 -> [Result];
 
-'SavingsGoalsViewModel
 if () then ([is Service Error])
     'displays a dialog, not a snackbar
     'doesn't return to the main screen
@@ -38,23 +36,16 @@ endif
 (extension point: Savings Goals CRUD);
 
 |system|
-'passed to TransferConfirmationFragment
-->[savingsGoal,
-roundUpAmount,
-accountCurrency,
-accountId]
+->[savingsGoalId]
 ;
 
 repeat
-'TransferConfirmationViewModel
-:<&spreadsheet> Summarize transfer;
+:<&spreadsheet> Gather transfer details;
+
+-> [roundUpAmount, accountCurrency, goalName] ;
 
 |user|
 :Confirm transfer;
--> [accountId,
-savingsGoalId,
-accountCurrency,
-roundUpAmount];
 |system|
 'AddMoneyIntoGoalInteractor
 : <&cog> Add money into goal;
@@ -66,9 +57,10 @@ backward: Present unrecoverable error message; <<sendSignal>>
 repeat while () is ([is Service Error])
 -> [OK];
 
-'TransferConfirmationViewModel
-'and returns to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
 :Send success acknowledgement; <<sendSignal>>
+
+'returns to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+:Send "Close Transfer Round-up UI"; <<sendSignal>>
 
 stop
 
