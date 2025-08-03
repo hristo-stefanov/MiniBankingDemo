@@ -6,9 +6,14 @@ import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
+import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
+import hristostefanov.minibankingdemo.business.entities.SavingsGoal
+import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.math.BigDecimal
+import java.util.Currency
 import javax.inject.Singleton
 
 @Singleton
@@ -45,6 +50,34 @@ class UserInterfaceImpl @Inject constructor(
         // TODO make it not navigate - display a temp
         navigationChannel.send(
             Navigation.Message(message)
+        )
+    }
+
+    override suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>) {
+        val displaySavingsGoals = savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
+        navigationChannel.send(
+            Navigation.Forward(
+                AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                    message,
+                    displaySavingsGoals.toTypedArray()
+                )
+            )
+        )
+    }
+
+    override suspend fun promptUserToConfirmTransfer(
+        roundUpAmount: BigDecimal,
+        accountCurrency: Currency,
+        savingsGoalNam: String
+    ) {
+        navigationChannel.send(
+            Navigation.Forward(
+                SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                    savingsGoalName = savingsGoalNam,
+                    roundUpAmount = roundUpAmount,
+                    accountCurrency = accountCurrency
+                )
+            )
         )
     }
 }

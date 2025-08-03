@@ -36,14 +36,11 @@
             android:id="@+id/action_to_transferConfirmationDestination"
             app:destination="@id/transferConfirmationDestination" />
         <argument
-            android:name="accountId"
+            android:name="message"
             app:argType="string" />
         <argument
-            android:name="accountCurrency"
-            app:argType="java.util.Currency" />
-        <argument
-            android:name="roundUpAmount"
-            app:argType="java.math.BigDecimal" />
+            android:name="savingsGoals"
+            app:argType="hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal[]" />
     </fragment>
     <fragment
         android:id="@+id/createSavingsGoalDestination"
@@ -63,17 +60,14 @@
         android:label="Confirm transfer"
         tools:layout="@layout/transfer_confirmation_fragment">
         <argument
-            android:name="savingsGoal"
-            app:argType="hristostefanov.minibankingdemo.business.entities.SavingsGoal" />
+            android:name="savingsGoalName"
+            app:argType="string" />
         <argument
             android:name="roundUpAmount"
             app:argType="java.math.BigDecimal" />
         <argument
             android:name="accountCurrency"
             app:argType="java.util.Currency" />
-        <argument
-            android:name="accountId"
-            app:argType="string" />
     </fragment>
 
     <action

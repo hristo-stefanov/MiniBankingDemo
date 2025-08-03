@@ -17,7 +17,7 @@ class ContinuationService @Inject constructor(
     private val userInterface: UserInterfaceImpl,
     private val sessionRegistry: LoginSessionRegistry,
     private val getSummaryInteractor: GetSummaryInteractor,
-    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor
+    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
 ) {
 
     suspend fun executeContinuation(continuationId: ContinuationId, param: String? = null) {
@@ -34,14 +34,11 @@ class ContinuationService @Inject constructor(
                     userInterface
                 )
 
-            ContinuationId.TransferRoundUp_AccountSelected ->
-                sessionRegistry.component?.transferRoundUpInteractor?.onAccountSelected(
-                    param!!,
-                    userInterface
-                )
-
             ContinuationId.GetSummary_LoginCredentialsEnsured ->
                 getSummaryInteractor.onLoginCredentialsEnsured(userInterface)
+
+            ContinuationId.TransferRoundUp_SavingsGoalSelected ->
+                sessionRegistry.component?.transferRoundUpInteractor?.onSavingsGaolSelected(param!!, userInterface)
         }
     }
 }

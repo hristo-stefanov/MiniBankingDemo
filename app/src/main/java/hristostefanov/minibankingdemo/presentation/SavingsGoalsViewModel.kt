@@ -2,12 +2,12 @@ package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.NavGraphXmlDirections
-import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
-import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
+import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.ContinuationId
+import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -23,7 +23,9 @@ class SavingsGoalsViewModel @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
     private val eventBus: EventBus,
     @NavigationChannel
-    private val navigationChannel: Channel<Navigation>
+    private val navigationChannel: Channel<Navigation>,
+    @ContinuationChannel
+    private val continuationChannel: Channel<Continuation>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -49,49 +51,32 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
-            try {
-                goals = loginSessionRegistry.component?.listSavingGoalInteractor?.execute(args.accountId)
-                    ?: emptyList()
-                _list.value = goals.map { DisplaySavingsGoal(it.id, it.name) }
-            } catch (e: ServiceException) {
-                e.localizedMessage?.also {
-                    navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toErrorDialog(it)))
-                }
-            }
-        }
+        _list.value = args.savingsGoals.asList()
     }
 
-
     fun onSavingsGoalClicked(savingsGoalId: String) {
-        goals
-            .find { it.id == savingsGoalId }
-            ?.also {
-                viewModelScope.launch {
-                    navigationChannel.send(
-                        Navigation.Forward(
-                            SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
-                                it,
-                                args.roundUpAmount,
-                                args.accountCurrency,
-                                args.accountId
-                            )
-                        )
-                    )
-                }
-            }
+        viewModelScope.launch {
+            continuationChannel.send(
+                Continuation(
+                    // TODO shouldn't we get the continuation is as an argument instead of
+                    // hardcoding it?
+                    ContinuationId.TransferRoundUp_SavingsGoalSelected,
+                    savingsGoalId
+                )
+            )
+        }
     }
 
     fun onAddSavingsGoalCommand() {
         viewModelScope.launch {
-            navigationChannel.send(
-                Navigation.Forward(
-                    SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
-                        args.accountId,
-                        args.accountCurrency
-                    )
-                )
-            )
+//            navigationChannel.send(
+//                Navigation.Forward(
+//                    SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(
+//                        args.accountId,
+//                        args.accountCurrency
+//                    )
+//                )
+//            )
         }
     }
 }

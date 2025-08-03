@@ -42,18 +42,18 @@ class TransferConfirmationViewModel @Inject constructor(
             args.accountCurrency.currencyCode
         )
         _info.value = stringSupplier.get(R.string.transferInfo)
-            .format(amountFormatted, args.savingsGoal.name)
+            .format(amountFormatted, args.savingsGoalName)
     }
 
     fun onConfirmCommand() {
         viewModelScope.launch {
             try {
-                loginSessionRegistry?.component?.addMoneyIntoGoalInteractor?.execute(
-                    args.accountId,
-                    args.savingsGoal.id,
-                    args.accountCurrency,
-                    args.roundUpAmount
-                )
+//                loginSessionRegistry?.component?.addMoneyIntoGoalInteractor?.execute(
+//                    args.accountId,
+//                    args.savingsGoal.id,
+//                    args.accountCurrency,
+//                    args.roundUpAmount
+//                )
 
                 _acknowledgement.send(stringSupplier.get(R.string.success))
                 delay(NAVIGATION_DELAY_MS)

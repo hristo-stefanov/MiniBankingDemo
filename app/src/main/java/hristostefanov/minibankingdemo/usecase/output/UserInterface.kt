@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.usecase.output
 
+import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -24,6 +25,8 @@ interface UserInterface {
      */
     suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean, continuationId: ContinuationId)
 
+    suspend fun promptUserToConfirmTransfer(amount: BigDecimal, currency: Currency, savingsGoalNam: String)
+
     /**
      * Will not make savable state changes, such a navigation or displaying a dialog,
      * to keep the UI state and interactor state in sync in case of process death.
@@ -38,6 +41,8 @@ interface UserInterface {
      * The calling interactor will not wait for continuation.
      */
     suspend fun presentMessage(message: String)
+
+    suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
 }
 
 data class Summary(
