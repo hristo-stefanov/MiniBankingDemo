@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import hristostefanov.minibankingdemo.BuildConfig
-import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
 import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
@@ -14,10 +13,9 @@ import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteracto
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
-import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractorImpl
 import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
-import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -105,4 +103,8 @@ abstract class LoginSessionModule {
     @LoginSessionScope
     @Binds
     abstract fun bind(impl: TransferRoundUpInteractorImpl): TransferRoundUpInteractor
+
+    @LoginSessionScope
+    @Binds
+    abstract fun bindCreateSavingsGoalInteractor(impl: CreateSavingsGoalInteractorImpl): CreateSavingsGoalInteractor
 }

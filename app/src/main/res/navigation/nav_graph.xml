@@ -48,11 +48,8 @@
         android:label="New Savings Goal"
         tools:layout="@layout/create_savings_goal_fragment" >
         <argument
-            android:name="accountId"
+            android:name="continuationId"
             app:argType="string" />
-        <argument
-            android:name="accountCurrency"
-            app:argType="java.util.Currency" />
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"

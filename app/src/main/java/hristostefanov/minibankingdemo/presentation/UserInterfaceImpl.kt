@@ -66,6 +66,14 @@ class UserInterfaceImpl @Inject constructor(
         )
     }
 
+    override suspend fun promptUserToSubmitGoalName(continuationId: ContinuationId) {
+        navigationChannel.send(
+            Navigation.Forward(
+                SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(continuationId.name)
+            )
+        )
+    }
+
     override suspend fun closeTransferRoundUpUI() {
         navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
     }
@@ -86,5 +94,9 @@ class UserInterfaceImpl @Inject constructor(
                 )
             )
         )
+    }
+
+    override suspend fun closeCreateSavingsGoalUI() {
+        navigationChannel.send(Navigation.Backward)
     }
 }

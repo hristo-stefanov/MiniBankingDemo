@@ -19,8 +19,10 @@ class TransferRoundUpInteractorImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
 
-    private lateinit var accountId: String
-    private lateinit var accountCurrency: Currency
+    // Note: internal for extensions
+    override lateinit var accountId: String
+    override lateinit var accountCurrency: Currency
+
     private lateinit var roundUpAmount: BigDecimal
     private lateinit var savingsGoals: List<SavingsGoal>
     private lateinit var selectedSavingGoalId: String

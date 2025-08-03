@@ -1,12 +1,16 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
-import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.ContinuationId
+import hristostefanov.minibankingdemo.util.ContinuationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,9 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
-    private val loginSessionRegistry: LoginSessionRegistry,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>
+    @ContinuationChannel
+    private val continuationChannel: Channel<Continuation>
 ) : ViewModel() {
 
     private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
@@ -30,35 +33,20 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     // exposing MutableLiveData to allow two-way data binding
     val name: MutableLiveData<String> = savedState.getLiveData(NAME_KEY)
 
+    // TODO validation rule
+    private fun validateName(name: String) = name.isNotBlank()
+
     open val createCommandEnabled: LiveData<Boolean> by lazy {
         savedState.getLiveData<String>(NAME_KEY).map { name ->
-            loginSessionRegistry.component?.createSavingGoalsInteractor?.validateName(name) ?: false
+            validateName(name) ?: false
+            true
         }
     }
 
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
-            if (loginSessionRegistry.component?.createSavingGoalsInteractor?.validateName(name) == true) {
-                viewModelScope.launch {
-                    try {
-                        loginSessionRegistry?.component?.createSavingGoalsInteractor?.execute(
-                            name,
-                            args.accountId,
-                            args.accountCurrency
-                        )
-                        navigationChannel.send(Navigation.Backward)
-                    } catch (e: ServiceException) {
-                        e.localizedMessage?.also {
-                            navigationChannel.send(
-                                Navigation.Forward(
-                                    CreateSavingsGoalFragmentDirections.toErrorDialog(
-                                        it
-                                    )
-                                )
-                            )
-                        }
-                    }
-                }
+            viewModelScope.launch {
+                continuationChannel.send(Continuation(ContinuationId.valueOf(args.continuationId), name))
             }
         }
     }

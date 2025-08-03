@@ -1,7 +1,7 @@
 @startuml
 'https://plantuml.com/activity-diagram-beta
 
-|user|
+|system|
 start
 
 'This is the case of "Two levels of blue"
@@ -20,13 +20,17 @@ Precondition: User has been presented with
   point has been reached.
 end note
 
-|app|
-:Provides a form;
+|system|
 |user|
-:Submits goal name;
-|app|
-:Calls createSavingsGoal;
-:TODO provide a report?;
+:<&person> Submit goal name;
+-> [name];
+|system|
+:<&script> Query context from Transfer Round-up;
+-> [accountId, accountCurrency];
+:<&cog> Create Savings Goal;
+
+:Send Close Create Savings Goal UI; <<sendSignal>>
+:Send Data Source Changed; <<sendSignal>>
 
 stop
 

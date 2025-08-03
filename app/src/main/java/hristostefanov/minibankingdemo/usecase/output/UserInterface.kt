@@ -6,6 +6,9 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
 
+// TODO there is no binding for this and view model inject the implementation directly
+// how the instances of this interface should be created when navigation is not used
+// for every user interaction?
 interface UserInterface {
 
     /**
@@ -49,7 +52,11 @@ interface UserInterface {
 
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
 
+    suspend fun promptUserToSubmitGoalName(continuationId: ContinuationId)
+
     suspend fun closeTransferRoundUpUI()
+
+    suspend fun closeCreateSavingsGoalUI()
 }
 
 data class Summary(
