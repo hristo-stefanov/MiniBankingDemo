@@ -6,6 +6,7 @@ import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
+import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
@@ -65,17 +66,23 @@ class UserInterfaceImpl @Inject constructor(
         )
     }
 
+    override suspend fun closeTransferRoundUpUI() {
+        navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+    }
+
     override suspend fun promptUserToConfirmTransfer(
         roundUpAmount: BigDecimal,
         accountCurrency: Currency,
-        savingsGoalNam: String
+        savingsGoalNam: String,
+        continuationId: ContinuationId
     ) {
         navigationChannel.send(
             Navigation.Forward(
                 SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
                     savingsGoalName = savingsGoalNam,
                     roundUpAmount = roundUpAmount,
-                    accountCurrency = accountCurrency
+                    accountCurrency = accountCurrency,
+                    continuationId = continuationId.name,
                 )
             )
         )

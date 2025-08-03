@@ -25,7 +25,12 @@ interface UserInterface {
      */
     suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean, continuationId: ContinuationId)
 
-    suspend fun promptUserToConfirmTransfer(amount: BigDecimal, currency: Currency, savingsGoalNam: String)
+    suspend fun promptUserToConfirmTransfer(
+        amount: BigDecimal,
+        currency: Currency,
+        savingsGoalNam: String,
+        continuationId: ContinuationId
+    )
 
     /**
      * Will not make savable state changes, such a navigation or displaying a dialog,
@@ -43,6 +48,8 @@ interface UserInterface {
     suspend fun presentMessage(message: String)
 
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
+
+    suspend fun closeTransferRoundUpUI()
 }
 
 data class Summary(

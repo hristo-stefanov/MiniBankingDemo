@@ -13,4 +13,5 @@ interface TransferRoundUpInteractor : InteractorLifecycle {
         userInterface: UserInterface
     )
     suspend fun onSavingsGaolSelected(id: String, userInterface: UserInterface)
+    suspend fun onTransferConfirmed(userInterface: UserInterface)
 }

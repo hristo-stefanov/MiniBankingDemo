@@ -39,6 +39,9 @@ class ContinuationService @Inject constructor(
 
             ContinuationId.TransferRoundUp_SavingsGoalSelected ->
                 sessionRegistry.component?.transferRoundUpInteractor?.onSavingsGaolSelected(param!!, userInterface)
+
+            ContinuationId.TransferRoundUp_Confirmed ->
+                sessionRegistry.component?.transferRoundUpInteractor?.onTransferConfirmed(userInterface)
         }
     }
 }

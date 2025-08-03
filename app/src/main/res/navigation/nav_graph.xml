@@ -68,6 +68,9 @@
         <argument
             android:name="accountCurrency"
             app:argType="java.util.Currency" />
+        <argument
+            android:name="continuationId"
+            app:argType="string" />
     </fragment>
 
     <action

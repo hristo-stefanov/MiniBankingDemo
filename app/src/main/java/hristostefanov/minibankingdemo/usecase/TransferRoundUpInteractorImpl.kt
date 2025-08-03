@@ -1,23 +1,29 @@
 package hristostefanov.minibankingdemo.usecase
 
+import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
+import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.minibankingdemo.business.interactors.ListSavingGoalsInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
 import java.util.Currency
 import javax.inject.Inject
 
 class TransferRoundUpInteractorImpl @Inject constructor(
     private val lifecycle: InteractorLifecycleImpl,
-    private val listSavingsGoalsInteractor: ListSavingGoalsInteractor
+    private val listSavingsGoalsInteractor: ListSavingGoalsInteractor,
+    private val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor,
+    private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
 
     private lateinit var accountId: String
     private lateinit var accountCurrency: Currency
     private lateinit var roundUpAmount: BigDecimal
     private lateinit var savingsGoals: List<SavingsGoal>
+    private lateinit var selectedSavingGoalId: String
 
     override suspend fun start(
         accountId: String,
@@ -45,8 +51,33 @@ class TransferRoundUpInteractorImpl @Inject constructor(
     }
 
     override suspend fun onSavingsGaolSelected(id: String, userInterface: UserInterface) {
+        selectedSavingGoalId = id
         savingsGoals.find { it.id == id }?.let {
-            userInterface.promptUserToConfirmTransfer(roundUpAmount, accountCurrency, it.name)
+            userInterface.promptUserToConfirmTransfer(
+                roundUpAmount,
+                accountCurrency,
+                it.name,
+                ContinuationId.TransferRoundUp_Confirmed
+            )
+        }
+    }
+
+    override suspend fun onTransferConfirmed(userInterface: UserInterface) {
+        try {
+            addMoneyIntoGoalInteractor.execute(
+                accountId,
+                selectedSavingGoalId,
+                accountCurrency,
+                roundUpAmount
+            )
+
+            userInterface.presentMessage(stringSupplier.get(R.string.success))
+
+            userInterface.closeTransferRoundUpUI()
+
+            // TODO proper error handling
+        } catch (e: ServiceException) {
+            e.localizedMessage?.let { userInterface.presentMessage(it) }
         }
     }
 }
