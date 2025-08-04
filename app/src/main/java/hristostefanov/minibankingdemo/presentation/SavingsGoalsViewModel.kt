@@ -10,8 +10,11 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.ContinuationId
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
+import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.TriggerChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -26,7 +29,9 @@ class SavingsGoalsViewModel @Inject constructor(
     private val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
     @ContinuationChannel
-    private val continuationChannel: Channel<Continuation>
+    private val continuationChannel: Channel<Continuation>,
+    @TriggerChannel
+    private val triggerChannel: Channel<Trigger>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -68,7 +73,7 @@ class SavingsGoalsViewModel @Inject constructor(
 
     fun onAddSavingsGoalCommand() {
         viewModelScope.launch {
-            loginSessionRegistry.component?.createSavingGoalsInteractor?.start(userInterface)
+            triggerChannel.send(CreateSavingsGoal)
         }
     }
 }

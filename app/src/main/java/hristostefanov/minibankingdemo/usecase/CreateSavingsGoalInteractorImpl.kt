@@ -3,17 +3,12 @@ package hristostefanov.minibankingdemo.usecase
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
-import hristostefanov.minibankingdemo.util.NavigationChannel
-import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
-import javax.inject.Inject
 
-class CreateSavingsGoalInteractorImpl @Inject constructor(
+class CreateSavingsGoalInteractorImpl constructor(
     private val lifecycle: InteractorLifecycleImpl,
-    @NavigationChannel
     private val transferRoundupInteractor: TransferRoundUpInteractor,
     private val repository: Repository,
     private val eventBus: EventBus

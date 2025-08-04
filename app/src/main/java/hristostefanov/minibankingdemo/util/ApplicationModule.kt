@@ -15,6 +15,7 @@ import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
 import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
+import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import kotlinx.coroutines.channels.Channel
@@ -40,6 +41,10 @@ abstract class ApplicationModule {
         @Singleton
         @Provides @ContinuationChannel
         fun provideContinuationChannel(): Channel<Continuation> = Channel()
+
+        @Singleton
+        @Provides @TriggerChannel
+        fun provideTriggerChannel(): Channel<Trigger> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()

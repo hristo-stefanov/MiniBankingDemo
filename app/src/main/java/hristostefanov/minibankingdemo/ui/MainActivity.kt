@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +19,6 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.usecase.ContinuationService
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.sentry.android.navigation.SentryNavigationListener
@@ -39,9 +39,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     @ContinuationChannel
     internal lateinit var continuationChannel: Channel<Continuation>
-
-    @Inject
-    internal lateinit var continuationService: ContinuationService
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 
@@ -70,17 +67,10 @@ class MainActivity : AppCompatActivity() {
             }
             .launchIn(lifecycleScope)
 
-        continuationChannel
-            .receiveAsFlow()
-            .flowWithLifecycle(lifecycle)
-            .onEach {
-                continuationService.executeContinuation(it.id, it.param)
-            }
-            .launchIn(lifecycleScope)
-
         // start the view model
         viewModel
     }
+
 
     private fun onNavigation(navigation: Navigation, navController: NavController) {
         when (navigation) {

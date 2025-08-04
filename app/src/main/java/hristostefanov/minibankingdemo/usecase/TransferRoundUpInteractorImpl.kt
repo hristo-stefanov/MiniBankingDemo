@@ -1,6 +1,8 @@
 package hristostefanov.minibankingdemo.usecase
 
+import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.R
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
@@ -10,11 +12,11 @@ import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
 import java.util.Currency
-import javax.inject.Inject
 
-class TransferRoundUpInteractorImpl @Inject constructor(
+class TransferRoundUpInteractorImpl constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: Repository,
     private val lifecycle: InteractorLifecycleImpl,
-    private val listSavingsGoalsInteractor: ListSavingGoalsInteractor,
     private val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor,
     private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
@@ -43,7 +45,7 @@ class TransferRoundUpInteractorImpl @Inject constructor(
         lifecycle.setStatus(InteractorStatus.Started)
 
         try {
-            savingsGoals = listSavingsGoalsInteractor.execute(accountId)
+            savingsGoals = repository.findSavingGoals(accountId)
             userInterface.promptUserToSelectSavingsGoal("Select destination", savingsGoals)
 
             // TODO proper error handling

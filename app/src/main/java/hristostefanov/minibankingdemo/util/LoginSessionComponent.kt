@@ -36,7 +36,5 @@ interface LoginSessionComponent {
     val calcRoundUpInteractor: CalcRoundUpInteractor
     val listSavingGoalInteractor: ListSavingGoalsInteractor
     val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
-    val createSavingGoalsInteractor: CreateSavingsGoalInteractor
-    val transferRoundUpInteractor: TransferRoundUpInteractor
     val repository: Repository
 }

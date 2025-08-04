@@ -7,11 +7,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.TransferFromAccount
+import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
+import hristostefanov.minibankingdemo.util.TriggerChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +43,8 @@ class AccountsViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
+    @TriggerChannel
+    private val triggerChannel: Channel<Trigger>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val userInterface: UserInterfaceImpl,
@@ -74,11 +79,13 @@ class AccountsViewModel @Inject constructor(
             .take(1)
             .filterNotNull()
             .onEach {
-                loginSessionRegistry.component?.transferRoundUpInteractor?.start(
-                    it.accountId,
-                    it.currency,
-                    it.roundUp,
-                    userInterface)
+                triggerChannel.send(
+                    TransferFromAccount(
+                        it.accountId,
+                        it.currency,
+                        it.roundUp
+                    )
+                )
             }
             .launchIn(viewModelScope)
     }
