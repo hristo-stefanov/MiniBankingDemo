@@ -16,7 +16,6 @@ import java.util.Currency
 private const val ACCOUNT_ID_KEY = "accountId"
 private const val CURRENCY_KEY = "currency"
 private const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
-private const val SAVINGS_GOALS_KEY = "savingsGoals"
 private const val SELECTED_SAVINGS_GOAL_KEY = "selectedSavingsGoal"
 
 class TransferRoundUpInteractorImpl(
@@ -26,6 +25,9 @@ class TransferRoundUpInteractorImpl(
     private val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor,
     private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
+
+    // NOTE: SavedStateHandle only saves data written to it when the Activity is stopped!
+    // This mean data that put after the activity is stopped and the process is killed, is lost!!!
 
     // Note: internal for extensions
     override var accountId: String
@@ -39,10 +41,6 @@ class TransferRoundUpInteractorImpl(
     private var roundUpAmount: BigDecimal
         get() = savedStateHandle.get<BigDecimal>(ROUND_UP_AMOUNT_KEY) ?: BigDecimal.ZERO
         set(value) { savedStateHandle[ROUND_UP_AMOUNT_KEY] = value }
-
-    private var savingsGoals: List<SavingsGoal>
-        get() = savedStateHandle.get<List<SavingsGoal>>(SAVINGS_GOALS_KEY) ?: emptyList()
-        set(value) { savedStateHandle[SAVINGS_GOALS_KEY] = value }
 
     private var selectedSavingGoalId: String
         get() = savedStateHandle.get<String>(SELECTED_SAVINGS_GOAL_KEY) ?: ""
@@ -64,7 +62,8 @@ class TransferRoundUpInteractorImpl(
         lifecycle.setStatus(InteractorStatus.Started)
 
         try {
-            savingsGoals = repository.findSavingGoals(accountId)
+            val savingsGoals = repository.findSavingGoals(accountId)
+
             // TODO what do we do with message strings? Which layer do they come from?
             userInterface.promptUserToSelectSavingsGoal("Select destination", savingsGoals)
 
@@ -74,16 +73,18 @@ class TransferRoundUpInteractorImpl(
         }
     }
 
-    override suspend fun onSavingsGaolSelected(id: String, userInterface: UserInterface) {
+    override suspend fun onSavingsGaolSelected(
+        id: String,
+        name: String,
+        userInterface: UserInterface
+    ) {
         selectedSavingGoalId = id
-        savingsGoals.find { it.id == id }?.let {
-            userInterface.promptUserToConfirmTransfer(
-                roundUpAmount,
-                accountCurrency,
-                it.name,
-                ContinuationId.TransferRoundUp_Confirmed
-            )
-        }
+        userInterface.promptUserToConfirmTransfer(
+            roundUpAmount,
+            accountCurrency,
+            name,
+            ContinuationId.TransferRoundUp_Confirmed
+        )
     }
 
     override suspend fun onTransferConfirmed(userInterface: UserInterface) {

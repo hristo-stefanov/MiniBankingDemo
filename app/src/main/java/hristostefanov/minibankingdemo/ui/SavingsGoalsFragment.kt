@@ -32,7 +32,7 @@ class SavingsGoalsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = SavingsGoalsRecyclerViewAdapter {
-            viewModel.onSavingsGoalClicked(it.id)
+            viewModel.onSavingsGoalClicked(it.id, it.name)
         }
         binding.savingsGoalsRecyclerView.adapter = adapter
 

@@ -46,7 +46,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                continuationChannel.send(Continuation(ContinuationId.valueOf(args.continuationId), name))
+                continuationChannel.send(Continuation(ContinuationId.valueOf(args.continuationId), listOf(name)))
             }
         }
     }

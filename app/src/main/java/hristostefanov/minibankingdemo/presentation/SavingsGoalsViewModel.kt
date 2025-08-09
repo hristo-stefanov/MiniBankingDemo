@@ -58,14 +58,14 @@ class SavingsGoalsViewModel @Inject constructor(
         _list.value = args.savingsGoals.asList()
     }
 
-    fun onSavingsGoalClicked(savingsGoalId: String) {
+    fun onSavingsGoalClicked(savingsGoalId: String, savingsGoalName: String) {
         viewModelScope.launch {
             continuationChannel.send(
                 Continuation(
                     // TODO shouldn't we get the continuation is as an argument instead of
                     // hardcoding it?
                     ContinuationId.TransferRoundUp_SavingsGoalSelected,
-                    savingsGoalId
+                    listOf(savingsGoalId, savingsGoalName)
                 )
             )
         }

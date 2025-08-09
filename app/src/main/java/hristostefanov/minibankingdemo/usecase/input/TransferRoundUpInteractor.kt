@@ -12,7 +12,7 @@ interface TransferRoundUpInteractor : InteractorLifecycle {
         roundUpAmount: BigDecimal,
         userInterface: UserInterface
     )
-    suspend fun onSavingsGaolSelected(id: String, userInterface: UserInterface)
+    suspend fun onSavingsGaolSelected(id: String, name: String, userInterface: UserInterface)
     suspend fun onTransferConfirmed(userInterface: UserInterface)
 
     // For use by extension use case interactors

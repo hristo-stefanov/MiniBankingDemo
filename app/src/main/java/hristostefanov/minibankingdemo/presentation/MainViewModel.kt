@@ -91,7 +91,7 @@ class MainViewModel @Inject constructor(
         keepSavingFlagsForActiveInteractors()
 
         continuationChannel.receiveAsFlow().onEach {
-            executeContinuation(it.id, it.param)
+            executeContinuation(it.id, *it.params.toTypedArray())
         }.launchIn(viewModelScope)
 
         triggerChannel.receiveAsFlow().onEach {
@@ -153,12 +153,12 @@ class MainViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    suspend fun executeContinuation(continuationId: ContinuationId, param: String? = null) {
-        Log.d(LOG_INTERACTORS_TAG, "executeContinuation: continuationId = $continuationId param = $param")
+    suspend fun executeContinuation(continuationId: ContinuationId, vararg params: Any) {
+        Log.d(LOG_INTERACTORS_TAG, "executeContinuation: continuationId = $continuationId param = $params")
 
         when (continuationId) {
             ContinuationId.Startup_LoginCredentialsSubmit -> ensureLoginCredentialsInteractor.onLoginCredentialsSubmit(
-                param!!,
+                params[0] as String,
                 userInterface
             )
 
@@ -171,13 +171,13 @@ class MainViewModel @Inject constructor(
                 getSummaryInteractor.onLoginCredentialsEnsured(userInterface)
 
             ContinuationId.TransferRoundUp_SavingsGoalSelected ->
-                transferRoundUpInteractor.onSavingsGaolSelected(param!!, userInterface)
+                transferRoundUpInteractor.onSavingsGaolSelected(params[0] as String, params[1] as String,  userInterface)
 
             ContinuationId.TransferRoundUp_Confirmed ->
                 transferRoundUpInteractor.onTransferConfirmed(userInterface)
 
             ContinuationId.CreateSavingsGoal_NameSubmitted ->
-                createSavingsGoalInteractor.onGoalNameSubmit(param!!, userInterface)
+                createSavingsGoalInteractor.onGoalNameSubmit(params[0] as String, userInterface)
         }
     }
 
