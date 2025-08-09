@@ -6,14 +6,20 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
-import hristostefanov.minibankingdemo.business.interactors.ListSavingGoalsInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
 import java.util.Currency
 
-class TransferRoundUpInteractorImpl constructor(
+// TODO prefix with the interactor name for namespacing
+private const val ACCOUNT_ID_KEY = "accountId"
+private const val CURRENCY_KEY = "currency"
+private const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
+private const val SAVINGS_GOALS_KEY = "savingsGoals"
+private const val SELECTED_SAVINGS_GOAL_KEY = "selectedSavingsGoal"
+
+class TransferRoundUpInteractorImpl(
     private val savedStateHandle: SavedStateHandle,
     private val repository: Repository,
     private val lifecycle: InteractorLifecycleImpl,
@@ -22,12 +28,25 @@ class TransferRoundUpInteractorImpl constructor(
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
 
     // Note: internal for extensions
-    override lateinit var accountId: String
-    override lateinit var accountCurrency: Currency
+    override var accountId: String
+        get() = savedStateHandle.get<String>(ACCOUNT_ID_KEY) ?: ""
+        set(value) { savedStateHandle[ACCOUNT_ID_KEY] = value }
 
-    private lateinit var roundUpAmount: BigDecimal
-    private lateinit var savingsGoals: List<SavingsGoal>
-    private lateinit var selectedSavingGoalId: String
+    override var accountCurrency: Currency
+        get() = savedStateHandle.get<Currency>(CURRENCY_KEY) ?: Currency.getInstance("GBP")
+        set(value) { savedStateHandle[CURRENCY_KEY] = value }
+
+    private var roundUpAmount: BigDecimal
+        get() = savedStateHandle.get<BigDecimal>(ROUND_UP_AMOUNT_KEY) ?: BigDecimal.ZERO
+        set(value) { savedStateHandle[ROUND_UP_AMOUNT_KEY] = value }
+
+    private var savingsGoals: List<SavingsGoal>
+        get() = savedStateHandle.get<List<SavingsGoal>>(SAVINGS_GOALS_KEY) ?: emptyList()
+        set(value) { savedStateHandle[SAVINGS_GOALS_KEY] = value }
+
+    private var selectedSavingGoalId: String
+        get() = savedStateHandle.get<String>(SELECTED_SAVINGS_GOAL_KEY) ?: ""
+        set(value) { savedStateHandle[SELECTED_SAVINGS_GOAL_KEY] = value }
 
     override suspend fun start(
         accountId: String,
@@ -46,6 +65,7 @@ class TransferRoundUpInteractorImpl constructor(
 
         try {
             savingsGoals = repository.findSavingGoals(accountId)
+            // TODO what do we do with message strings? Which layer do they come from?
             userInterface.promptUserToSelectSavingsGoal("Select destination", savingsGoals)
 
             // TODO proper error handling
