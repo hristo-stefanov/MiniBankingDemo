@@ -16,7 +16,7 @@ interface UserInterface {
      *
      * Continuation must pass `loginCredentials: String`
      */
-    suspend fun promptUserToSubmitCredentials(continuationId: ContinuationId)
+    suspend fun promptUserToSubmitCredentials(): String?
 
     /**
      * Optionally cancellable.

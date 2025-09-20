@@ -29,23 +29,21 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
         this.stopContinuationId = stopContinuationId
 
         if (sessionRegistry.component == null) {
-            userInterface.promptUserToSubmitCredentials(ContinuationId.Startup_LoginCredentialsSubmit)
+            val result = userInterface.promptUserToSubmitCredentials()
+            if (result == null) {
+                lifecycle.setStatus(InteractorStatus.Cancelled)
+            } else {
+                // TODO should this be here?
+                tokenStore.token = result
+                sessionRegistry.createSession(tokenStore.token, "Bearer")
+
+                continuationChannel.send(Continuation(stopContinuationId))
+
+                lifecycle.setStatus(InteractorStatus.Completed)
+            }
         } else {
             continuationChannel.send(Continuation(stopContinuationId))
             lifecycle.setStatus(InteractorStatus.Completed)
         }
-    }
-
-    override suspend fun onLoginCredentialsSubmit(
-        loginCredentials: String,
-        userInterface: UserInterface
-    ) {
-        // TODO should this be here?
-        tokenStore.token = loginCredentials
-        sessionRegistry.createSession(tokenStore.token, "Bearer")
-
-        continuationChannel.send(Continuation(stopContinuationId))
-
-        lifecycle.setStatus(InteractorStatus.Completed)
     }
 }

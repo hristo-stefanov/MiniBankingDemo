@@ -10,9 +10,6 @@
         android:name="hristostefanov.minibankingdemo.ui.LoginFragment"
         android:label="@string/login_title"
         tools:layout="@layout/login_fragment">
-        <argument
-            android:name="continuationId"
-            app:argType="string" />
     </fragment>
 
     <fragment

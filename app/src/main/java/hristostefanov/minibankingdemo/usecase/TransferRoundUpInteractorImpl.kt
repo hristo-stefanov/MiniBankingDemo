@@ -6,14 +6,14 @@ import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
 import java.util.Currency
 
 class TransferRoundUpInteractorImpl(
-    private val repository: Repository,
+    private val loginSessionRegistry: LoginSessionRegistry,
     private val lifecycle: InteractorLifecycleImpl,
-    private val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor,
     private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
 
@@ -41,7 +41,7 @@ class TransferRoundUpInteractorImpl(
         lifecycle.setStatus(InteractorStatus.Started)
 
         try {
-            val savingsGoals = repository.findSavingGoals(accountId)
+            val savingsGoals = loginSessionRegistry.component!!.repository.findSavingGoals(accountId)
 
             // TODO what do we do with message strings? Which layer do they come from?
             userInterface.promptUserToSelectSavingsGoal("Select destination", savingsGoals)
@@ -68,7 +68,7 @@ class TransferRoundUpInteractorImpl(
 
     override suspend fun onTransferConfirmed(userInterface: UserInterface) {
         try {
-            addMoneyIntoGoalInteractor.execute(
+            loginSessionRegistry.component!!.addMoneyIntoGoalInteractor.execute(
                 accountId,
                 selectedSavingGoalId,
                 accountCurrency,

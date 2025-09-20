@@ -46,16 +46,15 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val transferRoundUpInteractor = TransferRoundUpInteractorImpl(
-        repository = loginSessionRegistry.component?.repository!!,
+        loginSessionRegistry,
         InteractorLifecycleImpl(),
-        loginSessionRegistry.component?.addMoneyIntoGoalInteractor!!,
         stringSupplier
     )
 
     private val createSavingsGoalInteractor = CreateSavingsGoalInteractorImpl(
         InteractorLifecycleImpl(),
         transferRoundUpInteractor,
-        loginSessionRegistry.component?.repository!!,
+        loginSessionRegistry,
         eventBus
     )
 
@@ -105,11 +104,6 @@ class MainViewModel @Inject constructor(
         Log.d(LOG_INTERACTORS_TAG, "executeContinuation: continuationId = $continuationId param = $params")
 
         when (continuationId) {
-            ContinuationId.Startup_LoginCredentialsSubmit -> ensureLoginCredentialsInteractor.onLoginCredentialsSubmit(
-                params[0] as String,
-                userInterface
-            )
-
             ContinuationId.GetSummary_RetryLoading ->
                 getSummaryInteractor.onRetryLoading(
                     userInterface

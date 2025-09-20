@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.math.BigDecimal
 import java.util.Currency
 import javax.inject.Singleton
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class UserInterfaceImpl @Inject constructor(
@@ -26,8 +28,13 @@ class UserInterfaceImpl @Inject constructor(
     private val _summary = MutableStateFlow<Summary?>(null)
     val summary = _summary.asStateFlow()
 
-    override suspend fun promptUserToSubmitCredentials(continuationId: ContinuationId) {
-        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination(continuationId.name)))
+    lateinit var loginCredentialsContinuation: Continuation<String?>
+
+    override suspend fun promptUserToSubmitCredentials(): String? {
+        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+        return suspendCoroutine {
+            loginCredentialsContinuation = it
+        }
     }
 
     override fun presentSummary(summary: Summary) {

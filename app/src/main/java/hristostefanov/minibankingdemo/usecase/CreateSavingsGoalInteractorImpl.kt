@@ -5,12 +5,13 @@ import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import org.greenrobot.eventbus.EventBus
 
 class CreateSavingsGoalInteractorImpl constructor(
     private val lifecycle: InteractorLifecycleImpl,
     private val transferRoundupInteractor: TransferRoundUpInteractor,
-    private val repository: Repository,
+    private val loginSessionRegistry: LoginSessionRegistry,
     private val eventBus: EventBus
 ): CreateSavingsGoalInteractor, InteractorLifecycle by lifecycle {
 
@@ -30,7 +31,7 @@ class CreateSavingsGoalInteractorImpl constructor(
             val accountId = transferRoundupInteractor.accountId
             val currency = transferRoundupInteractor.accountCurrency
 
-            repository.createSavingsGoal(goalName, accountId, currency)
+            loginSessionRegistry.component!!.repository.createSavingsGoal(goalName, accountId, currency)
 
             userInterface.closeCreateSavingsGoalUI()
 

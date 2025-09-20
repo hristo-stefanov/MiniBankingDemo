@@ -7,13 +7,13 @@ import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val userInterface: UserInterfaceImpl,
-    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor
 ) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)
@@ -35,13 +35,12 @@ class LoginViewModel @Inject constructor(
     fun onAcceptCommand() {
         viewModelScope.launch {
             accessToken?.let {
-                ensureLoginCredentialsInteractor.onLoginCredentialsSubmit(it, userInterface)
+                userInterface.loginCredentialsContinuation.resume(it)
 
                 // Note this will clear this view model and cancel this coroutine so
                 // should be called after calling the interactor
                 navigationChannel.send(Navigation.Backward)
             }
-
         }
     }
 }

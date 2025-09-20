@@ -9,5 +9,4 @@ import kotlinx.coroutines.flow.Flow
 interface EnsureLoginCredentialsInteractor : InteractorLifecycle {
     override val statusChanged: Flow<InteractorStatus>
     suspend fun start(userInterface: UserInterface, stopContinuation: ContinuationId)
-    suspend fun onLoginCredentialsSubmit(loginCredentials: String, userInterface: UserInterface)
 }
