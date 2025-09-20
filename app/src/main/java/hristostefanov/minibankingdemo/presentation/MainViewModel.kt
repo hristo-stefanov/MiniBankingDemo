@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.ui.LOG_INTERACTORS_TAG
+import hristostefanov.minibankingdemo.usecase.CancelCreateSavingsGoal
+import hristostefanov.minibankingdemo.usecase.CancelTransferRoundUp
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
@@ -137,6 +139,8 @@ class MainViewModel @Inject constructor(
             )
 
             CreateSavingsGoal -> createSavingsGoalInteractor.start(userInterface)
+            CancelTransferRoundUp -> transferRoundUpInteractor.cancel()
+            CancelCreateSavingsGoal -> createSavingsGoalInteractor.cancel()
         }
     }
 }

@@ -80,8 +80,15 @@ class TransferRoundUpInteractorImpl(
             userInterface.closeTransferRoundUpUI()
 
             // TODO proper error handling
+
+            lifecycle.setStatus(InteractorStatus.Completed)
         } catch (e: ServiceException) {
             e.localizedMessage?.let { userInterface.presentMessage(it) }
+            lifecycle.setStatus(InteractorStatus.Failed)
         }
+    }
+
+    override suspend fun cancel() {
+        lifecycle.setStatus(InteractorStatus.Cancelled)
     }
 }

@@ -12,3 +12,7 @@ data class TransferFromAccount(
 ): Trigger
 
 data object CreateSavingsGoal : Trigger
+
+data object CancelTransferRoundUp : Trigger
+
+data object CancelCreateSavingsGoal : Trigger

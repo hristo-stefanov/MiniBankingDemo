@@ -15,6 +15,9 @@ class CreateSavingsGoalInteractorImpl constructor(
 ): CreateSavingsGoalInteractor, InteractorLifecycle by lifecycle {
 
     override suspend fun start(userInterface: UserInterface) {
+        if (lifecycle.status == InteractorStatus.Started)
+            throw IllegalStateException()
+        lifecycle.setStatus(InteractorStatus.Started)
         userInterface.promptUserToSubmitGoalName(ContinuationId.CreateSavingsGoal_NameSubmitted)
     }
 
@@ -32,11 +35,18 @@ class CreateSavingsGoalInteractorImpl constructor(
             userInterface.closeCreateSavingsGoalUI()
 
             eventBus.post(DataSourceChangedEvent())
+            lifecycle.setStatus(InteractorStatus.Completed)
         } catch(e: ServiceException) {
             e.localizedMessage?.let { userInterface.presentMessage(it) }
+            lifecycle.setStatus(InteractorStatus.Failed)
         }
     }
 
     // TODO it's also in the view model
     private fun validateName(name: String) = name.isNotBlank()
+
+    override suspend fun cancel() {
+        lifecycle.setStatus(InteractorStatus.Cancelled)
+    }
 }
+

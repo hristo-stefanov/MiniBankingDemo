@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
+import hristostefanov.minibankingdemo.usecase.CancelTransferRoundUp
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
@@ -15,6 +16,7 @@ import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.TriggerChannel
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -46,6 +48,12 @@ class SavingsGoalsViewModel @Inject constructor(
 
     override fun onCleared() {
         eventBus.unregister(this)
+
+        // ATOMIC prevents cancelling the coroutine before it starts by cancelling the scope
+        viewModelScope.launch(start = CoroutineStart.ATOMIC) {
+            triggerChannel.send(CancelTransferRoundUp)
+        }
+
         super.onCleared()
     }
 

@@ -15,6 +15,8 @@ interface TransferRoundUpInteractor : InteractorLifecycle {
     suspend fun onSavingsGaolSelected(id: String, name: String, userInterface: UserInterface)
     suspend fun onTransferConfirmed(userInterface: UserInterface)
 
+    suspend fun cancel()
+
     // For use by extension use case interactors
     val accountId: String
     val accountCurrency: Currency

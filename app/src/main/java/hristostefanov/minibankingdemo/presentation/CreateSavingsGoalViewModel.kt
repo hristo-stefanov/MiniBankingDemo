@@ -8,9 +8,13 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
+import hristostefanov.minibankingdemo.usecase.CancelCreateSavingsGoal
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.ContinuationId
+import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.util.ContinuationChannel
+import hristostefanov.minibankingdemo.util.TriggerChannel
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +23,9 @@ import javax.inject.Inject
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     @ContinuationChannel
-    private val continuationChannel: Channel<Continuation>
+    private val continuationChannel: Channel<Continuation>,
+    @TriggerChannel
+    private val triggerChannel: Channel<Trigger>
 ) : ViewModel() {
 
     private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
@@ -41,6 +47,15 @@ open class CreateSavingsGoalViewModel @Inject constructor(
             validateName(name) ?: false
             true
         }
+    }
+
+    override fun onCleared() {
+        // ATOMIC prevents cancelling the coroutine before it starts by cancelling the scope
+        viewModelScope.launch(start = CoroutineStart.ATOMIC) {
+            triggerChannel.send(CancelCreateSavingsGoal)
+        }
+
+        super.onCleared()
     }
 
     open fun onCreateCommand() {
