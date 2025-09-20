@@ -28,14 +28,6 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
-private const val IS_FRESH_START_KEY = "isFreshStart"
-
-private const val IS_TRANSFER_ROUND_UP_INTERACTOR_ACTIVE_KEY = "isTransferRoundUpInteractorActive"
-private const val IS_CREATE_SAVINGS_GOAL_INTERACTOR_ACTIVE_KEY = "isCreateSavingsGoalInteractorActive"
-private const val IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY = "isStartupInteractorActive"
-private const val IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY = "isPresentSummaryInteractorActive"
-
-
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -52,7 +44,6 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val transferRoundUpInteractor = TransferRoundUpInteractorImpl(
-        savedStateHandle,
         repository = loginSessionRegistry.component?.repository!!,
         InteractorLifecycleImpl(),
         loginSessionRegistry.component?.addMoneyIntoGoalInteractor!!,
@@ -67,28 +58,7 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        val isFreshStart: Boolean = savedStateHandle.get<Boolean?>(IS_FRESH_START_KEY) == null
-        Log.d(LOG_INTERACTORS_TAG, "isFreshStart = $isFreshStart")
-
-        savedStateHandle[IS_FRESH_START_KEY] = false
-
-        val isEnsureLoginCredentialsInteractorActive: Boolean =
-            savedStateHandle[IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY] ?: false
-        Log.d(LOG_INTERACTORS_TAG, "Init: isStartupInteractorActive = $isEnsureLoginCredentialsInteractorActive")
-
-        val isGetSummaryInteractorActive: Boolean =
-            savedStateHandle[IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY] ?: false
-        Log.d(LOG_INTERACTORS_TAG, "Init: isPresentSummaryInteractorActive = $isGetSummaryInteractorActive")
-
-        val isTransferRoundUpInteractorActive = savedStateHandle[IS_TRANSFER_ROUND_UP_INTERACTOR_ACTIVE_KEY] ?: false
-        Log.d(LOG_INTERACTORS_TAG, "Init: isTransferRoundUpInteractorActive = $isTransferRoundUpInteractorActive")
-
-        val isCreateSavingsGoalInteractorActive = savedStateHandle[IS_CREATE_SAVINGS_GOAL_INTERACTOR_ACTIVE_KEY] ?: false
-        Log.d(LOG_INTERACTORS_TAG, "Init: isCreateSavingsGoalInteractorActive = $isCreateSavingsGoalInteractorActive")
-
-        // Should be exactly here - after getting the saved values and before
-        // starting interactors.
-        keepSavingFlagsForActiveInteractors()
+        setUpLogginInteractorStateChanges()
 
         continuationChannel.receiveAsFlow().onEach {
             executeContinuation(it.id, *it.params.toTypedArray())
@@ -99,56 +69,32 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-            if (isEnsureLoginCredentialsInteractorActive) {
-                ensureLoginCredentialsInteractor.resume()
-            }
-
-            if (isGetSummaryInteractorActive) {
-                getSummaryInteractor.resume()
-            }
-
-            if (isTransferRoundUpInteractorActive) {
-                transferRoundUpInteractor.resume()
-            }
-
-            if (isCreateSavingsGoalInteractorActive) {
-                createSavingsGoalInteractor.resume()
-            }
-
-            if (isFreshStart) {
-                getSummaryInteractor.start(userInterface)
-            }
+            getSummaryInteractor.start(userInterface)
         }
     }
 
-
-
-    private fun keepSavingFlagsForActiveInteractors() {
+    private fun setUpLogginInteractorStateChanges() {
         ensureLoginCredentialsInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "EnsureLoginCredentials.status = $it")
-                savedStateHandle[IS_ENSURE_LOGIN_CREDENTIALS_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
 
         getSummaryInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "GetSummaryInteractor.status = $it")
-                savedStateHandle[IS_GET_SUMMARY_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
 
         transferRoundUpInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "TransferRoundUpInteractor.status = $it")
-                savedStateHandle[IS_TRANSFER_ROUND_UP_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
 
         createSavingsGoalInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "CreateSavingsGoalInteractor.status = $it")
-                savedStateHandle[IS_CREATE_SAVINGS_GOAL_INTERACTOR_ACTIVE_KEY] = it.isActive()
             }
             .launchIn(viewModelScope)
     }

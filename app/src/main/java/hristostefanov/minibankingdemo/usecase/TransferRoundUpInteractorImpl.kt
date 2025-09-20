@@ -1,10 +1,8 @@
 package hristostefanov.minibankingdemo.usecase
 
-import androidx.lifecycle.SavedStateHandle
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.AddMoneyIntoGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
@@ -12,39 +10,20 @@ import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
 import java.util.Currency
 
-// TODO prefix with the interactor name for namespacing
-private const val ACCOUNT_ID_KEY = "accountId"
-private const val CURRENCY_KEY = "currency"
-private const val ROUND_UP_AMOUNT_KEY = "roundUpAmount"
-private const val SELECTED_SAVINGS_GOAL_KEY = "selectedSavingsGoal"
-
 class TransferRoundUpInteractorImpl(
-    private val savedStateHandle: SavedStateHandle,
     private val repository: Repository,
     private val lifecycle: InteractorLifecycleImpl,
     private val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor,
     private val stringSupplier: StringSupplier,
 ) : TransferRoundUpInteractor, InteractorLifecycle by lifecycle {
 
-    // NOTE: SavedStateHandle only saves data written to it when the Activity is stopped!
-    // This mean data that put after the activity is stopped and the process is killed, is lost!!!
+    override lateinit var accountId: String
 
-    // Note: internal for extensions
-    override var accountId: String
-        get() = savedStateHandle.get<String>(ACCOUNT_ID_KEY) ?: ""
-        set(value) { savedStateHandle[ACCOUNT_ID_KEY] = value }
+    override lateinit var accountCurrency: Currency
 
-    override var accountCurrency: Currency
-        get() = savedStateHandle.get<Currency>(CURRENCY_KEY) ?: Currency.getInstance("GBP")
-        set(value) { savedStateHandle[CURRENCY_KEY] = value }
+    private lateinit var roundUpAmount: BigDecimal
 
-    private var roundUpAmount: BigDecimal
-        get() = savedStateHandle.get<BigDecimal>(ROUND_UP_AMOUNT_KEY) ?: BigDecimal.ZERO
-        set(value) { savedStateHandle[ROUND_UP_AMOUNT_KEY] = value }
-
-    private var selectedSavingGoalId: String
-        get() = savedStateHandle.get<String>(SELECTED_SAVINGS_GOAL_KEY) ?: ""
-        set(value) { savedStateHandle[SELECTED_SAVINGS_GOAL_KEY] = value }
+    private lateinit var selectedSavingGoalId: String
 
     override suspend fun start(
         accountId: String,

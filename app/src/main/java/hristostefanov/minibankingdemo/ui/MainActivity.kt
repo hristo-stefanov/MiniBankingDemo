@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -30,6 +29,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    companion object {
+        var isFreshProcess = true
+    }
+
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     @Inject
@@ -52,6 +55,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val isProcessDeathRestore = savedInstanceState != null && isFreshProcess
+        isFreshProcess = false
+
+        if (isProcessDeathRestore) {
+            // Reset the navigation state since we don't restore full app state after process death
+            navController.setGraph(R.navigation.nav_graph)
+        }
 
         // needed to hide the Up button on the ActionBar for top-level destinations
         val topLevelDestinationIds = setOf(R.id.loginDestination, R.id.accountsDestination)

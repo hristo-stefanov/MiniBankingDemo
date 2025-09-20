@@ -18,7 +18,6 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val lifecycle: InteractorLifecycleImpl,
 ) : EnsureLoginCredentialsInteractor, InteractorLifecycle by lifecycle {
 
-    // TODO needs to be saved
     private lateinit var stopContinuationId: ContinuationId
 
     override suspend fun start(userInterface: UserInterface, stopContinuationId: ContinuationId) {

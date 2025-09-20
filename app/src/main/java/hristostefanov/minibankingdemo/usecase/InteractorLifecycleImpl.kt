@@ -27,15 +27,6 @@ class InteractorLifecycleImpl @Inject constructor(): InteractorLifecycle {
     // the situation of no subscribers
     override val statusChanged: Flow<InteractorStatus> = statusChannel.receiveAsFlow().shareIn(scope, SharingStarted.Eagerly)
 
-    override suspend fun resume() {
-        // TODO restore status?
-        //
-        // for now I assume this function is called for Started
-        // interactors only
-
-        setStatus(InteractorStatus.Started)
-    }
-
     internal suspend fun setStatus(status: InteractorStatus) {
         _status = status
         statusChannel.send(status)
