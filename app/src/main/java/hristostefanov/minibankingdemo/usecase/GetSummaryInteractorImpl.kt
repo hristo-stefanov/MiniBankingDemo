@@ -34,53 +34,63 @@ class GetSummaryInteractorImpl @Inject constructor(
             throw IllegalStateException()
         lifecycle.setStatus(InteractorStatus.Started)
 
-        // TODO handle the outcome
         val outcome = ensureLoginCredentialsInteractor.start(userInterface)
-
-        execute(userInterface)
+        if (outcome is Outcome.Completed<*>) {
+            execute(userInterface)
+        } else {
+            userInterface.presentHintToReferesh()
+        }
     }
 
     private suspend fun execute(userInterface: UserInterface) {
         val now = nowProvider.get()
         val since = calcSincePolicy(now)
-        try {
-            loginSessionRegistry.component?.repository?.let { repository ->
-                val dataset = repository.findAllAccounts()
-                    .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
-                        val transactions = repository.findTransactions(account.id, since)
-                        acc + (account to transactions)
+
+        var shouldRetry: Boolean
+        do {
+            shouldRetry = false
+            try {
+                loginSessionRegistry.component?.repository?.let { repository ->
+                    val dataset = repository.findAllAccounts()
+                        .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
+                            val transactions = repository.findTransactions(account.id, since)
+                            acc + (account to transactions)
+                        }
+
+                    val summary = summarize(since, dataset)
+                    userInterface.presentSummary(summary)
+                }
+                lifecycle.setStatus(InteractorStatus.Completed)
+            } catch (e: ServiceException) {
+                when (e) {
+                    is AuthException -> {
+                        userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
+                        lifecycle.setStatus(InteractorStatus.Failed)
                     }
 
-                val summary = summarize(since, dataset)
-                userInterface.presentSummary(summary)
-            }
-            lifecycle.setStatus(InteractorStatus.Completed)
-        } catch (e: ServiceException) {
-            when (e) {
-                is AuthException -> {
-                    userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
-                }
-                is APIException, is NetworkException -> {
-                    userInterface.promptUserToRetryRecovery(
-                        message = e.localizedMessage,
-                        isCancellable = false,
-                        continuationId = ContinuationId.GetSummary_RetryLoading
-                    )
-                }
-                else -> {
-                    lifecycle.setStatus(InteractorStatus.Failed)
-                    throw e
-                }
-            }
-        }
-    }
+                    is APIException, is NetworkException -> {
+                        val isConfirmed = userInterface.promptUserToRetryRecovery(
+                            message = e.localizedMessage,
+                            isCancellable = true,
+                        )
+                        if (isConfirmed) {
+                            shouldRetry = true
+                        } else {
+                            userInterface.presentHintToReferesh()
+                            lifecycle.setStatus(InteractorStatus.Cancelled)
+                        }
+                    }
 
-    override suspend fun onRetryLoading(userInterface: UserInterface) {
-        // TODO retry confirmation result? When to cancel the interactor?
-        // what would happen to the status of StartupInteractor when
-        // called from there? And what about the status tracking in
-        // MainViewModel?
-        execute(userInterface)
+                    else -> {
+                        lifecycle.setStatus(InteractorStatus.Failed)
+                        // unexpected exception - crash
+                        // TODO log it
+                        throw e
+                    }
+                }
+            }
+
+        } while (shouldRetry)
     }
 }
 

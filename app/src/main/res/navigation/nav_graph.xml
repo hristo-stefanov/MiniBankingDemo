@@ -88,9 +88,6 @@
         <argument
             android:name="message"
             app:argType="string" />
-        <argument
-            android:name="continuationId"
-            app:argType="string" />
     </dialog>
 
 

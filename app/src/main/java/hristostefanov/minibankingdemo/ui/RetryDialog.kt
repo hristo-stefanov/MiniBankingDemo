@@ -11,6 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.usecase.ContinuationId
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
 
 class RetryDialog : DialogFragment() {
     private val args: RetryDialogArgs by navArgs()
@@ -25,7 +26,7 @@ class RetryDialog : DialogFragment() {
             .setPositiveButton("Retry") { _, _ ->
                 val mainViewModel by activityViewModels<MainViewModel>()
                 lifecycleScope.launch {
-                    mainViewModel.executeContinuation(ContinuationId.valueOf(args.continuationId))
+                    mainViewModel.userInterface.retryRecoveryContinuation.resume(true)
 
                     // This is a must when using the navigation library
                     findNavController().popBackStack()
@@ -33,7 +34,12 @@ class RetryDialog : DialogFragment() {
             }
             .run {
                 if (args.isCancelable) {
-                    setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                        val mainViewModel by activityViewModels<MainViewModel>()
+                        lifecycleScope.launch {
+                            mainViewModel.userInterface.retryRecoveryContinuation.resume(false)
+                        }
+                    }
                 } else {
                     this
                 }

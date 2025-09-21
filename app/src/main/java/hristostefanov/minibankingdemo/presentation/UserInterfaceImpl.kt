@@ -31,6 +31,10 @@ class UserInterfaceImpl @Inject constructor(
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
 
+    // TODO consider the case of multiple async operations asking for retry confirmation
+    // true - confirmed , false - cancelled
+    lateinit var retryRecoveryContinuation: Continuation<Boolean>
+
     override suspend fun promptUserToSubmitCredentials(): String? {
         navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
         return suspendCoroutine {
@@ -42,17 +46,19 @@ class UserInterfaceImpl @Inject constructor(
         _summary.value = summary
     }
 
-    override suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean, continuationId: ContinuationId) {
+    override suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean): Boolean {
         navigationChannel.send(
             Navigation.Forward(
                 NavGraphXmlDirections.toRetryDialog(
                     // TODO how about cancelling uncancelable use case to close the app?
                     isCancelable = isCancellable,
                     message = message,
-                    continuationId = continuationId.name
                 )
             )
         )
+        return suspendCoroutine {
+            retryRecoveryContinuation = it
+        }
     }
 
     override suspend fun presentMessage(message: String) {
@@ -60,6 +66,10 @@ class UserInterfaceImpl @Inject constructor(
         navigationChannel.send(
             Navigation.Message(message)
         )
+    }
+
+    override suspend fun presentHintToReferesh() {
+        presentMessage("Use the Refresh command later")
     }
 
     override suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>) {

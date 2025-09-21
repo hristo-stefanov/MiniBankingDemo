@@ -26,6 +26,10 @@ endnote
 : <&plus> Ensure Login Credentials;
 -> [Outcome];
 
+if () then ([is not Completed])
+    :Suggest to refresh; <<sendSignal>>
+endif
+
 :TODO handle the outcome;
 
 :<&script> Get current date and time;

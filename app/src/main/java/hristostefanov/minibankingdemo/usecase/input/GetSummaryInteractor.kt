@@ -9,5 +9,4 @@ interface GetSummaryInteractor : InteractorLifecycle {
     override val statusChanged: Flow<InteractorStatus>
 
     suspend fun start(userInterface: UserInterface)
-    suspend fun onRetryLoading(userInterface: UserInterface)
 }

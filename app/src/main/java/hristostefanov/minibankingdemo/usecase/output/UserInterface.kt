@@ -26,7 +26,7 @@ interface UserInterface {
      * The interactor should stay active until receving continuation as the
      * the interactor state and UI are in sync.
      */
-    suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean, continuationId: ContinuationId)
+    suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean): Boolean
 
     suspend fun promptUserToConfirmTransfer(
         amount: BigDecimal,
@@ -49,6 +49,8 @@ interface UserInterface {
      * The calling interactor will not wait for continuation.
      */
     suspend fun presentMessage(message: String)
+
+    suspend fun presentHintToReferesh()
 
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
 

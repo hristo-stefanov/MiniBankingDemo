@@ -35,7 +35,7 @@ class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val stringSupplier: StringSupplier,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
-    private val userInterface: UserInterfaceImpl,
+    val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
     @ContinuationChannel
     private val continuationChannel: Channel<Continuation>,
@@ -104,11 +104,6 @@ class MainViewModel @Inject constructor(
         Log.d(LOG_INTERACTORS_TAG, "executeContinuation: continuationId = $continuationId param = $params")
 
         when (continuationId) {
-            ContinuationId.GetSummary_RetryLoading ->
-                getSummaryInteractor.onRetryLoading(
-                    userInterface
-                )
-
             ContinuationId.TransferRoundUp_SavingsGoalSelected ->
                 transferRoundUpInteractor.onSavingsGaolSelected(params[0] as String, params[1] as String,  userInterface)
 
