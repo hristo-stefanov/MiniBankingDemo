@@ -31,6 +31,7 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
         if (sessionRegistry.component == null) {
             val result = userInterface.promptUserToSubmitCredentials()
             if (result == null) {
+                // TODO what happen next?
                 lifecycle.setStatus(InteractorStatus.Cancelled)
             } else {
                 // TODO should this be here?

@@ -28,6 +28,7 @@ class UserInterfaceImpl @Inject constructor(
     private val _summary = MutableStateFlow<Summary?>(null)
     val summary = _summary.asStateFlow()
 
+    // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
 
     override suspend fun promptUserToSubmitCredentials(): String? {
