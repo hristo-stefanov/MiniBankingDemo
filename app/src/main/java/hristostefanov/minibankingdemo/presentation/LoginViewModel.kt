@@ -32,6 +32,11 @@ class LoginViewModel @Inject constructor(
         this.accessToken = accessToken
     }
 
+    override fun onCleared() {
+        userInterface.loginCredentialsContinuation.resume(null)
+        super.onCleared()
+    }
+
     fun onAcceptCommand() {
         viewModelScope.launch {
             accessToken?.let {
