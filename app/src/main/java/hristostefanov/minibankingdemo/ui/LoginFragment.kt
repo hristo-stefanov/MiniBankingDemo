@@ -45,6 +45,9 @@ class LoginFragment : Fragment() {
 
         // Do not allow dismissing
         requireActivity().onBackPressedDispatcher.addCallback(this) {
+            viewModel.onCancel()
+
+            // TODO hmm
             requireActivity().finish()
         }
     }

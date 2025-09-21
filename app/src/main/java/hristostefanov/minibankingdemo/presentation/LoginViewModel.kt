@@ -32,9 +32,8 @@ class LoginViewModel @Inject constructor(
         this.accessToken = accessToken
     }
 
-    override fun onCleared() {
+    fun onCancel() {
         userInterface.loginCredentialsContinuation.resume(null)
-        super.onCleared()
     }
 
     fun onAcceptCommand() {
