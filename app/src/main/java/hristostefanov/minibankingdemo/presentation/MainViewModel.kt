@@ -109,9 +109,6 @@ class MainViewModel @Inject constructor(
                     userInterface
                 )
 
-            ContinuationId.GetSummary_LoginCredentialsEnsured ->
-                getSummaryInteractor.onLoginCredentialsEnsured(userInterface)
-
             ContinuationId.TransferRoundUp_SavingsGoalSelected ->
                 transferRoundUpInteractor.onSavingsGaolSelected(params[0] as String, params[1] as String,  userInterface)
 

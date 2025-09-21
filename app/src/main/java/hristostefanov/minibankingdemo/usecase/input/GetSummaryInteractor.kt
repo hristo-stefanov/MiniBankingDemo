@@ -10,5 +10,4 @@ interface GetSummaryInteractor : InteractorLifecycle {
 
     suspend fun start(userInterface: UserInterface)
     suspend fun onRetryLoading(userInterface: UserInterface)
-    suspend fun onLoginCredentialsEnsured(userInterface: UserInterface)
 }

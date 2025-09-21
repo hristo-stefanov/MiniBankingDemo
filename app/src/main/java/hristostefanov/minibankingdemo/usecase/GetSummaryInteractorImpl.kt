@@ -34,10 +34,9 @@ class GetSummaryInteractorImpl @Inject constructor(
             throw IllegalStateException()
         lifecycle.setStatus(InteractorStatus.Started)
 
-        ensureLoginCredentialsInteractor.start(userInterface, ContinuationId.GetSummary_LoginCredentialsEnsured)
-    }
+        // TODO handle the outcome
+        val outcome = ensureLoginCredentialsInteractor.start(userInterface)
 
-    override suspend fun onLoginCredentialsEnsured(userInterface: UserInterface) {
         execute(userInterface)
     }
 

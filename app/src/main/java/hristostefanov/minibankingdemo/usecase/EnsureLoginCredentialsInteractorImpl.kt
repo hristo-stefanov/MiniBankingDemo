@@ -17,34 +17,31 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     val continuationChannel: Channel<Continuation>,
     private val lifecycle: InteractorLifecycleImpl,
 ) : EnsureLoginCredentialsInteractor, InteractorLifecycle by lifecycle {
-
-    private lateinit var stopContinuationId: ContinuationId
-
-    override suspend fun start(userInterface: UserInterface, stopContinuationId: ContinuationId) {
+    override suspend fun start(userInterface: UserInterface): Outcome {
         if (lifecycle.status == InteractorStatus.Started)
             throw IllegalStateException()
 
         lifecycle.setStatus(InteractorStatus.Started)
 
-        this.stopContinuationId = stopContinuationId
-
         if (sessionRegistry.component == null) {
             val result = userInterface.promptUserToSubmitCredentials()
             if (result == null) {
-                // TODO what happen next?
-                lifecycle.setStatus(InteractorStatus.Cancelled)
+                val outcome = Outcome.Cancelled
+                lifecycle.setFinishOutcome(outcome)
+                return outcome
             } else {
                 // TODO should this be here?
                 tokenStore.token = result
                 sessionRegistry.createSession(tokenStore.token, "Bearer")
 
-                continuationChannel.send(Continuation(stopContinuationId))
-
-                lifecycle.setStatus(InteractorStatus.Completed)
+                val outcome = Outcome.Completed(Unit)
+                lifecycle.setFinishOutcome(outcome)
+                return outcome
             }
         } else {
-            continuationChannel.send(Continuation(stopContinuationId))
-            lifecycle.setStatus(InteractorStatus.Completed)
+            val outcome = Outcome.Completed(Unit)
+            lifecycle.setFinishOutcome(outcome)
+            return outcome
         }
     }
 }

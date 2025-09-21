@@ -24,6 +24,9 @@ Precondition: none
 endnote
 
 : <&plus> Ensure Login Credentials;
+-> [Outcome];
+
+:TODO handle the outcome;
 
 :<&script> Get current date and time;
 -> [Date and time];

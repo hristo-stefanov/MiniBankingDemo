@@ -31,4 +31,12 @@ class InteractorLifecycleImpl @Inject constructor(): InteractorLifecycle {
         _status = status
         statusChannel.send(status)
     }
+
+    internal suspend fun setFinishOutcome(outcome: Outcome) {
+        when (outcome) {
+            is Outcome.Completed<*> -> setStatus(InteractorStatus.Completed)
+            is Outcome.Failed -> setStatus(InteractorStatus.Failed)
+            is Outcome.Cancelled -> setStatus(InteractorStatus.Cancelled)
+        }
+    }
 }
