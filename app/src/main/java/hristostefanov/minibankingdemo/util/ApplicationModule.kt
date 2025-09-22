@@ -13,7 +13,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
 import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
+import hristostefanov.minibankingdemo.usecase.subfunction.EnsureLoginCredentialsInteractorImpl
 import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor

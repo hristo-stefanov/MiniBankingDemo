@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
+import hristostefanov.minibankingdemo.usecase.subfunction.EnsureLoginCredentialsInteractorImpl
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.*
 import kotlinx.coroutines.channels.Channel

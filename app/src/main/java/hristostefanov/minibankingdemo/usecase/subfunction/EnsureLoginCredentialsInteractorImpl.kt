@@ -1,6 +1,11 @@
-package hristostefanov.minibankingdemo.usecase
+package hristostefanov.minibankingdemo.usecase.subfunction
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.InteractorLifecycle
+import hristostefanov.minibankingdemo.usecase.InteractorLifecycleImpl
+import hristostefanov.minibankingdemo.usecase.InteractorStatus
+import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.ContinuationChannel
