@@ -39,6 +39,7 @@ class GetSummaryInteractorImpl @Inject constructor(
             execute(userInterface)
         } else {
             userInterface.presentHintToReferesh()
+            lifecycle.setFinishOutcome(outcome)
         }
     }
 

@@ -12,9 +12,7 @@ import java.util.Currency
 interface UserInterface {
 
     /**
-     * Non cancellable.
-     *
-     * Continuation must pass `loginCredentials: String`
+     * @return null if cancelled and the credentials otherwise
      */
     suspend fun promptUserToSubmitCredentials(): String?
 
@@ -55,10 +53,6 @@ interface UserInterface {
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
 
     suspend fun promptUserToSubmitGoalName(continuationId: ContinuationId)
-
-    suspend fun closeTransferRoundUpUI()
-
-    suspend fun closeCreateSavingsGoalUI()
 }
 
 data class Summary(

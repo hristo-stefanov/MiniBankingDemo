@@ -33,8 +33,6 @@ class CreateSavingsGoalInteractorImpl constructor(
 
             loginSessionRegistry.component!!.repository.createSavingsGoal(goalName, accountId, currency)
 
-            userInterface.closeCreateSavingsGoalUI()
-
             eventBus.post(DataSourceChangedEvent())
             lifecycle.setStatus(InteractorStatus.Completed)
         } catch(e: ServiceException) {
@@ -46,7 +44,7 @@ class CreateSavingsGoalInteractorImpl constructor(
     // TODO it's also in the view model
     private fun validateName(name: String) = name.isNotBlank()
 
-    override suspend fun cancel() {
+    override suspend fun cancel(userInterface: UserInterface) {
         lifecycle.setStatus(InteractorStatus.Cancelled)
     }
 }

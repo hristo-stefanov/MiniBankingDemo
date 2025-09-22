@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.ui.LOG_INTERACTORS_TAG
 import hristostefanov.minibankingdemo.usecase.CancelCreateSavingsGoal
 import hristostefanov.minibankingdemo.usecase.CancelTransferRoundUp
@@ -20,6 +21,7 @@ import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsIntera
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import hristostefanov.minibankingdemo.util.TriggerChannel
 import kotlinx.coroutines.channels.Channel
@@ -41,6 +43,8 @@ class MainViewModel @Inject constructor(
     private val continuationChannel: Channel<Continuation>,
     @TriggerChannel
     private val triggerChannel: Channel<Trigger>,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>,
     private val getSummaryInteractor: GetSummaryInteractor,
     private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
@@ -88,14 +92,22 @@ class MainViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         transferRoundUpInteractor.statusChanged
-            .onEach {
-                Log.d(LOG_INTERACTORS_TAG, "TransferRoundUpInteractor.status = $it")
+            .onEach { status ->
+                Log.d(LOG_INTERACTORS_TAG, "TransferRoundUpInteractor.status = $status")
+                // TODO what statuses we need here?
+                if (status.isFinished()) {
+                    navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+                }
             }
             .launchIn(viewModelScope)
 
         createSavingsGoalInteractor.statusChanged
-            .onEach {
-                Log.d(LOG_INTERACTORS_TAG, "CreateSavingsGoalInteractor.status = $it")
+            .onEach { status ->
+                Log.d(LOG_INTERACTORS_TAG, "CreateSavingsGoalInteractor.status = $status")
+                // TODO what statuses we need here?
+                if (status.isFinished()) {
+                    navigationChannel.send(Navigation.Backward)
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -126,7 +138,7 @@ class MainViewModel @Inject constructor(
 
             CreateSavingsGoal -> createSavingsGoalInteractor.start(userInterface)
             CancelTransferRoundUp -> transferRoundUpInteractor.cancel()
-            CancelCreateSavingsGoal -> createSavingsGoalInteractor.cancel()
+            CancelCreateSavingsGoal -> createSavingsGoalInteractor.cancel(userInterface)
         }
     }
 }

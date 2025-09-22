@@ -14,8 +14,8 @@ Precondition: The user has provided
 end note
 
 |app|
-:Erases saved credentials;
-:Erases any user specific data;
+:Erase saved credentials;
+:Erase any user specific data;
 :Restarts the app;
 stop
 

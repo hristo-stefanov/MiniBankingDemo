@@ -49,13 +49,10 @@ open class CreateSavingsGoalViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        // ATOMIC prevents cancelling the coroutine before it starts by cancelling the scope
+    fun onCancel() {
         viewModelScope.launch(start = CoroutineStart.ATOMIC) {
             triggerChannel.send(CancelCreateSavingsGoal)
         }
-
-        super.onCleared()
     }
 
     open fun onCreateCommand() {

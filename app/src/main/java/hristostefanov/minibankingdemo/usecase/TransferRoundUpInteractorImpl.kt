@@ -77,8 +77,6 @@ class TransferRoundUpInteractorImpl(
 
             userInterface.presentMessage(stringSupplier.get(R.string.success))
 
-            userInterface.closeTransferRoundUpUI()
-
             // TODO proper error handling
 
             lifecycle.setStatus(InteractorStatus.Completed)

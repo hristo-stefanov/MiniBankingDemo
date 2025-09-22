@@ -6,5 +6,5 @@ interface CreateSavingsGoalInteractor : InteractorLifecycle {
     suspend fun start(userInterface: UserInterface)
     suspend fun onGoalNameSubmit(goalName: String, userInterface: UserInterface)
 
-    suspend fun cancel()
+    suspend fun cancel(userInterface: UserInterface)
 }
