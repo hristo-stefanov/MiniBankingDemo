@@ -24,10 +24,6 @@ class UserInterfaceImpl @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
 ) : UserInterface {
 
-    // TODO this needs to be attached to LoginSession state so when logging out it is removed!!!
-    private val _summary = MutableStateFlow<Summary?>(null)
-    val summary = _summary.asStateFlow()
-
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
 
@@ -42,9 +38,6 @@ class UserInterfaceImpl @Inject constructor(
         }
     }
 
-    override fun presentSummary(summary: Summary) {
-        _summary.value = summary
-    }
 
     override suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean): Boolean {
         navigationChannel.send(
@@ -66,10 +59,6 @@ class UserInterfaceImpl @Inject constructor(
         navigationChannel.send(
             Navigation.Message(message)
         )
-    }
-
-    override suspend fun presentHintToReferesh() {
-        presentMessage("Use the Refresh command later")
     }
 
     override suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>) {

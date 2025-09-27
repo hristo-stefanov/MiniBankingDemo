@@ -12,6 +12,9 @@ import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
+import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
@@ -54,6 +57,10 @@ class AccountsViewModel @Inject constructor(
     private val logoutInteractor: LogoutInteractor
 ) : ViewModel() {
 
+    // TODO this needs to be attached to LoginSession state so when logging out it is removed!!!
+    private val _summary = MutableStateFlow<Summary?>(null)
+    val summary = _summary.asStateFlow()
+
     private val savedAccountIdFlow: Flow<String?> =
         state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
 
@@ -73,9 +80,20 @@ class AccountsViewModel @Inject constructor(
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
     private val selectedAccountFlow: Flow<Summary.Item?> =
-        combine(_selectedAccountPosition, userInterface.summary) { position: Int, summary: Summary? ->
+        combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
             summary?.items?.getOrNull(position)
         }.distinctUntilChanged()
+
+
+    private val getSummaryUI = object : GetSummaryUI, StockUI by userInterface, EnsureLoginCredentialsUI by userInterface {
+        override fun presentSummary(summary: Summary) {
+            _summary.value = summary
+        }
+
+        override suspend fun presentHintToReferesh() {
+            presentMessage("Use the Refresh command later")
+        }
+    }
 
     fun onTransferCommand() {
         selectedAccountFlow
@@ -94,13 +112,13 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val accountId = userInterface.summary.value?.items?.getOrNull(position)?.accountId
+        val accountId = summary.value?.items?.getOrNull(position)?.accountId
         state[ACCOUNT_ID_KEY] = accountId
     }
 
     init {
         // map Account to DisplayAccount
-        userInterface.summary.filterNotNull().map { it ->
+        summary.filterNotNull().map { it ->
             it.items.map { item ->
                 val displayBalance = amountFormatter.format(
                     item.balance,
@@ -116,7 +134,7 @@ class AccountsViewModel @Inject constructor(
             .onEach { _accountList.value = it }
             .launchIn(viewModelScope)
 
-        userInterface.summary.filterNotNull().map { it ->
+        summary.filterNotNull().map { it ->
             // TODO consider externalizing similarly to AmountFormatter
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
             it.roundUpSince.format(formatter)
@@ -126,7 +144,7 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        combine(savedAccountIdFlow, userInterface.summary.filterNotNull()) { accountId: String?, summary: Summary ->
+        combine(savedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
             val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
             summary.items.indexOf(selectedAccount)
         }
@@ -159,7 +177,7 @@ class AccountsViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         viewModelScope.launch {
-            getSummaryInteractor.start(userInterface)
+            getSummaryInteractor.start(getSummaryUI)
         }
     }
 
@@ -174,7 +192,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onRefresh() {
         viewModelScope.launch {
-            getSummaryInteractor.start(userInterface)
+            getSummaryInteractor.start(getSummaryUI)
         }
     }
 }

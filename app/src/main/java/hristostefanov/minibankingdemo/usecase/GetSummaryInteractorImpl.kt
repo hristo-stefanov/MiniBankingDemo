@@ -11,6 +11,7 @@ import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
@@ -28,7 +29,7 @@ class GetSummaryInteractorImpl @Inject constructor(
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
 ) : GetSummaryInteractor {
 
-    override suspend fun start(userInterface: UserInterface): Outcome {
+    override suspend fun start(userInterface: GetSummaryUI): Outcome {
         val outcome = ensureLoginCredentialsInteractor.start(userInterface)
         if (outcome is Outcome.Completed<*>) {
             return execute(userInterface)
@@ -38,7 +39,7 @@ class GetSummaryInteractorImpl @Inject constructor(
         }
     }
 
-    private suspend fun execute(userInterface: UserInterface): Outcome {
+    private suspend fun execute(userInterface: GetSummaryUI): Outcome {
         var shouldRetry: Boolean
         do {
             shouldRetry = false
@@ -65,7 +66,7 @@ class GetSummaryInteractorImpl @Inject constructor(
 
                     is APIException, is NetworkException -> {
                         val isConfirmed = userInterface.promptUserToRetryRecovery(
-                            message = e.localizedMessage,
+                            errorMessage = e.localizedMessage,
                             isCancellable = true,
                         )
                         if (isConfirmed) {

@@ -9,22 +9,7 @@ import java.util.Currency
 // TODO there is no binding for this and view model inject the implementation directly
 // how the instances of this interface should be created when navigation is not used
 // for every user interaction?
-interface UserInterface {
-
-    /**
-     * @return null if cancelled and the credentials otherwise
-     */
-    suspend fun promptUserToSubmitCredentials(): String?
-
-    /**
-     * Optionally cancellable.
-     *
-     * Continuation must pass `confirmedOrCancelled: Boolean`
-     *
-     * The interactor should stay active until receving continuation as the
-     * the interactor state and UI are in sync.
-     */
-    suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean): Boolean
+interface UserInterface: EnsureLoginCredentialsUI, StockUI  {
 
     suspend fun promptUserToConfirmTransfer(
         amount: BigDecimal,
@@ -32,23 +17,6 @@ interface UserInterface {
         savingsGoalNam: String,
         continuationId: ContinuationId
     )
-
-    /**
-     * Will not make savable state changes, such a navigation or displaying a dialog,
-     * to keep the UI state and interactor state in sync in case of process death.
-     */
-    fun presentSummary(summary: Summary)
-
-    /**
-     * The UI will not prompt for acknowledgement nor will make savable state changes
-     * (such as navigation or displaying a dialog) to keep the state in sync
-     * with the interactor in case of process death.
-     *
-     * The calling interactor will not wait for continuation.
-     */
-    suspend fun presentMessage(message: String)
-
-    suspend fun presentHintToReferesh()
 
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
 
