@@ -15,6 +15,8 @@ import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
 import hristostefanov.minibankingdemo.usecase.Continuation
 import hristostefanov.minibankingdemo.usecase.subfunction.EnsureLoginCredentialsInteractorImpl
 import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
+import hristostefanov.minibankingdemo.usecase.LogoutInteractor
+import hristostefanov.minibankingdemo.usecase.LogoutInteractorImpl
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
@@ -87,6 +89,10 @@ abstract class ApplicationModule {
     @Singleton
     @Binds
     abstract fun bindStartup(impl: EnsureLoginCredentialsInteractorImpl): EnsureLoginCredentialsInteractor
+
+    @Singleton
+    @Binds
+    abstract fun bindLogoutInteractor(impl: LogoutInteractorImpl): LogoutInteractor
 
     // TODO how to handle recreation of the interactor when triggered again?
     @Singleton

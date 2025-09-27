@@ -14,6 +14,8 @@ import hristostefanov.minibankingdemo.usecase.ContinuationId
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractorImpl
 import hristostefanov.minibankingdemo.usecase.InteractorLifecycleImpl
+import hristostefanov.minibankingdemo.usecase.Logout
+import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.Trigger
@@ -37,6 +39,7 @@ class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val stringSupplier: StringSupplier,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
+    private val logoutInteractor: LogoutInteractor,
     val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
     @ContinuationChannel
@@ -79,6 +82,16 @@ class MainViewModel @Inject constructor(
     }
 
     private fun setUpLogginInteractorStateChanges() {
+        logoutInteractor.statusChanged
+            .onEach {
+                Log.d(LOG_INTERACTORS_TAG, "LogoutInteractor.status = $it")
+
+                // TODO this looks redundant since using SessionRegistry
+                // restart to get deps from the new [SessionComponent]
+                navigationChannel.send(Navigation.Restart)
+            }
+            .launchIn(viewModelScope)
+
         ensureLoginCredentialsInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "EnsureLoginCredentials.status = $it")
@@ -139,6 +152,7 @@ class MainViewModel @Inject constructor(
             CreateSavingsGoal -> createSavingsGoalInteractor.start(userInterface)
             CancelTransferRoundUp -> transferRoundUpInteractor.cancel()
             CancelCreateSavingsGoal -> createSavingsGoalInteractor.cancel(userInterface)
+            Logout -> logoutInteractor.start(userInterface)
         }
     }
 }

@@ -24,6 +24,7 @@ class UserInterfaceImpl @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
 ) : UserInterface {
 
+    // TODO this needs to be attached to LoginSession state so when logging out it is removed!!!
     private val _summary = MutableStateFlow<Summary?>(null)
     val summary = _summary.asStateFlow()
 

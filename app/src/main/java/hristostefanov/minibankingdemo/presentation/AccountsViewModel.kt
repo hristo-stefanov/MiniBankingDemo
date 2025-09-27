@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.Logout
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
@@ -158,12 +159,8 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onLogout() {
-        tokenStore.token = ""
-        loginSessionRegistry.close()
-        // TODO this looks redundant since using SessionRegistry
-        // restart to get deps from the new [SessionComponent]
         viewModelScope.launch {
-            navigationChannel.send(Navigation.Restart)
+            triggerChannel.send(Logout)
         }
     }
 
