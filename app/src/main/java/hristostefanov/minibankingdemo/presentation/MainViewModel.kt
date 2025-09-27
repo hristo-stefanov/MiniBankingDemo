@@ -14,8 +14,6 @@ import hristostefanov.minibankingdemo.usecase.ContinuationId
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractorImpl
 import hristostefanov.minibankingdemo.usecase.InteractorLifecycleImpl
-import hristostefanov.minibankingdemo.usecase.Logout
-import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.Trigger
@@ -34,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val stringSupplier: StringSupplier,
-    private val logoutInteractor: LogoutInteractor,
     val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
     @ContinuationChannel
@@ -72,18 +69,6 @@ class MainViewModel @Inject constructor(
     }
 
     private fun setUpTrackingInteractorStateChanges() {
-        logoutInteractor.statusChanged
-            .onEach { status ->
-                Log.d(LOG_INTERACTORS_TAG, "LogoutInteractor.status = $status")
-
-                if (status.isFinished()) {
-                    // TODO this looks redundant since using SessionRegistry
-                    // restart to get deps from the new [SessionComponent]
-                    navigationChannel.send(Navigation.Restart)
-                }
-            }
-            .launchIn(viewModelScope)
-
         transferRoundUpInteractor.statusChanged
             .onEach { status ->
                 Log.d(LOG_INTERACTORS_TAG, "TransferRoundUpInteractor.status = $status")
@@ -132,7 +117,6 @@ class MainViewModel @Inject constructor(
             CreateSavingsGoal -> createSavingsGoalInteractor.start(userInterface)
             CancelTransferRoundUp -> transferRoundUpInteractor.cancel()
             CancelCreateSavingsGoal -> createSavingsGoalInteractor.cancel(userInterface)
-            Logout -> logoutInteractor.start(userInterface)
         }
     }
 }

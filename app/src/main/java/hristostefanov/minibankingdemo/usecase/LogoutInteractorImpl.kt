@@ -8,16 +8,14 @@ import javax.inject.Singleton
 
 @Singleton
 class LogoutInteractorImpl @Inject constructor(
-    private val lifecycle: InteractorLifecycleImpl,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
-) : LogoutInteractor,
-    InteractorLifecycle by lifecycle {
+) : LogoutInteractor {
 
-    override suspend fun start(userInterface: UserInterface) {
+    override suspend fun start(): Outcome {
         tokenStore.token = ""
         loginSessionRegistry.close()
 
-        lifecycle.setStatus(InteractorStatus.Completed)
+        return Outcome.Completed(Unit)
     }
 }

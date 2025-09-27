@@ -7,7 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.Logout
+import hristostefanov.minibankingdemo.usecase.LogoutInteractor
+import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
@@ -50,6 +51,7 @@ class AccountsViewModel @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
     private val userInterface: UserInterfaceImpl,
     private val getSummaryInteractor: GetSummaryInteractor,
+    private val logoutInteractor: LogoutInteractor
 ) : ViewModel() {
 
     private val savedAccountIdFlow: Flow<String?> =
@@ -163,7 +165,10 @@ class AccountsViewModel @Inject constructor(
 
     fun onLogout() {
         viewModelScope.launch {
-            triggerChannel.send(Logout)
+            val outcome = logoutInteractor.start()
+            if (outcome is Outcome.Completed<*>) {
+                navigationChannel.send(Navigation.Restart)
+            }
         }
     }
 
