@@ -156,6 +156,9 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
+        viewModelScope.launch {
+            getSummaryInteractor.start(userInterface)
+        }
     }
 
     fun onLogout() {

@@ -19,8 +19,6 @@ import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.Trigger
-import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
@@ -30,15 +28,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val stringSupplier: StringSupplier,
-    private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
     private val logoutInteractor: LogoutInteractor,
     val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
@@ -48,7 +43,6 @@ class MainViewModel @Inject constructor(
     private val triggerChannel: Channel<Trigger>,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val getSummaryInteractor: GetSummaryInteractor,
     private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
 
@@ -75,32 +69,18 @@ class MainViewModel @Inject constructor(
         triggerChannel.receiveAsFlow().onEach {
             executeTrigger(it)
         }.launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            getSummaryInteractor.start(userInterface)
-        }
     }
 
     private fun setUpTrackingInteractorStateChanges() {
         logoutInteractor.statusChanged
-            .onEach {
-                Log.d(LOG_INTERACTORS_TAG, "LogoutInteractor.status = $it")
+            .onEach { status ->
+                Log.d(LOG_INTERACTORS_TAG, "LogoutInteractor.status = $status")
 
-                // TODO this looks redundant since using SessionRegistry
-                // restart to get deps from the new [SessionComponent]
-                navigationChannel.send(Navigation.Restart)
-            }
-            .launchIn(viewModelScope)
-
-        ensureLoginCredentialsInteractor.statusChanged
-            .onEach {
-                Log.d(LOG_INTERACTORS_TAG, "EnsureLoginCredentials.status = $it")
-            }
-            .launchIn(viewModelScope)
-
-        getSummaryInteractor.statusChanged
-            .onEach {
-                Log.d(LOG_INTERACTORS_TAG, "GetSummaryInteractor.status = $it")
+                if (status.isFinished()) {
+                    // TODO this looks redundant since using SessionRegistry
+                    // restart to get deps from the new [SessionComponent]
+                    navigationChannel.send(Navigation.Restart)
+                }
             }
             .launchIn(viewModelScope)
 

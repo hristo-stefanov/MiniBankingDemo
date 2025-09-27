@@ -26,32 +26,26 @@ class GetSummaryInteractorImpl @Inject constructor(
     val nowProvider: Provider<OffsetDateTime>,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
-    private val lifecycle: InteractorLifecycleImpl,
-) : GetSummaryInteractor, InteractorLifecycle by lifecycle  {
+) : GetSummaryInteractor {
 
-    override suspend fun start(userInterface: UserInterface) {
-        if (lifecycle.status == InteractorStatus.Started)
-            throw IllegalStateException()
-        lifecycle.setStatus(InteractorStatus.Started)
-
+    override suspend fun start(userInterface: UserInterface): Outcome {
         val outcome = ensureLoginCredentialsInteractor.start(userInterface)
         if (outcome is Outcome.Completed<*>) {
-            execute(userInterface)
+            return execute(userInterface)
         } else {
             userInterface.presentHintToReferesh()
-            lifecycle.setFinishOutcome(outcome)
+            return outcome
         }
     }
 
-    private suspend fun execute(userInterface: UserInterface) {
-        val now = nowProvider.get()
-        val since = calcSincePolicy(now)
-
+    private suspend fun execute(userInterface: UserInterface): Outcome {
         var shouldRetry: Boolean
         do {
             shouldRetry = false
             try {
                 loginSessionRegistry.component?.repository?.let { repository ->
+                    val now = nowProvider.get()
+                    val since = calcSincePolicy(now)
                     val dataset = repository.findAllAccounts()
                         .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
                             val transactions = repository.findTransactions(account.id, since)
@@ -61,12 +55,12 @@ class GetSummaryInteractorImpl @Inject constructor(
                     val summary = summarize(since, dataset)
                     userInterface.presentSummary(summary)
                 }
-                lifecycle.setStatus(InteractorStatus.Completed)
+                return Outcome.Completed(Unit)
             } catch (e: ServiceException) {
                 when (e) {
                     is AuthException -> {
                         userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
-                        lifecycle.setStatus(InteractorStatus.Failed)
+                        return Outcome.Failed(e)
                     }
 
                     is APIException, is NetworkException -> {
@@ -78,12 +72,11 @@ class GetSummaryInteractorImpl @Inject constructor(
                             shouldRetry = true
                         } else {
                             userInterface.presentHintToReferesh()
-                            lifecycle.setStatus(InteractorStatus.Cancelled)
+                            return Outcome.Cancelled
                         }
                     }
 
                     else -> {
-                        lifecycle.setStatus(InteractorStatus.Failed)
                         // unexpected exception - crash
                         // TODO log it
                         throw e
@@ -92,6 +85,9 @@ class GetSummaryInteractorImpl @Inject constructor(
             }
 
         } while (shouldRetry)
+
+        // should not come here
+        return Outcome.Cancelled
     }
 }
 
