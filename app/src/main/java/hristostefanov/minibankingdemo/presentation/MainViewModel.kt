@@ -66,7 +66,7 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        setUpLogginInteractorStateChanges()
+        setUpTrackingInteractorStateChanges()
 
         continuationChannel.receiveAsFlow().onEach {
             executeContinuation(it.id, *it.params.toTypedArray())
@@ -81,7 +81,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun setUpLogginInteractorStateChanges() {
+    private fun setUpTrackingInteractorStateChanges() {
         logoutInteractor.statusChanged
             .onEach {
                 Log.d(LOG_INTERACTORS_TAG, "LogoutInteractor.status = $it")
