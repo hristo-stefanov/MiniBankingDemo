@@ -8,9 +8,7 @@ import hristostefanov.minibankingdemo.usecase.InteractorStatus
 import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.output.UserInterface
-import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,8 +16,6 @@ import javax.inject.Singleton
 class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val sessionRegistry: LoginSessionRegistry,
     val tokenStore: TokenStore,
-    @ContinuationChannel
-    val continuationChannel: Channel<Continuation>,
     private val lifecycle: InteractorLifecycleImpl,
 ) : EnsureLoginCredentialsInteractor, InteractorLifecycle by lifecycle {
     override suspend fun start(userInterface: UserInterface): Outcome {
