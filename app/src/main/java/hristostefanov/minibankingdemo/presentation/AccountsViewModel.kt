@@ -8,7 +8,6 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
-import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.TransferFromAccount
 import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
@@ -32,6 +31,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -58,8 +58,10 @@ class AccountsViewModel @Inject constructor(
 ) : ViewModel() {
 
     // TODO this needs to be attached to LoginSession state so when logging out it is removed!!!
+    // Conceptually, this is similar to keeping a result set from a query or keeping
+    // a dataset on a form for data binding or keeping a generated report model for rendering
+    // in various formats.
     private val _summary = MutableStateFlow<Summary?>(null)
-    val summary = _summary.asStateFlow()
 
     private val savedAccountIdFlow: Flow<String?> =
         state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
@@ -83,7 +85,7 @@ class AccountsViewModel @Inject constructor(
     val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
 
     private val selectedAccountFlow: Flow<Summary.Item?> =
-        combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
+        combine(_selectedAccountPosition, _summary) { position: Int, summary: Summary? ->
             summary?.items?.getOrNull(position)
         }.distinctUntilChanged()
 
@@ -96,6 +98,10 @@ class AccountsViewModel @Inject constructor(
         override suspend fun presentHintToReferesh() {
             presentMessage("Use the Refresh command later")
         }
+    }
+
+    private fun clearInMemoryLoginSessionData() {
+        _summary.value = null
     }
 
     fun onTransferCommand() {
@@ -115,14 +121,14 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val accountId = summary.value?.items?.getOrNull(position)?.accountId
+        val accountId = _summary.value?.items?.getOrNull(position)?.accountId
         state[ACCOUNT_ID_KEY] = accountId
     }
 
     init {
         // map Account to DisplayAccount
-        summary.filterNotNull().map { it ->
-            it.items.map { item ->
+        _summary.map { it ->
+            it?.items?.map { item ->
                 val displayBalance = amountFormatter.format(
                     item.balance,
                     item.currency.currencyCode
@@ -132,22 +138,23 @@ class AccountsViewModel @Inject constructor(
                     item.currency.currencyCode,
                     displayBalance
                 )
-            }
+            } ?: emptyList()
         }
             .onEach { _accountList.value = it }
             .launchIn(viewModelScope)
 
-        summary.filterNotNull().map { it ->
+        _summary.map { it ->
             // TODO consider externalizing similarly to AmountFormatter
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
-            it.roundUpSince.format(formatter)
+            it?.roundUpSince?.format(formatter)
         }
-            .onEach {
-                _roundUpInfo.value = stringSupplier.get(R.string.roundUpInfo).format(it)
+            .onEach { date ->
+                val text = date?.let { stringSupplier.get(R.string.roundUpInfo).format(it) } ?: ""
+                _roundUpInfo.value = text
             }
             .launchIn(viewModelScope)
 
-        combine(savedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
+        combine(savedAccountIdFlow, _summary.filterNotNull()) { accountId: String?, summary: Summary ->
             val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
             summary.items.indexOf(selectedAccount)
         }
@@ -185,6 +192,11 @@ class AccountsViewModel @Inject constructor(
                 _logoutCommandEnabled.value = it
             }
             .launchIn(viewModelScope)
+
+        // TODO consider making SessionRegistry observable instead
+        tokenStore.tokenFlow.onEach {
+            if (it == null) clearInMemoryLoginSessionData()
+        }.launchIn(viewModelScope)
 
         viewModelScope.launch {
             getSummaryInteractor.start(getSummaryUI)
