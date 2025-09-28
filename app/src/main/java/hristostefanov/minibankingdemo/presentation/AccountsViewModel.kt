@@ -205,10 +205,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onLogout() {
         viewModelScope.launch {
-            val outcome = logoutInteractor.start()
-//            if (outcome is Outcome.Completed<*>) {
-//                navigationChannel.send(Navigation.Restart)
-//            }
+            logoutInteractor.start()
         }
     }
 
