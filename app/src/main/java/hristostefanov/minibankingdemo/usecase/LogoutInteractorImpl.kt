@@ -13,7 +13,7 @@ class LogoutInteractorImpl @Inject constructor(
 ) : LogoutInteractor {
 
     override suspend fun start(): Outcome {
-        tokenStore.token = ""
+        tokenStore.setToken(null)
         loginSessionRegistry.close()
 
         return Outcome.Completed(Unit)

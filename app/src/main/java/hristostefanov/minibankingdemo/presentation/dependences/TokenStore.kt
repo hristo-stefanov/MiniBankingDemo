@@ -1,5 +1,9 @@
 package hristostefanov.minibankingdemo.presentation.dependences
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface TokenStore {
-    var token: String
+    val tokenFlow: StateFlow<String?>
+
+    fun setToken(token: String?)
 }

@@ -19,9 +19,8 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
             if (result == null) {
                 return Outcome.Cancelled
             } else {
-                // TODO should this be here?
-                tokenStore.token = result
-                sessionRegistry.createSession(tokenStore.token, "Bearer")
+                tokenStore.setToken(result)
+                sessionRegistry.createSession(result, "Bearer")
 
                 return Outcome.Completed<Unit>(Unit)
             }

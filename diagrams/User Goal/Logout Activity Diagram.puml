@@ -9,14 +9,13 @@ floating note left
 Level: User Goal
 Trigger: User selects to log out
 Primary Actor: User
-Precondition: The user has provided
+Precondition: The system has user's
     login credentials
 end note
 
 |app|
 :Erase saved credentials;
 :Erase any user specific data;
-:Restarts the app;
 stop
 
 @enduml

@@ -17,10 +17,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // This is executed regardless of whether the app is restoring from process death
-        // or starting fresh
-        if (tokenStore.token.isNotEmpty()) {
-            sessionRegistry.createSession(tokenStore.token, "Bearer")
+        tokenStore.tokenFlow.value?.let { token ->
+            sessionRegistry.createSession(token, "Bearer")
         }
     }
 }

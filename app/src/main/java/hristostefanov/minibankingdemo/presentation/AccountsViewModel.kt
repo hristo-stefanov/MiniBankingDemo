@@ -79,6 +79,9 @@ class AccountsViewModel @Inject constructor(
     private val _transferCommandEnabled = MutableStateFlow(false)
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
+    private val _logoutCommandEnabled = MutableStateFlow(false)
+    val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
+
     private val selectedAccountFlow: Flow<Summary.Item?> =
         combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
             summary?.items?.getOrNull(position)
@@ -176,6 +179,13 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
+        tokenStore.tokenFlow
+            .map { it != null }
+            .onEach {
+                _logoutCommandEnabled.value = it
+            }
+            .launchIn(viewModelScope)
+
         viewModelScope.launch {
             getSummaryInteractor.start(getSummaryUI)
         }
@@ -184,9 +194,9 @@ class AccountsViewModel @Inject constructor(
     fun onLogout() {
         viewModelScope.launch {
             val outcome = logoutInteractor.start()
-            if (outcome is Outcome.Completed<*>) {
-                navigationChannel.send(Navigation.Restart)
-            }
+//            if (outcome is Outcome.Completed<*>) {
+//                navigationChannel.send(Navigation.Restart)
+//            }
         }
     }
 
