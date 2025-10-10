@@ -8,18 +8,18 @@ actor User <<Human>>
 actor Bank <<Service>>
 
 rectangle System {
-usecase "Get Accounts and Round-up Summary"
+usecase "Get Summary"
 usecase "Log out"
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
 }
 
-User -- "Get Accounts and Round-up Summary"
+User -- "Get Summary"
 User -- "Transfer Round-up"
 User -- "Create Savings Goal"
 User -- "Log out"
 
-"Get Accounts and Round-up Summary" -- "Bank"
+"Get Summary" -- "Bank"
 "Create Savings Goal" .> "Transfer Round-up" : <<extend>>
 "Transfer Round-up" -- "Bank"
 "Create Savings Goal" -- "Bank"
