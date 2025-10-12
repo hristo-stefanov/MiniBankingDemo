@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import hristostefanov.minibankingdemo.presentation.MainViewModel
-import hristostefanov.minibankingdemo.usecase.ContinuationId
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 

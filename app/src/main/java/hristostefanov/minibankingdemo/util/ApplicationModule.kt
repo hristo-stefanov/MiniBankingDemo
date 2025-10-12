@@ -9,17 +9,21 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
-import hristostefanov.minibankingdemo.usecase.Continuation
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractorImpl
 import hristostefanov.minibankingdemo.usecase.subfunction.EnsureLoginCredentialsInteractorImpl
 import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.LogoutInteractorImpl
-import hristostefanov.minibankingdemo.usecase.Trigger
+import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -39,14 +43,6 @@ abstract class ApplicationModule {
         @Singleton
         @Provides @NavigationChannel
         fun provideNavigationChannel(): Channel<Navigation> = Channel()
-
-        @Singleton
-        @Provides @ContinuationChannel
-        fun provideContinuationChannel(): Channel<Continuation> = Channel()
-
-        @Singleton
-        @Provides @TriggerChannel
-        fun provideTriggerChannel(): Channel<Trigger> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()
@@ -98,4 +94,16 @@ abstract class ApplicationModule {
     @Singleton
     @Binds
     abstract fun bindGetSummaryInteractor(impl: GetSummaryInteractorImpl): GetSummaryInteractor
+
+    @Singleton
+    @Binds
+    abstract fun bindTransferRoundUpInteractor(impl: TransferRoundUpInteractorImpl): TransferRoundUpInteractor
+
+    @Singleton
+    @Binds
+    abstract fun bindUserInterface(impl: UserInterfaceImpl): UserInterface
+
+    @Singleton
+    @Binds
+    abstract fun bindCreateSavingsGoalInteractor(impl: CreateSavingsGoalInteractorImpl): CreateSavingsGoalInteractor
 }

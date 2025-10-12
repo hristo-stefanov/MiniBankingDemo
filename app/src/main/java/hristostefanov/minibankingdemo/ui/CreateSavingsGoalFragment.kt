@@ -31,9 +31,5 @@ class CreateSavingsGoalFragment : Fragment() {
 
         binding.viewmodel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.onCancel()
-        }
     }
 }

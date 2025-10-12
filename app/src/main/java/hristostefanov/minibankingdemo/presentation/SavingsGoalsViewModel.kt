@@ -8,15 +8,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
-import hristostefanov.minibankingdemo.usecase.CancelTransferRoundUp
-import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.usecase.CreateSavingsGoal
-import hristostefanov.minibankingdemo.usecase.Trigger
-import hristostefanov.minibankingdemo.util.ContinuationChannel
+import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.TriggerChannel
-import kotlinx.coroutines.CoroutineStart
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -30,10 +24,8 @@ class SavingsGoalsViewModel @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
     private val userInterface: UserInterfaceImpl,
     private val eventBus: EventBus,
-    @ContinuationChannel
-    private val continuationChannel: Channel<Continuation>,
-    @TriggerChannel
-    private val triggerChannel: Channel<Trigger>
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -48,15 +40,10 @@ class SavingsGoalsViewModel @Inject constructor(
 
     override fun onCleared() {
         eventBus.unregister(this)
-
-        // ATOMIC prevents cancelling the coroutine before it starts by cancelling the scope
-        viewModelScope.launch(start = CoroutineStart.ATOMIC) {
-            triggerChannel.send(CancelTransferRoundUp)
-        }
-
         super.onCleared()
     }
 
+    // TODO
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onDataSourceChanged(event: DataSourceChangedEvent) {
         load()
@@ -67,21 +54,28 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     fun onSavingsGoalClicked(savingsGoalId: String, savingsGoalName: String) {
-        viewModelScope.launch {
-            continuationChannel.send(
-                Continuation(
-                    // TODO shouldn't we get the continuation is as an argument instead of
-                    // hardcoding it?
-                    ContinuationId.TransferRoundUp_SavingsGoalSelected,
-                    listOf(savingsGoalId, savingsGoalName)
+        with(loginSessionRegistry.requireComponent.data) {
+            this.savingsGoalId = savingsGoalId
+            this.savingsGoalName = savingsGoalName
+
+            viewModelScope.launch {
+                userInterface.promptUserToConfirmTransfer(
+                    selectedAccount.roundUp,
+                    selectedAccount.currency,
+                    savingsGoalName
                 )
-            )
+            }
         }
+
     }
 
     fun onAddSavingsGoalCommand() {
         viewModelScope.launch {
-            triggerChannel.send(CreateSavingsGoal)
+            navigationChannel.send(
+                Navigation.Forward(
+                    SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination()
+                )
+            )
         }
     }
 }

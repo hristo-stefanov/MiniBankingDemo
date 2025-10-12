@@ -17,8 +17,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.util.ContinuationChannel
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
@@ -38,10 +36,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     @NavigationChannel
     internal lateinit var navigationChannel: Channel<Navigation>
-
-    @Inject
-    @ContinuationChannel
-    internal lateinit var continuationChannel: Channel<Continuation>
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 

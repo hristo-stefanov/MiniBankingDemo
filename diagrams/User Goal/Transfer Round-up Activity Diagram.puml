@@ -57,10 +57,7 @@ backward: Present unrecoverable error message; <<sendSignal>>
 repeat while () is ([is Service Error])
 -> [OK];
 
-:Send success acknowledgement; <<sendSignal>>
-
-'returns to the main screen - navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
-:Send "Close Transfer Round-up UI"; <<sendSignal>>
+:Present success acknowledgement; <<sendSignal>>
 
 stop
 

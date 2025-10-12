@@ -10,6 +10,7 @@ actor Bank <<Service>>
 rectangle System {
 usecase "Get Summary"
 usecase "Log out"
+usecase "Ensure Login Credentials"
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
 }
@@ -20,7 +21,8 @@ User -- "Create Savings Goal"
 User -- "Log out"
 
 "Get Summary" -- "Bank"
-"Create Savings Goal" .> "Transfer Round-up" : <<extend>>
+"Get Summary" .> "Ensure Login Credentials": <<includes>>
+'"Create Savings Goal" .> "Transfer Round-up" : <<extends>>
 "Transfer Round-up" -- "Bank"
 "Create Savings Goal" -- "Bank"
 @enduml

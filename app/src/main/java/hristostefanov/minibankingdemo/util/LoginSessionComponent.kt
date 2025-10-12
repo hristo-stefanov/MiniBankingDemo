@@ -4,8 +4,6 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.interactors.*
-import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
-import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 
 // TODO rename Session* to LoginSession* to make it clear that the lifecycle is the
 // as the one of the interactive user session
@@ -37,4 +35,5 @@ interface LoginSessionComponent {
     val listSavingGoalInteractor: ListSavingGoalsInteractor
     val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
     val repository: Repository
+    val data: LoginSessionData
 }

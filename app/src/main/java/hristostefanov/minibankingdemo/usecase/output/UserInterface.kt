@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.usecase.output
 
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
-import hristostefanov.minibankingdemo.usecase.ContinuationId
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
@@ -15,12 +14,9 @@ interface UserInterface: EnsureLoginCredentialsUI, StockUI  {
         amount: BigDecimal,
         currency: Currency,
         savingsGoalNam: String,
-        continuationId: ContinuationId
     )
 
     suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>)
-
-    suspend fun promptUserToSubmitGoalName(continuationId: ContinuationId)
 }
 
 data class Summary(
@@ -33,5 +29,6 @@ data class Summary(
         val currency: Currency,
         val roundUp: BigDecimal,
         val balance: BigDecimal,
+        val savingsGoals: List<SavingsGoal>
     )
 }

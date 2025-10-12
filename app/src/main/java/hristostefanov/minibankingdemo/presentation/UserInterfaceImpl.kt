@@ -9,9 +9,6 @@ import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.ContinuationId
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.math.BigDecimal
 import java.util.Currency
 import javax.inject.Singleton
@@ -73,20 +70,10 @@ class UserInterfaceImpl @Inject constructor(
         )
     }
 
-    override suspend fun promptUserToSubmitGoalName(continuationId: ContinuationId) {
-        navigationChannel.send(
-            Navigation.Forward(
-                SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination(continuationId.name)
-            )
-        )
-    }
-
-
     override suspend fun promptUserToConfirmTransfer(
         roundUpAmount: BigDecimal,
         accountCurrency: Currency,
         savingsGoalNam: String,
-        continuationId: ContinuationId
     ) {
         navigationChannel.send(
             Navigation.Forward(
@@ -94,7 +81,6 @@ class UserInterfaceImpl @Inject constructor(
                     savingsGoalName = savingsGoalNam,
                     roundUpAmount = roundUpAmount,
                     accountCurrency = accountCurrency,
-                    continuationId = continuationId.name,
                 )
             )
         )

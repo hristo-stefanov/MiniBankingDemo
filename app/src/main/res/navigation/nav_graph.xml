@@ -26,7 +26,7 @@
         android:name="hristostefanov.minibankingdemo.ui.SavingsGoalsFragment"
         android:label="Savings Goals"
         tools:layout="@layout/savings_goals_fragment">
-        <action
+            <action
             android:id="@+id/action_to_createSavingsGoalDestination"
             app:destination="@id/createSavingsGoalDestination" />
         <action
@@ -44,9 +44,6 @@
         android:name="hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragment"
         android:label="New Savings Goal"
         tools:layout="@layout/create_savings_goal_fragment" >
-        <argument
-            android:name="continuationId"
-            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/transferConfirmationDestination"
@@ -62,9 +59,6 @@
         <argument
             android:name="accountCurrency"
             app:argType="java.util.Currency" />
-        <argument
-            android:name="continuationId"
-            app:argType="string" />
     </fragment>
 
     <action

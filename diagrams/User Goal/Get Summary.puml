@@ -27,10 +27,11 @@ endnote
 -> [Outcome];
 
 if () then ([is not Completed])
-    :Suggest to refresh; <<sendSignal>>
+    end
 endif
 
-:TODO handle the outcome;
+: <&cog> Fetch savings goals;
+-> [Result];
 
 :<&script> Get current date and time;
 -> [Date and time];
@@ -42,7 +43,8 @@ since the start of the period;
 -> [Result];
 
 if () then ([is Auth Error])
-    :Present unrecoverable error message and ask to Log out; <<sendSignal>>
+'    :Present unrecoverable error message and ask to Log out; <<sendSignal>>
+    :Present info about auth issue and recovery suggestion.; <<sendSignal>>
     stop
 endif
 

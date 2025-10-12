@@ -5,15 +5,16 @@ import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.dependences.APIException
 import hristostefanov.minibankingdemo.business.dependences.AuthException
 import hristostefanov.minibankingdemo.business.dependences.NetworkException
+import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
+import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -40,67 +41,56 @@ class GetSummaryInteractorImpl @Inject constructor(
     }
 
     private suspend fun execute(userInterface: GetSummaryUI): Outcome {
-        var shouldRetry: Boolean
-        do {
-            shouldRetry = false
-            try {
-                loginSessionRegistry.component?.repository?.let { repository ->
-                    val now = nowProvider.get()
-                    val since = calcSincePolicy(now)
-                    val dataset = repository.findAllAccounts()
-                        .fold(emptyMap<Account, List<Transaction>>()) { acc, account ->
-                            val transactions = repository.findTransactions(account.id, since)
-                            acc + (account to transactions)
-                        }
-
-                    val summary = summarize(since, dataset)
-                    userInterface.presentSummary(summary)
+        try {
+            val now = nowProvider.get()
+            val since = calcSincePolicy(now)
+            val accountDetails = repository.findAllAccounts()
+                .fold(emptyMap<Account, Pair<List<Transaction>, List<SavingsGoal>>>()) { acc, account ->
+                    val transactions = repository.findTransactions(account.id, since)
+                    val savingsGoals = repository.findSavingGoals(account.id)
+                    val details = transactions to savingsGoals
+                    acc + (account to details)
                 }
-                return Outcome.Completed(Unit)
-            } catch (e: ServiceException) {
-                when (e) {
-                    is AuthException -> {
-                        userInterface.presentMessage("Your credentials are invalid. You need to Log out first")
-                        return Outcome.Failed(e)
-                    }
 
-                    is APIException, is NetworkException -> {
-                        val isConfirmed = userInterface.promptUserToRetryRecovery(
-                            errorMessage = e.localizedMessage,
-                            isCancellable = true,
-                        )
-                        if (isConfirmed) {
-                            shouldRetry = true
-                        } else {
-                            userInterface.presentHintToReferesh()
-                            return Outcome.Cancelled
-                        }
-                    }
+            val summary = summarize(since, accountDetails)
 
-                    else -> {
-                        // unexpected exception - crash
-                        // TODO log it
-                        throw e
-                    }
+            userInterface.presentSummary(summary)
+
+            return Outcome.Completed(Unit)
+        } catch (e: ServiceException) {
+            when (e) {
+                is AuthException -> {
+                    userInterface.presentInfoAboutAuthFailure()
+                    return Outcome.Failed(e)
+                }
+
+                is APIException, is NetworkException -> {
+                    return Outcome.Failed(e)
+                }
+
+                else -> {
+                    // unexpected exception - crash
+                    // TODO log it
+                    throw e
                 }
             }
-
-        } while (shouldRetry)
-
-        // should not come here
-        return Outcome.Cancelled
+        }
     }
+
+    private val repository: Repository
+        get() = loginSessionRegistry.requireComponent.repository
 }
+
 
 internal fun summarize(
     since: OffsetDateTime,
-    dataset: Map<Account, List<Transaction>>,
+    dataset: Map<Account, Pair<List<Transaction>, List<SavingsGoal>>>,
     calcTransactionRoundUpPolicy: (Transaction) -> BigDecimal = ::calcTransactionRoundUp,
     isSpendingTransactionPolicy: (Transaction) -> Boolean = ::isSpendingTransaction,
 ): Summary {
-    val items = dataset.entries.map { (account, transactions) ->
+    val items = dataset.entries.map { (account, accountDetails) ->
         val roundUp = calcAccountRoundUp(
-            transactions = transactions,
+            transactions = accountDetails.first,
             calcTransactionRoundUpPolicy = calcTransactionRoundUpPolicy,
             isSpendingTransactionPolicy = isSpendingTransactionPolicy
         )
@@ -110,6 +100,7 @@ internal fun summarize(
             balance = account.balance,
             currency = account.currency,
             roundUp = roundUp,
+            savingsGoals = accountDetails.second
         )
     }
 

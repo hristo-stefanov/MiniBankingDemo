@@ -7,14 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentArgs
-import hristostefanov.minibankingdemo.usecase.CancelCreateSavingsGoal
-import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.usecase.Trigger
-import hristostefanov.minibankingdemo.util.ContinuationChannel
-import hristostefanov.minibankingdemo.util.TriggerChannel
-import kotlinx.coroutines.CoroutineStart
+import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
+import hristostefanov.minibankingdemo.usecase.Outcome
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,13 +19,13 @@ import javax.inject.Inject
 @HiltViewModel
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
-    @ContinuationChannel
-    private val continuationChannel: Channel<Continuation>,
-    @TriggerChannel
-    private val triggerChannel: Channel<Trigger>
+    private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
+    private val userInterface: UserInterface,
+    private val loginSessionRegistry: LoginSessionRegistry,
+    @NavigationChannel
+    private val navigationChannel: Channel<Navigation>
 ) : ViewModel() {
 
-    private val args = CreateSavingsGoalFragmentArgs.fromSavedStateHandle(savedState)
     // Another approach could be using @EntryPoint, see
     // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
 
@@ -49,16 +46,20 @@ open class CreateSavingsGoalViewModel @Inject constructor(
         }
     }
 
-    fun onCancel() {
-        viewModelScope.launch(start = CoroutineStart.ATOMIC) {
-            triggerChannel.send(CancelCreateSavingsGoal)
-        }
-    }
-
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                continuationChannel.send(Continuation(ContinuationId.valueOf(args.continuationId), listOf(name)))
+                with(loginSessionRegistry.requireComponent.data) {
+                    val outcome = createSavingsGoalInteractor.start(
+                        userInterface = userInterface,
+                        goalName = name,
+                        accountId = selectedAccount.accountId,
+                        accountCurrency = selectedAccount.currency
+                    )
+                    if (outcome is Outcome.Completed<*>) {
+                        navigationChannel.send(Navigation.Backward)
+                    }
+                }
             }
         }
     }

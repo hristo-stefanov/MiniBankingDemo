@@ -9,9 +9,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
-import hristostefanov.minibankingdemo.usecase.Continuation
-import hristostefanov.minibankingdemo.usecase.ContinuationId
-import hristostefanov.minibankingdemo.util.ContinuationChannel
+import hristostefanov.minibankingdemo.usecase.Outcome
+import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -27,8 +28,9 @@ class TransferConfirmationViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    @ContinuationChannel
-    private val continuationChannel: Channel<Continuation>
+    private val userInterface: UserInterface,
+    private val transferRoundUpInteractor: TransferRoundUpInteractor,
+    private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
 
     private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -47,7 +49,18 @@ class TransferConfirmationViewModel @Inject constructor(
 
     fun onConfirmCommand() {
         viewModelScope.launch {
-            continuationChannel.send(Continuation(ContinuationId.TransferRoundUp_Confirmed))
+            with(loginSessionRegistry.requireComponent.data) {
+                val outcome = transferRoundUpInteractor.start(
+                    accountId = selectedAccount.accountId,
+                    accountCurrency = selectedAccount.currency,
+                    savingsGoalId = savingsGoalId,
+                    roundUpAmount = selectedAccount.roundUp,
+                    userInterface = userInterface,
+                )
+                if (outcome is Outcome.Completed<*>) {
+                    navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+                }
+            }
         }
     }
 }

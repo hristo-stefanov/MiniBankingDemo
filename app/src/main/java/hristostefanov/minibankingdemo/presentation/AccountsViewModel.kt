@@ -8,8 +8,6 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
-import hristostefanov.minibankingdemo.usecase.TransferFromAccount
-import hristostefanov.minibankingdemo.usecase.Trigger
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
@@ -18,7 +16,6 @@ import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
-import hristostefanov.minibankingdemo.util.TriggerChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +28,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -48,8 +44,6 @@ class AccountsViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    @TriggerChannel
-    private val triggerChannel: Channel<Trigger>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val userInterface: UserInterfaceImpl,
@@ -84,6 +78,7 @@ class AccountsViewModel @Inject constructor(
     private val _logoutCommandEnabled = MutableStateFlow(false)
     val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
 
+    // TODO this can go in session data, no? We already have Summary there
     private val selectedAccountFlow: Flow<Summary.Item?> =
         combine(_selectedAccountPosition, _summary) { position: Int, summary: Summary? ->
             summary?.items?.getOrNull(position)
@@ -98,6 +93,10 @@ class AccountsViewModel @Inject constructor(
         override suspend fun presentHintToReferesh() {
             presentMessage("Use the Refresh command later")
         }
+
+        override suspend fun presentInfoAboutAuthFailure() {
+            presentMessage("Your credentials are invalid. You need to Log out first")
+        }
     }
 
     private fun clearInMemoryLoginSessionData() {
@@ -108,20 +107,15 @@ class AccountsViewModel @Inject constructor(
         selectedAccountFlow
             .take(1)
             .filterNotNull()
-            .onEach {
-                triggerChannel.send(
-                    TransferFromAccount(
-                        it.accountId,
-                        it.currency,
-                        it.roundUp
-                    )
-                )
+            .onEach { it ->
+                userInterface.promptUserToSelectSavingsGoal("Select destination", it.savingsGoals)
             }
             .launchIn(viewModelScope)
     }
 
     fun onAccountSelectionChanged(position: Int) {
         val accountId = _summary.value?.items?.getOrNull(position)?.accountId
+        // TODO do we really need to save it
         state[ACCOUNT_ID_KEY] = accountId
     }
 
@@ -176,6 +170,12 @@ class AccountsViewModel @Inject constructor(
             }
             .onEach {
                 _roundUpAmountText.value = it
+            }
+            .launchIn(viewModelScope)
+
+        selectedAccountFlow.filterNotNull()
+            .onEach {
+                loginSessionRegistry.requireComponent.data.selectedAccount = it
             }
             .launchIn(viewModelScope)
 
