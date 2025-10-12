@@ -10,6 +10,8 @@ import androidx.core.content.edit
 import kotlinx.coroutines.flow.asStateFlow
 
 class TokenStoreImpl(context: Context): TokenStore {
+    private val _tokenFlow = MutableStateFlow<String?>(null)
+    override val tokenFlow = _tokenFlow.asStateFlow()
 
     private val pref: SharedPreferences by lazy {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
@@ -18,9 +20,9 @@ class TokenStoreImpl(context: Context): TokenStore {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
     }
 
-    private val _tokenFlow = MutableStateFlow<String?>(null)
-
-    override val tokenFlow = _tokenFlow.asStateFlow()
+    init {
+        _tokenFlow.value = pref.getString("token", null)
+    }
 
     override fun setToken(token: String?) {
         pref.edit { putString("token", token) }
