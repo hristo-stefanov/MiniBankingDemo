@@ -40,7 +40,7 @@ class GetSummaryInteractorImpl @Inject constructor(
         }
     }
 
-    private suspend fun execute(userInterface: GetSummaryUI): Outcome {
+    private suspend fun execute(getSummaryUI: GetSummaryUI): Outcome {
         try {
             val now = nowProvider.get()
             val since = calcSincePolicy(now)
@@ -54,13 +54,13 @@ class GetSummaryInteractorImpl @Inject constructor(
 
             val summary = summarize(since, accountDetails)
 
-            userInterface.presentSummary(summary)
+            getSummaryUI.presentSummary(summary)
 
             return Outcome.Completed(Unit)
         } catch (e: ServiceException) {
             when (e) {
                 is AuthException -> {
-                    userInterface.presentInfoAboutAuthFailure()
+                    getSummaryUI.presentInfoAboutAuthFailure()
                     return Outcome.Failed(e)
                 }
 
