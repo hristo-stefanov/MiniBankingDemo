@@ -13,12 +13,12 @@ import javax.inject.Inject
 class TransferRoundUpInteractorImpl @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
     private val stringSupplier: StringSupplier,
+    private val stockUI: StockUI
 ) : TransferRoundUpInteractor {
     override suspend fun start(
         accountId: String,
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,
-        stockUI: StockUI,
         savingsGoalId: String
     ): Outcome {
         try {

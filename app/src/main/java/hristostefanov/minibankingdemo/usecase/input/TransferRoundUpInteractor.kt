@@ -10,7 +10,6 @@ interface TransferRoundUpInteractor {
         accountId: String,
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,
-        stockUI: StockUI,
         savingsGoalId: String
     ): Outcome
 }

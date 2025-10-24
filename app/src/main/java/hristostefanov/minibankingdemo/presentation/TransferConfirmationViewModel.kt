@@ -28,7 +28,6 @@ class TransferConfirmationViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val stockUI: StockUI,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
     private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
@@ -55,7 +54,6 @@ class TransferConfirmationViewModel @Inject constructor(
                     accountCurrency = selectedAccount.currency,
                     savingsGoalId = savingsGoalId,
                     roundUpAmount = selectedAccount.roundUp,
-                    stockUI = stockUI,
                 )
                 if (outcome is Outcome.Completed<*>) {
                     navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
