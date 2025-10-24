@@ -31,7 +31,7 @@ class GetSummaryInteractorImpl @Inject constructor(
 ) : GetSummaryInteractor {
 
     override suspend fun start(getSummaryUI: GetSummaryUI): Outcome {
-        val outcome = ensureLoginCredentialsInteractor.start(getSummaryUI)
+        val outcome = ensureLoginCredentialsInteractor.start()
         if (outcome is Outcome.Completed<*>) {
             return execute(getSummaryUI)
         } else {

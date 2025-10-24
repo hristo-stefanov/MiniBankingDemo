@@ -11,11 +11,12 @@ import javax.inject.Singleton
 @Singleton
 class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val sessionRegistry: LoginSessionRegistry,
-    val tokenStore: TokenStore,
+    private val tokenStore: TokenStore,
+    private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI
 ) : EnsureLoginCredentialsInteractor {
-    override suspend fun start(userInterface: EnsureLoginCredentialsUI): Outcome {
+    override suspend fun start(): Outcome {
         if (sessionRegistry.component == null) {
-            val result = userInterface.promptUserToSubmitCredentials()
+            val result = ensureLoginCredentialsUI.promptUserToSubmitCredentials()
             if (result == null) {
                 return Outcome.Cancelled
             } else {
