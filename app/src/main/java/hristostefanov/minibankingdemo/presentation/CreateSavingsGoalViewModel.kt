@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.Outcome
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val userInterface: UserInterface,
+    private val stockUI: StockUI,
     private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
@@ -51,7 +51,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
             viewModelScope.launch {
                 with(loginSessionRegistry.requireComponent.data) {
                     val outcome = createSavingsGoalInteractor.start(
-                        userInterface = userInterface,
+                        stockUI = stockUI,
                         goalName = name,
                         accountId = selectedAccount.accountId,
                         accountCurrency = selectedAccount.currency

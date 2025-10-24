@@ -2,7 +2,7 @@ package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import org.greenrobot.eventbus.EventBus
 import java.util.Currency
@@ -13,7 +13,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
     private val eventBus: EventBus
 ) : CreateSavingsGoalInteractor {
 
-    override suspend fun start(userInterface: UserInterface, goalName: String, accountId: String, accountCurrency: Currency): Outcome {
+    override suspend fun start(stockUI: StockUI, goalName: String, accountId: String, accountCurrency: Currency): Outcome {
         if (!validateName(goalName))
             throw IllegalArgumentException()
 
@@ -28,7 +28,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
 
             return Outcome.Completed(Unit)
         } catch (e: ServiceException) {
-            e.localizedMessage?.let { userInterface.presentMessage(it) }
+            e.localizedMessage?.let { stockUI.presentMessage(it) }
             return Outcome.Failed(e)
         }
     }

@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
 import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -28,7 +28,7 @@ class TransferConfirmationViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val userInterface: UserInterface,
+    private val stockUI: StockUI,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
     private val loginSessionRegistry: LoginSessionRegistry,
 ) : ViewModel() {
@@ -55,7 +55,7 @@ class TransferConfirmationViewModel @Inject constructor(
                     accountCurrency = selectedAccount.currency,
                     savingsGoalId = savingsGoalId,
                     roundUpAmount = selectedAccount.roundUp,
-                    userInterface = userInterface,
+                    stockUI = stockUI,
                 )
                 if (outcome is Outcome.Completed<*>) {
                     navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))

@@ -59,10 +59,14 @@ class SavingsGoalsViewModel @Inject constructor(
             this.savingsGoalName = savingsGoalName
 
             viewModelScope.launch {
-                userInterface.promptUserToConfirmTransfer(
-                    selectedAccount.roundUp,
-                    selectedAccount.currency,
-                    savingsGoalName
+                navigationChannel.send(
+                    Navigation.Forward(
+                        SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                            savingsGoalName = savingsGoalName,
+                            roundUpAmount = selectedAccount.roundUp,
+                            accountCurrency = selectedAccount.currency,
+                        )
+                    )
                 )
             }
         }
