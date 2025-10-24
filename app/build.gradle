@@ -181,6 +181,9 @@ dependencies {
 }
 
 kapt {
+    // This kapt option is needed to prevent reporting NonExistentClass in error messages
+    // when using Dagger from Kotlin
+    correctErrorTypes = true
     arguments {
         arg('eventBusIndex', 'hristostefanov.minibankingdemo.util.EventBusIndex')
     }

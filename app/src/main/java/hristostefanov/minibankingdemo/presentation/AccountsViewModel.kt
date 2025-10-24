@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.presentation
 
+import android.R.id.message
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
@@ -33,6 +35,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.collections.map
+import kotlin.collections.toTypedArray
 
 const val ACCOUNT_ID_KEY = "accountId"
 
@@ -46,7 +50,8 @@ class AccountsViewModel @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
-    private val userInterface: UserInterfaceImpl,
+    private val stockUI: StockUI,
+    private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI,
     private val getSummaryInteractor: GetSummaryInteractor,
     private val logoutInteractor: LogoutInteractor
 ) : ViewModel() {
@@ -84,8 +89,8 @@ class AccountsViewModel @Inject constructor(
             summary?.items?.getOrNull(position)
         }.distinctUntilChanged()
 
-
-    private val getSummaryUI = object : GetSummaryUI, StockUI by userInterface, EnsureLoginCredentialsUI by userInterface {
+    // TODO refactor
+    private val getSummaryUI = object : GetSummaryUI, StockUI by stockUI, EnsureLoginCredentialsUI by ensureLoginCredentialsUI {
         override fun presentSummary(summary: Summary) {
             _summary.value = summary
         }
@@ -108,7 +113,15 @@ class AccountsViewModel @Inject constructor(
             .take(1)
             .filterNotNull()
             .onEach { it ->
-                userInterface.promptUserToSelectSavingsGoal("Select destination", it.savingsGoals)
+                val displaySavingsGoals = it.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
+                navigationChannel.send(
+                    Navigation.Forward(
+                        AccountsFragmentDirections.actionToSavingsGoalsDestination(
+                            "Select destination",
+                            displaySavingsGoals.toTypedArray()
+                        )
+                    )
+                )
             }
             .launchIn(viewModelScope)
     }

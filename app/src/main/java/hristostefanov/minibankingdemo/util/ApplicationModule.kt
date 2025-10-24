@@ -23,7 +23,8 @@ import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -101,7 +102,11 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindUserInterface(impl: UserInterfaceImpl): UserInterface
+    abstract fun bindStockUI(impl: UserInterfaceImpl): StockUI
+
+    @Singleton
+    @Binds
+    abstract fun bindEnsureLoginCredentials(impl: UserInterfaceImpl): EnsureLoginCredentialsUI
 
     @Singleton
     @Binds

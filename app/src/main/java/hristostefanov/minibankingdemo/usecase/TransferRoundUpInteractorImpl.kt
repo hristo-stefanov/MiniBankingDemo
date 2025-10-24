@@ -3,7 +3,7 @@ package hristostefanov.minibankingdemo.usecase
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import java.math.BigDecimal
@@ -18,7 +18,7 @@ class TransferRoundUpInteractorImpl @Inject constructor(
         accountId: String,
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,
-        userInterface: UserInterface,
+        stockUI: StockUI,
         savingsGoalId: String
     ): Outcome {
         try {
@@ -29,11 +29,11 @@ class TransferRoundUpInteractorImpl @Inject constructor(
                 roundUpAmount
             )
 
-            userInterface.presentMessage(stringSupplier.get(R.string.success))
+            stockUI.presentMessage(stringSupplier.get(R.string.success))
 
             return Outcome.Completed(Unit)
         } catch (e: ServiceException) {
-            e.localizedMessage?.let { userInterface.presentMessage(it) }
+            e.localizedMessage?.let { stockUI.presentMessage(it) }
             return Outcome.Failed(e)
         }
     }

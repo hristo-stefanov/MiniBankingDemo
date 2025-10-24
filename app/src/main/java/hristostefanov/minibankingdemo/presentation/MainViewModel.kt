@@ -12,7 +12,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val stringSupplier: StringSupplier,
-    val userInterface: UserInterfaceImpl,
+    // TODO do we need this here exactly? Can't RetryDialog inject it?
+    val userInterfaceImpl: UserInterfaceImpl,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,

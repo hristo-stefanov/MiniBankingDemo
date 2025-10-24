@@ -1,8 +1,8 @@
 package hristostefanov.minibankingdemo.usecase
 
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import java.util.Currency
 
 interface CreateSavingsGoalInteractor {
-    suspend fun start(userInterface: UserInterface, goalName: String, accountId: String, accountCurrency: Currency): Outcome
+    suspend fun start(stockUI: StockUI, goalName: String, accountId: String, accountCurrency: Currency): Outcome
 }

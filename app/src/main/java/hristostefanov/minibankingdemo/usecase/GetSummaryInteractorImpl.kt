@@ -30,12 +30,12 @@ class GetSummaryInteractorImpl @Inject constructor(
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
 ) : GetSummaryInteractor {
 
-    override suspend fun start(userInterface: GetSummaryUI): Outcome {
-        val outcome = ensureLoginCredentialsInteractor.start(userInterface)
+    override suspend fun start(getSummaryUI: GetSummaryUI): Outcome {
+        val outcome = ensureLoginCredentialsInteractor.start(getSummaryUI)
         if (outcome is Outcome.Completed<*>) {
-            return execute(userInterface)
+            return execute(getSummaryUI)
         } else {
-            userInterface.presentHintToReferesh()
+            getSummaryUI.presentHintToReferesh()
             return outcome
         }
     }

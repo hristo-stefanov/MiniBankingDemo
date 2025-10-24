@@ -1,16 +1,11 @@
 package hristostefanov.minibankingdemo.presentation
 
-import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.usecase.output.UserInterface
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
-import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.business.entities.SavingsGoal
-import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import java.math.BigDecimal
-import java.util.Currency
+import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
+import hristostefanov.minibankingdemo.usecase.output.StockUI
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -19,7 +14,8 @@ import kotlin.coroutines.suspendCoroutine
 class UserInterfaceImpl @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-) : UserInterface {
+    // TODO shouldn't we break this implementation into separate ones for each interface?
+) : EnsureLoginCredentialsUI, StockUI {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
@@ -55,34 +51,6 @@ class UserInterfaceImpl @Inject constructor(
         // TODO make it not navigate - display a temp
         navigationChannel.send(
             Navigation.Message(message)
-        )
-    }
-
-    override suspend fun promptUserToSelectSavingsGoal(message: String, savingsGoals: List<SavingsGoal>) {
-        val displaySavingsGoals = savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
-        navigationChannel.send(
-            Navigation.Forward(
-                AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                    message,
-                    displaySavingsGoals.toTypedArray()
-                )
-            )
-        )
-    }
-
-    override suspend fun promptUserToConfirmTransfer(
-        roundUpAmount: BigDecimal,
-        accountCurrency: Currency,
-        savingsGoalNam: String,
-    ) {
-        navigationChannel.send(
-            Navigation.Forward(
-                SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
-                    savingsGoalName = savingsGoalNam,
-                    roundUpAmount = roundUpAmount,
-                    accountCurrency = accountCurrency,
-                )
-            )
         )
     }
 }
