@@ -30,7 +30,10 @@ class GetSummaryInteractorImpl @Inject constructor(
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
 ) : GetSummaryInteractor {
 
-    override suspend fun start(getSummaryUI: GetSummaryUI): Outcome {
+    private val getSummaryUI: GetSummaryUI
+        get() = loginSessionRegistry.requireComponent.getSummaryUI
+
+    override suspend fun start(): Outcome {
         val outcome = ensureLoginCredentialsInteractor.start()
         if (outcome is Outcome.Completed<*>) {
             return execute(getSummaryUI)
