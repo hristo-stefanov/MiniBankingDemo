@@ -9,7 +9,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
-import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
@@ -48,7 +48,7 @@ class AccountsViewModel @Inject constructor(
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val stockUI: StockUI,
-    private val getSummaryInteractor: GetSummaryInteractor,
+    private val presentSummaryInteractor: PresentSummaryInteractor,
     private val logoutInteractor: LogoutInteractor
 ) : ViewModel() {
 
@@ -191,7 +191,7 @@ class AccountsViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-            getSummaryInteractor.start()
+            presentSummaryInteractor.start()
         }
     }
 
@@ -203,7 +203,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onRefresh() {
         viewModelScope.launch {
-            getSummaryInteractor.start()
+            presentSummaryInteractor.start()
         }
     }
 }

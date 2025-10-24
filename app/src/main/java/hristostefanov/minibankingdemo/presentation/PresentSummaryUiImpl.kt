@@ -1,19 +1,17 @@
 package hristostefanov.minibankingdemo.presentation
 
-import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
+import hristostefanov.minibankingdemo.usecase.output.PresentSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.LoginSessionScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @LoginSessionScope
-class GetSummaryUiImpl @Inject constructor(
+class PresentSummaryUiImpl @Inject constructor(
     private val stockUI: StockUI,
     private val loginSessionData: LoginSessionData
-) : GetSummaryUI {
+) : PresentSummaryUI {
     override fun presentSummary(summary: Summary) {
         loginSessionData.summary.value = summary
     }

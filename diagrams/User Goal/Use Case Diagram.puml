@@ -8,20 +8,20 @@ actor User <<Human>>
 actor Bank <<Service>>
 
 rectangle System {
-usecase "Get Summary"
+usecase "Present Summary"
 usecase "Log out"
 usecase "Ensure Login Credentials"
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
 }
 
-User -- "Get Summary"
+User -- "Present Summary"
 User -- "Transfer Round-up"
 User -- "Create Savings Goal"
 User -- "Log out"
 
-"Get Summary" -- "Bank"
-"Get Summary" .> "Ensure Login Credentials": <<includes>>
+"Present Summary" -- "Bank"
+"Present Summary" .> "Ensure Login Credentials": <<includes>>
 '"Create Savings Goal" .> "Transfer Round-up" : <<extends>>
 "Transfer Round-up" -- "Bank"
 "Create Savings Goal" -- "Bank"

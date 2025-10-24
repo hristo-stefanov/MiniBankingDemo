@@ -12,8 +12,8 @@ import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
-import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
+import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.output.PresentSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import java.math.BigDecimal
@@ -23,27 +23,27 @@ import javax.inject.Provider
 
 typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
 
-class GetSummaryInteractorImpl @Inject constructor(
+class PresentSummaryInteractorImpl @Inject constructor(
     val loginSessionRegistry: LoginSessionRegistry,
     val nowProvider: Provider<OffsetDateTime>,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
-) : GetSummaryInteractor {
+) : PresentSummaryInteractor {
 
-    private val getSummaryUI: GetSummaryUI
-        get() = loginSessionRegistry.requireComponent.getSummaryUI
+    private val presentSummaryUI: PresentSummaryUI
+        get() = loginSessionRegistry.requireComponent.presentSummaryUI
 
     override suspend fun start(): Outcome {
         val outcome = ensureLoginCredentialsInteractor.start()
         if (outcome is Outcome.Completed<*>) {
-            return execute(getSummaryUI)
+            return execute(presentSummaryUI)
         } else {
-            getSummaryUI.presentHintToReferesh()
+            presentSummaryUI.presentHintToReferesh()
             return outcome
         }
     }
 
-    private suspend fun execute(getSummaryUI: GetSummaryUI): Outcome {
+    private suspend fun execute(presentSummaryUI: PresentSummaryUI): Outcome {
         try {
             val now = nowProvider.get()
             val since = calcSincePolicy(now)
@@ -57,13 +57,13 @@ class GetSummaryInteractorImpl @Inject constructor(
 
             val summary = summarize(since, accountDetails)
 
-            getSummaryUI.presentSummary(summary)
+            presentSummaryUI.presentSummary(summary)
 
             return Outcome.Completed(Unit)
         } catch (e: ServiceException) {
             when (e) {
                 is AuthException -> {
-                    getSummaryUI.presentInfoAboutAuthFailure()
+                    presentSummaryUI.presentInfoAboutAuthFailure()
                     return Outcome.Failed(e)
                 }
 

@@ -16,12 +16,12 @@ import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractorImpl
 import hristostefanov.minibankingdemo.usecase.subfunction.EnsureLoginCredentialsInteractorImpl
-import hristostefanov.minibankingdemo.usecase.GetSummaryInteractorImpl
+import hristostefanov.minibankingdemo.usecase.PresentSummaryInteractorImpl
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.LogoutInteractorImpl
 import hristostefanov.minibankingdemo.usecase.TransferRoundUpInteractorImpl
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.usecase.output.StockUI
@@ -94,7 +94,7 @@ abstract class ApplicationModule {
     // TODO how to handle recreation of the interactor when triggered again?
     @Singleton
     @Binds
-    abstract fun bindGetSummaryInteractor(impl: GetSummaryInteractorImpl): GetSummaryInteractor
+    abstract fun bindPresentSummaryInteractor(impl: PresentSummaryInteractorImpl): PresentSummaryInteractor
 
     @Singleton
     @Binds
