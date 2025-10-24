@@ -11,7 +11,6 @@ import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.GetSummaryInteractor
-import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.usecase.output.GetSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
@@ -51,7 +50,6 @@ class AccountsViewModel @Inject constructor(
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val stockUI: StockUI,
-    private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI,
     private val getSummaryInteractor: GetSummaryInteractor,
     private val logoutInteractor: LogoutInteractor
 ) : ViewModel() {
@@ -90,17 +88,17 @@ class AccountsViewModel @Inject constructor(
         }.distinctUntilChanged()
 
     // TODO refactor
-    private val getSummaryUI = object : GetSummaryUI, StockUI by stockUI, EnsureLoginCredentialsUI by ensureLoginCredentialsUI {
+    private val getSummaryUI = object : GetSummaryUI {
         override fun presentSummary(summary: Summary) {
             _summary.value = summary
         }
 
         override suspend fun presentHintToReferesh() {
-            presentMessage("Use the Refresh command later")
+            stockUI.presentMessage("Use the Refresh command later")
         }
 
         override suspend fun presentInfoAboutAuthFailure() {
-            presentMessage("Your credentials are invalid. You need to Log out first")
+            stockUI.presentMessage("Your credentials are invalid. You need to Log out first")
         }
     }
 
