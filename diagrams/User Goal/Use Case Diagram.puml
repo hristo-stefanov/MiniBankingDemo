@@ -1,28 +1,27 @@
 @startuml
 'https://plantuml.com/use-case-diagram
 
-' Level: User Goals
+'Includes the subfunction level use cases
 
 left to right direction
-actor User <<Human>>
-actor Bank <<Service>>
+actor Customer
+actor "Banking API"
 
 rectangle System {
-usecase "Present Summary"
+usecase "View Summary"
 usecase "Log out"
 usecase "Ensure Login Credentials"
 usecase "Transfer Round-up"
 usecase "Create Savings Goal"
 }
 
-User -- "Present Summary"
-User -- "Transfer Round-up"
-User -- "Create Savings Goal"
-User -- "Log out"
+Customer -- "View Summary"
+Customer -- "Transfer Round-up"
+Customer -- "Create Savings Goal"
+Customer -- "Log out"
 
-"Present Summary" -- "Bank"
-"Present Summary" .> "Ensure Login Credentials": <<includes>>
-'"Create Savings Goal" .> "Transfer Round-up" : <<extends>>
-"Transfer Round-up" -- "Bank"
-"Create Savings Goal" -- "Bank"
+"View Summary" -- "Banking API"
+"View Summary" .> "Ensure Login Credentials": <<includes>>
+"Transfer Round-up" -- "Banking API"
+"Create Savings Goal" -- "Banking API"
 @enduml
