@@ -12,10 +12,11 @@ import javax.inject.Inject
 
 class CreateSavingsGoalInteractorImpl @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
-    private val eventBus: EventBus
+    private val eventBus: EventBus,
+    private val stockUI: StockUI
 ) : CreateSavingsGoalInteractor {
 
-    override suspend fun start(stockUI: StockUI, goalName: String, accountId: String, accountCurrency: Currency): Outcome {
+    override suspend fun start(goalName: String, accountId: String, accountCurrency: Currency): Outcome {
         if (!validateName(goalName))
             throw IllegalArgumentException()
 
