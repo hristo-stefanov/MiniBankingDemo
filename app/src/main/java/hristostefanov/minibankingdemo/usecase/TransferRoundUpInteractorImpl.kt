@@ -2,6 +2,7 @@ package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry

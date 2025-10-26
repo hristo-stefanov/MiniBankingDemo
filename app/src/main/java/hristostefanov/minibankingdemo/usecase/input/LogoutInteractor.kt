@@ -2,6 +2,6 @@ package hristostefanov.minibankingdemo.usecase.input
 
 import hristostefanov.minibankingdemo.usecase.input.Outcome
 
-interface EnsureLoginCredentialsInteractor {
+interface LogoutInteractor {
     suspend fun start(): Outcome
 }

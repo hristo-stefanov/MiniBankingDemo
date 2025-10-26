@@ -1,4 +1,4 @@
-package hristostefanov.minibankingdemo.usecase
+package hristostefanov.minibankingdemo.usecase.input
 
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import java.util.Currency

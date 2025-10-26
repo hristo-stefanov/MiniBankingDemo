@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.usecase.CreateSavingsGoalInteractor
-import hristostefanov.minibankingdemo.usecase.Outcome
+import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel

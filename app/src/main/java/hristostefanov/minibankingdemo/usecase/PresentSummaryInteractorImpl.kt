@@ -12,6 +12,7 @@ import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.PresentSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary

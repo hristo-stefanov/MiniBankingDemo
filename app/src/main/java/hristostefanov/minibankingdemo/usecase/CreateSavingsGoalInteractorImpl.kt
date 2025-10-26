@@ -2,6 +2,8 @@ package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import org.greenrobot.eventbus.EventBus

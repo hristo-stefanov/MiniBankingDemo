@@ -8,7 +8,7 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.LogoutInteractor
+import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary

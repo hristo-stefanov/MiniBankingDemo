@@ -1,6 +1,8 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import javax.inject.Inject
 import javax.inject.Singleton

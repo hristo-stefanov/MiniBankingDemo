@@ -1,8 +1,8 @@
-package hristostefanov.minibankingdemo.usecase.subfunction
+package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.Outcome
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import javax.inject.Inject
