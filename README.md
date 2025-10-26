@@ -42,6 +42,24 @@ The project includes various types of tests:
 * Unit tests for view models (AccountsViewModelTest and CreateSavingsGoalViewModelTest)
 * UI unit tests (CreateSavingsGoalFragmentTest)
 
+## Use cases
+
+### Summary level
+
+* Achieve savings goals
+ 
+### User goal level
+
+* Save round-ups
+* Create savings goals
+
+### Subfunction level
+
+[Use Case Diagram](diagrams/Use%20Case%20Diagram.puml)
+
+## Architecture
+
+ 
 ## Architecture
 The author aims to follow the ideas in the "*Clean architecture*" book by
 Robert C. Martin.
