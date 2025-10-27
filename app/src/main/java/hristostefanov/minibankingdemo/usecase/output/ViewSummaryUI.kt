@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.Currency
 
-interface PresentSummaryUI {
+interface ViewSummaryUI {
     fun presentSummary(summary: Summary)
     suspend fun presentHintToReferesh()
     suspend fun presentInfoAboutAuthFailure()

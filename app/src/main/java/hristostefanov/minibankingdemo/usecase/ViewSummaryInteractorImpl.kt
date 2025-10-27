@@ -15,10 +15,10 @@ import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.Failure
-import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.status
-import hristostefanov.minibankingdemo.usecase.output.PresentSummaryUI
+import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import java.math.BigDecimal
@@ -28,20 +28,20 @@ import javax.inject.Provider
 
 typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
 
-class PresentSummaryInteractorImpl @Inject constructor(
+class ViewSummaryInteractorImpl @Inject constructor(
     val loginSessionRegistry: LoginSessionRegistry,
     val nowProvider: Provider<OffsetDateTime>,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
-) : PresentSummaryInteractor {
+) : ViewSummaryInteractor {
 
-    private val presentSummaryUI: PresentSummaryUI
-        get() = loginSessionRegistry.requireComponent.presentSummaryUI
+    private val viewSummaryUI: ViewSummaryUI
+        get() = loginSessionRegistry.requireComponent.viewSummaryUI
 
     override suspend fun invoke(): Status {
-        return ensureLoginCredentialsInteractor().fold(
+           return ensureLoginCredentialsInteractor().fold(
             {
-                presentSummaryUI.presentHintToReferesh()
+                viewSummaryUI.presentHintToReferesh()
                 Completion.status()
             },
             {
@@ -64,11 +64,11 @@ class PresentSummaryInteractorImpl @Inject constructor(
 
             val summary = summarize(since, accountDetails)
 
-            presentSummaryUI.presentSummary(summary)
+            viewSummaryUI.presentSummary(summary)
         }.recover { e ->
             when (e) {
                 is AuthException -> {
-                    presentSummaryUI.presentInfoAboutAuthFailure()
+                    viewSummaryUI.presentInfoAboutAuthFailure()
                     Failure(e).status()
                 }
 

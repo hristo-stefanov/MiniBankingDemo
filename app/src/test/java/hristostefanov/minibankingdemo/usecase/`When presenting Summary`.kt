@@ -62,7 +62,7 @@ class `When presenting Summary` {
         )
     )
 
-    private val interactor = PresentSummaryInteractorImpl(
+    private val interactor = ViewSummaryInteractorImpl(
         repository = repository,
         nowProvider = nowProvider,
         calcSincePolicy = ::calcStartOfSevenDayWindowIncludingToday
