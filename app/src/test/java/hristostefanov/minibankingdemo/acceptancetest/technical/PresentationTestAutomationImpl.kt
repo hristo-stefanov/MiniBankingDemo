@@ -79,7 +79,7 @@ class PresentationTestAutomationImpl @Inject constructor(
     private val userInterface = UserInterfaceImpl(navigationChannel)
 
     override suspend fun startUp() {
-        startupInteractor.start(userInterface,)
+        startupInteractor(userInterface,)
     }
     override fun correctAccessTokenIs(accessToken: String) {
         correctAccessToken = accessToken

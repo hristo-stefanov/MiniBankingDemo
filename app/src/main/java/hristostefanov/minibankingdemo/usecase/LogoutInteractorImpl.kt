@@ -15,7 +15,7 @@ class LogoutInteractorImpl @Inject constructor(
     private val loginSessionRegistry: LoginSessionRegistry,
 ) : LogoutInteractor {
 
-    override suspend fun start(): Status {
+    override suspend fun invoke(): Status {
         tokenStore.setToken(null)
         loginSessionRegistry.close()
 

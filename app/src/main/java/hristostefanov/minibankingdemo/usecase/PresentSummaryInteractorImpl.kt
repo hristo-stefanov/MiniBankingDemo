@@ -38,8 +38,8 @@ class PresentSummaryInteractorImpl @Inject constructor(
     private val presentSummaryUI: PresentSummaryUI
         get() = loginSessionRegistry.requireComponent.presentSummaryUI
 
-    override suspend fun start(): Status {
-        return ensureLoginCredentialsInteractor.start().fold(
+    override suspend fun invoke(): Status {
+        return ensureLoginCredentialsInteractor().fold(
             {
                 presentSummaryUI.presentHintToReferesh()
                 Completion.status()

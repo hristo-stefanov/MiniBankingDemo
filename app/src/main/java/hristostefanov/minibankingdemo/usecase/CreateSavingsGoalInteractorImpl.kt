@@ -24,7 +24,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
     private val stockUI: StockUI
 ) : CreateSavingsGoalInteractor {
 
-    override suspend fun start(goalName: String, accountId: String, accountCurrency: Currency): Status {
+    override suspend fun invoke(goalName: String, accountId: String, accountCurrency: Currency): Status {
         // TODO if that's a precondition we should not validate it, right?
         if (!validateName(goalName))
             throw IllegalArgumentException()

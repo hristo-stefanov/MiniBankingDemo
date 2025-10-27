@@ -18,7 +18,7 @@ class TransferRoundUpInteractorImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     private val stockUI: StockUI
 ) : TransferRoundUpInteractor {
-    override suspend fun start(
+    override suspend fun invoke(
         accountId: String,
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,

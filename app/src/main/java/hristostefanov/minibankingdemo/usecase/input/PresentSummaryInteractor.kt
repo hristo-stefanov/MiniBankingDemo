@@ -1,5 +1,5 @@
 package hristostefanov.minibankingdemo.usecase.input
 
 interface PresentSummaryInteractor {
-    suspend fun start(): Status
+    suspend operator fun invoke(): Status
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.util.Currency
 
 interface TransferRoundUpInteractor {
-    suspend fun start(
+    suspend operator fun invoke(
         accountId: String,
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,

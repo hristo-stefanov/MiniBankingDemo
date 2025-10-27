@@ -48,7 +48,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
                 with(loginSessionRegistry.requireComponent.data) {
-                    val status = createSavingsGoalInteractor.start(
+                    val status = createSavingsGoalInteractor(
                         goalName = name,
                         accountId = selectedAccount.accountId,
                         accountCurrency = selectedAccount.currency

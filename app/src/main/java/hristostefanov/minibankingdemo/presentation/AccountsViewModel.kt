@@ -191,19 +191,19 @@ class AccountsViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-            presentSummaryInteractor.start()
+            presentSummaryInteractor()
         }
     }
 
     fun onLogout() {
         viewModelScope.launch {
-            logoutInteractor.start()
+            logoutInteractor()
         }
     }
 
     fun onRefresh() {
         viewModelScope.launch {
-            presentSummaryInteractor.start()
+            presentSummaryInteractor()
         }
     }
 }

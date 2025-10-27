@@ -78,7 +78,7 @@ class `When presenting Summary` {
         given(repository.findAllAccounts()).willReturn(accounts)
         given(repository.findTransactions(any(), any())).willReturn(spendingTransactions)
 
-        interactor.start(userInterface)
+        interactor(userInterface)
 
         then(userInterface).should().presentSummary(expectedSummary)
     }
@@ -87,7 +87,7 @@ class `When presenting Summary` {
     fun `should cancel flow and return error when auth fails`() = runTest {
         given(repository.findAllAccounts()).willThrow(AuthException())
 
-        val result = interactor.start(userInterface)
+        val result = interactor(userInterface)
 
         assertThat(result.exceptionOrNull()).isInstanceOf(AuthException::class.java)
     }
@@ -99,7 +99,7 @@ class `When presenting Summary` {
 
         given(userInterface.promptUserToRetryRecovery("500")).willReturn(true)
 
-        interactor.invoke(userInterface)
+        interactor(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("500")
         then(userInterface).should().presentSummary(expectedSummary)
@@ -112,7 +112,7 @@ class `When presenting Summary` {
 
         given(userInterface.promptUserToRetryRecovery("500")).willReturn(false)
 
-        val result = interactor.invoke(userInterface)
+        val result = interactor(userInterface)
         then(userInterface).should().promptUserToRetryRecovery("500")
         assertThat(result.exceptionOrNull()).isInstanceOfSatisfying(APIException::class.java) {
             assertThat(it.message).isEqualTo("500")
@@ -125,7 +125,7 @@ class `When presenting Summary` {
 
         given(userInterface.promptUserToRetryRecovery("No route to host")).willReturn(true)
 
-        interactor.invoke(userInterface)
+        interactor(userInterface)
 
         then(userInterface).should().promptUserToRetryRecovery("No route to host")
         then(userInterface).should().presentSummary(expectedSummary)
@@ -138,7 +138,7 @@ class `When presenting Summary` {
 
         given(userInterface.promptUserToRetryRecovery("No route to host")).willReturn(false)
 
-        val result = interactor.invoke(userInterface)
+        val result = interactor(userInterface)
         then(userInterface).should().promptUserToRetryRecovery("No route to host")
         assertThat(result.exceptionOrNull()).isInstanceOfSatisfying(NetworkException::class.java) {
             assertThat(it.message).isEqualTo("No route to host")
