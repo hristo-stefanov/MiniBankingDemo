@@ -2,7 +2,7 @@ package hristostefanov.minibankingdemo.usecase.output
 
 interface StockUI {
     /**
-     * Optionally cancellable.
+     * @return true - confirmed , false - cancelled
      */
     suspend fun promptUserToRetryRecovery(errorMessage: String, isCancellable: Boolean): Boolean
 
