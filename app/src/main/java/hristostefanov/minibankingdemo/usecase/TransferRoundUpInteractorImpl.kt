@@ -1,9 +1,11 @@
 package hristostefanov.minibankingdemo.usecase
 
+import arrow.core.Either
+import arrow.core.recover
 import hristostefanov.minibankingdemo.R
-import hristostefanov.minibankingdemo.business.dependences.ServiceException
-import hristostefanov.minibankingdemo.usecase.input.Outcome
+import hristostefanov.minibankingdemo.usecase.input.Failure
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
+import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -21,8 +23,8 @@ class TransferRoundUpInteractorImpl @Inject constructor(
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,
         savingsGoalId: String
-    ): Outcome {
-        try {
+    ): Status {
+        return  Either.catch {
             loginSessionRegistry.component!!.addMoneyIntoGoalInteractor.execute(
                 accountId,
                 savingsGoalId,
@@ -31,11 +33,9 @@ class TransferRoundUpInteractorImpl @Inject constructor(
             )
 
             stockUI.presentMessage(stringSupplier.get(R.string.success))
-
-            return Outcome.Completed(Unit)
-        } catch (e: ServiceException) {
-            e.localizedMessage?.let { stockUI.presentMessage(it) }
-            return Outcome.Failed(e)
+        }.recover { exception ->
+            exception.localizedMessage?.let { stockUI.presentMessage(it) }
+            Failure(exception)
         }
     }
 }

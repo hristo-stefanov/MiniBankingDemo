@@ -9,9 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
-import hristostefanov.minibankingdemo.usecase.input.Outcome
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
-import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
@@ -49,13 +48,14 @@ class TransferConfirmationViewModel @Inject constructor(
     fun onConfirmCommand() {
         viewModelScope.launch {
             with(loginSessionRegistry.requireComponent.data) {
-                val outcome = transferRoundUpInteractor.start(
+                val status = transferRoundUpInteractor.start(
                     accountId = selectedAccount.accountId,
                     accountCurrency = selectedAccount.currency,
                     savingsGoalId = savingsGoalId,
                     roundUpAmount = selectedAccount.roundUp,
                 )
-                if (outcome is Outcome.Completed<*>) {
+
+                if (!status.isFailure()) {
                     navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
                 }
             }

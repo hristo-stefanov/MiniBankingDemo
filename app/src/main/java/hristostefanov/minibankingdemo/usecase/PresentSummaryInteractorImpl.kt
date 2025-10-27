@@ -1,19 +1,23 @@
 package hristostefanov.minibankingdemo.usecase
 
+import arrow.core.Either
+import arrow.core.recover
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
 import hristostefanov.minibankingdemo.business.dependences.APIException
 import hristostefanov.minibankingdemo.business.dependences.AuthException
 import hristostefanov.minibankingdemo.business.dependences.NetworkException
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
+import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.Outcome
+import hristostefanov.minibankingdemo.usecase.input.Failure
 import hristostefanov.minibankingdemo.usecase.input.PresentSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.Status
+import hristostefanov.minibankingdemo.usecase.input.status
 import hristostefanov.minibankingdemo.usecase.output.PresentSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
@@ -34,18 +38,20 @@ class PresentSummaryInteractorImpl @Inject constructor(
     private val presentSummaryUI: PresentSummaryUI
         get() = loginSessionRegistry.requireComponent.presentSummaryUI
 
-    override suspend fun start(): Outcome {
-        val outcome = ensureLoginCredentialsInteractor.start()
-        if (outcome is Outcome.Completed<*>) {
-            return execute(presentSummaryUI)
-        } else {
-            presentSummaryUI.presentHintToReferesh()
-            return outcome
-        }
+    override suspend fun start(): Status {
+        return ensureLoginCredentialsInteractor.start().fold(
+            {
+                presentSummaryUI.presentHintToReferesh()
+                Completion.status()
+            },
+            {
+                execute()
+            }
+        )
     }
 
-    private suspend fun execute(presentSummaryUI: PresentSummaryUI): Outcome {
-        try {
+    private suspend fun execute(): Status {
+        return Either.catch {
             val now = nowProvider.get()
             val since = calcSincePolicy(now)
             val accountDetails = repository.findAllAccounts()
@@ -59,17 +65,15 @@ class PresentSummaryInteractorImpl @Inject constructor(
             val summary = summarize(since, accountDetails)
 
             presentSummaryUI.presentSummary(summary)
-
-            return Outcome.Completed(Unit)
-        } catch (e: ServiceException) {
+        }.recover { e ->
             when (e) {
                 is AuthException -> {
                     presentSummaryUI.presentInfoAboutAuthFailure()
-                    return Outcome.Failed(e)
+                    Failure(e).status()
                 }
 
                 is APIException, is NetworkException -> {
-                    return Outcome.Failed(e)
+                    Failure(e).status()
                 }
 
                 else -> {

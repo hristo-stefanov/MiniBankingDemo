@@ -1,7 +1,5 @@
 package hristostefanov.minibankingdemo.usecase.input
 
-import hristostefanov.minibankingdemo.usecase.input.Outcome
-import hristostefanov.minibankingdemo.usecase.output.StockUI
 import java.math.BigDecimal
 import java.util.Currency
 
@@ -11,5 +9,5 @@ interface TransferRoundUpInteractor {
         accountCurrency: Currency,
         roundUpAmount: BigDecimal,
         savingsGoalId: String
-    ): Outcome
+    ): Status
 }

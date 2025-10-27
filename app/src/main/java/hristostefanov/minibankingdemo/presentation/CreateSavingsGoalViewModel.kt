@@ -8,7 +8,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
-import hristostefanov.minibankingdemo.usecase.input.Outcome
+import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -48,12 +48,13 @@ open class CreateSavingsGoalViewModel @Inject constructor(
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
                 with(loginSessionRegistry.requireComponent.data) {
-                    val outcome = createSavingsGoalInteractor.start(
+                    val status = createSavingsGoalInteractor.start(
                         goalName = name,
                         accountId = selectedAccount.accountId,
                         accountCurrency = selectedAccount.currency
                     )
-                    if (outcome is Outcome.Completed<*>) {
+
+                    if (!status.isFailure()) {
                         navigationChannel.send(Navigation.Backward)
                     }
                 }

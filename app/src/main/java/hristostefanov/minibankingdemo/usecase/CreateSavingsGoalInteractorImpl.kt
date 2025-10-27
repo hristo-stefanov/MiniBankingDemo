@@ -1,10 +1,18 @@
 package hristostefanov.minibankingdemo.usecase
 
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.recover
 import hristostefanov.minibankingdemo.business.dependences.ServiceException
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
-import hristostefanov.minibankingdemo.usecase.input.Outcome
+import hristostefanov.minibankingdemo.usecase.input.Failure
+import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.input.Termination
+import hristostefanov.minibankingdemo.usecase.input.status
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import org.greenrobot.eventbus.EventBus
 import java.util.Currency
@@ -16,11 +24,12 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
     private val stockUI: StockUI
 ) : CreateSavingsGoalInteractor {
 
-    override suspend fun start(goalName: String, accountId: String, accountCurrency: Currency): Outcome {
+    override suspend fun start(goalName: String, accountId: String, accountCurrency: Currency): Status {
+        // TODO if that's a precondition we should not validate it, right?
         if (!validateName(goalName))
             throw IllegalArgumentException()
 
-        try {
+        return  Either.catch {
             loginSessionRegistry.component!!.repository.createSavingsGoal(
                 goalName,
                 accountId,
@@ -28,11 +37,9 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
             )
             // TODO
             eventBus.post(DataSourceChangedEvent())
-
-            return Outcome.Completed(Unit)
-        } catch (e: ServiceException) {
-            e.localizedMessage?.let { stockUI.presentMessage(it) }
-            return Outcome.Failed(e)
+        }.recover { exception ->
+            exception.localizedMessage?.let { stockUI.presentMessage(it) }
+            Failure(exception).status()
         }
     }
 

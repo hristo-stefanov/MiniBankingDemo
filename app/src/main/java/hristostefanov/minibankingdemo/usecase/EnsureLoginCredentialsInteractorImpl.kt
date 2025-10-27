@@ -1,9 +1,12 @@
 package hristostefanov.minibankingdemo.usecase
 
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import hristostefanov.minibankingdemo.usecase.input.Cancellation
+import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.Outcome
+import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
+import hristostefanov.minibankingdemo.usecase.input.status
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,19 +17,20 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val tokenStore: TokenStore,
     private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI
 ) : EnsureLoginCredentialsInteractor {
-    override suspend fun start(): Outcome {
+    override suspend fun start(): Status {
         if (sessionRegistry.component == null) {
             val result = ensureLoginCredentialsUI.promptUserToSubmitCredentials()
+
             if (result == null) {
-                return Outcome.Cancelled
+                return Cancellation.status()
             } else {
                 tokenStore.setToken(result)
                 sessionRegistry.createSession(result, "Bearer")
 
-                return Outcome.Completed<Unit>(Unit)
+                return Completion.status()
             }
         } else {
-            return Outcome.Completed(Unit)
+            return Completion.status()
         }
     }
 }
