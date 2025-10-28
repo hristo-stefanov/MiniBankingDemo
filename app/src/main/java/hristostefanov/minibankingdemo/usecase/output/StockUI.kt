@@ -1,5 +1,7 @@
 package hristostefanov.minibankingdemo.usecase.output
 
+import hristostefanov.minibankingdemo.usecase.input.Status
+
 interface StockUI {
     /**
      * @return true - confirmed , false - cancelled
@@ -12,4 +14,6 @@ interface StockUI {
      * The calling interactor will not wait for continuation.
      */
     suspend fun presentMessage(message: String)
+
+    suspend fun presentStatus(status: Status)
 }

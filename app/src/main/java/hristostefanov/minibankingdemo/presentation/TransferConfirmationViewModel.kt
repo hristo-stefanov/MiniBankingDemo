@@ -11,7 +11,8 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +29,8 @@ class TransferConfirmationViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val loginSessionData: LoginSessionData,
+    private val stockUI: StockUI
 ) : ViewModel() {
 
     private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -47,13 +49,15 @@ class TransferConfirmationViewModel @Inject constructor(
 
     fun onConfirmCommand() {
         viewModelScope.launch {
-            with(loginSessionRegistry.requireComponent.data) {
+            loginSessionData.selectedAccount?.let { selectedAccount ->
                 val status = transferRoundUpInteractor(
                     accountId = selectedAccount.accountId,
                     accountCurrency = selectedAccount.currency,
-                    savingsGoalId = savingsGoalId,
+                    savingsGoalId = loginSessionData.savingsGoalId,
                     roundUpAmount = selectedAccount.roundUp,
                 )
+
+                stockUI.presentStatus(status)
 
                 if (!status.isFailure()) {
                     navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))

@@ -1,17 +1,27 @@
 package hristostefanov.minibankingdemo.presentation
 
+import arrow.core.Either
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
+import hristostefanov.minibankingdemo.R
+import hristostefanov.minibankingdemo.business.dependences.AuthException
+import hristostefanov.minibankingdemo.usecase.input.Cancellation
+import hristostefanov.minibankingdemo.usecase.input.Failure
+import hristostefanov.minibankingdemo.usecase.input.Status
+import hristostefanov.minibankingdemo.usecase.input.onCompletion
+import hristostefanov.minibankingdemo.usecase.input.onTermination
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.util.StringSupplier
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class UserInterfaceImpl @Inject constructor(
+    private val stringSupplier: StringSupplier,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     // TODO shouldn't we break this implementation into separate ones for each interface?
@@ -52,5 +62,22 @@ class UserInterfaceImpl @Inject constructor(
         navigationChannel.send(
             Navigation.Message(message)
         )
+    }
+
+    override suspend fun presentStatus(status: Status) {
+        status
+            .onCompletion { presentMessage(stringSupplier.get(R.string.success)) }
+            .onTermination {
+                when(it) {
+                    Cancellation -> presentMessage("Cancelled")
+                    is Failure -> {
+                        if (it.exception is AuthException) {
+                            presentMessage("Your credentials are invalid. You need to Log out first")
+                        } else {
+                            presentMessage("Failure: ${it.exception.localizedMessage}")
+                        }
+                    }
+                }
+            }
     }
 }

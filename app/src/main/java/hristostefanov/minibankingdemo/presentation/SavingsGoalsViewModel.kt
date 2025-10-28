@@ -9,7 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -21,8 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val loginSessionRegistry: LoginSessionRegistry,
-    private val userInterface: UserInterfaceImpl,
+    private val loginSessionData: LoginSessionData,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>
@@ -54,9 +53,9 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     fun onSavingsGoalClicked(savingsGoalId: String, savingsGoalName: String) {
-        with(loginSessionRegistry.requireComponent.data) {
-            this.savingsGoalId = savingsGoalId
-            this.savingsGoalName = savingsGoalName
+        loginSessionData.selectedAccount?.let { selectedAccount ->
+            loginSessionData.savingsGoalId = savingsGoalId
+            loginSessionData.savingsGoalName = savingsGoalName
 
             viewModelScope.launch {
                 navigationChannel.send(
@@ -69,8 +68,7 @@ class SavingsGoalsViewModel @Inject constructor(
                     )
                 )
             }
-        }
-
+        } ?: throw IllegalStateException("No selected account")
     }
 
     fun onAddSavingsGoalCommand() {

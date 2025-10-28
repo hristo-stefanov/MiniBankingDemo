@@ -10,9 +10,11 @@ import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
+import hristostefanov.minibankingdemo.usecase.input.isCancellation
+import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.usecase.output.StockUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -46,10 +48,10 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
-    private val loginSessionRegistry: LoginSessionRegistry,
     private val stockUI: StockUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
-    private val logoutInteractor: LogoutInteractor
+    private val logoutInteractor: LogoutInteractor,
+    private val loginSessionData: LoginSessionData
 ) : ViewModel() {
 
 
@@ -75,7 +77,7 @@ class AccountsViewModel @Inject constructor(
     val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
 
     private val summary: StateFlow<Summary?>
-        get() = loginSessionRegistry.requireComponent.data.summary
+        get() = loginSessionData.summary
 
     // TODO this can go in session data, no? We already have Summary there
     private val selectedAccountFlow: Flow<Summary.Item?> =
@@ -167,7 +169,7 @@ class AccountsViewModel @Inject constructor(
 
         selectedAccountFlow.filterNotNull()
             .onEach {
-                loginSessionRegistry.requireComponent.data.selectedAccount = it
+                loginSessionData.selectedAccount = it
             }
             .launchIn(viewModelScope)
 
@@ -190,9 +192,7 @@ class AccountsViewModel @Inject constructor(
             if (it == null) clearInMemoryLoginSessionData()
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            viewSummaryInteractor()
-        }
+        viewSummary()
     }
 
     fun onLogout() {
@@ -202,8 +202,17 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onRefresh() {
+        viewSummary()
+    }
+
+    private fun viewSummary() {
         viewModelScope.launch {
-            viewSummaryInteractor()
+            val status = viewSummaryInteractor()
+            if (status.isFailure()) {
+                stockUI.presentStatus(status)
+            } else if(status.isCancellation()) {
+                stockUI.presentMessage("Use the Refresh command to retry")
+            }
         }
     }
 }

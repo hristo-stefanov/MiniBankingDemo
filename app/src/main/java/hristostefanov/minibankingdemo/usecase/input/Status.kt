@@ -31,4 +31,5 @@ inline fun <C> Status.fold(
 ) = this.fold(ifTermination, ifCompletion)
 
 fun Status.isFailure() = this.isLeft { it is Failure }
+fun Status.isCancellation() = this.isLeft { it is Cancellation }
 

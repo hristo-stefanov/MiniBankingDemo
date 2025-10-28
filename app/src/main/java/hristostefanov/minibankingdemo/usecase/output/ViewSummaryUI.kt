@@ -7,8 +7,6 @@ import java.util.Currency
 
 interface ViewSummaryUI {
     fun presentSummary(summary: Summary)
-    suspend fun presentHintToReferesh()
-    suspend fun presentInfoAboutAuthFailure()
 }
 
 data class Summary(

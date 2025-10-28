@@ -9,7 +9,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -19,9 +20,10 @@ import javax.inject.Inject
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
-    private val navigationChannel: Channel<Navigation>
+    private val navigationChannel: Channel<Navigation>,
+    private val stockUI: StockUI,
+    private val loginSessionData: LoginSessionData
 ) : ViewModel() {
 
     // Another approach could be using @EntryPoint, see
@@ -47,17 +49,19 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                with(loginSessionRegistry.requireComponent.data) {
+                loginSessionData.selectedAccount?.let { selectedAccount ->
                     val status = createSavingsGoalInteractor(
                         goalName = name,
                         accountId = selectedAccount.accountId,
                         accountCurrency = selectedAccount.currency
                     )
 
-                    if (!status.isFailure()) {
+                    if (status.isFailure()) {
+                        stockUI.presentStatus(status)
+                    } else {
                         navigationChannel.send(Navigation.Backward)
                     }
-                }
+                } ?: throw IllegalStateException("No selected account")
             }
         }
     }

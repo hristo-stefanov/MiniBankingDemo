@@ -4,15 +4,11 @@ import arrow.core.Either
 import arrow.core.recover
 import hristostefanov.minibankingdemo.business.calcAccountRoundUp
 import hristostefanov.minibankingdemo.business.calcTransactionRoundUp
-import hristostefanov.minibankingdemo.business.dependences.APIException
-import hristostefanov.minibankingdemo.business.dependences.AuthException
-import hristostefanov.minibankingdemo.business.dependences.NetworkException
 import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
-import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
 import hristostefanov.minibankingdemo.usecase.input.Failure
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
@@ -39,15 +35,8 @@ class ViewSummaryInteractorImpl @Inject constructor(
         get() = loginSessionRegistry.requireComponent.viewSummaryUI
 
     override suspend fun invoke(): Status {
-           return ensureLoginCredentialsInteractor().fold(
-            {
-                viewSummaryUI.presentHintToReferesh()
-                Completion.status()
-            },
-            {
-                execute()
-            }
-        )
+           return ensureLoginCredentialsInteractor()
+               .fold( { it.status() }, { execute() } )
     }
 
     private suspend fun execute(): Status {
@@ -66,25 +55,11 @@ class ViewSummaryInteractorImpl @Inject constructor(
 
             viewSummaryUI.presentSummary(summary)
         }.recover { e ->
-            when (e) {
-                is AuthException -> {
-                    viewSummaryUI.presentInfoAboutAuthFailure()
-                    Failure(e).status()
-                }
-
-                is APIException, is NetworkException -> {
-                    Failure(e).status()
-                }
-
-                else -> {
-                    // unexpected exception - crash
-                    // TODO log it
-                    throw e
-                }
-            }
+            raise(Failure(e))
         }
     }
 
+    // TODO requireComponent is a pre-condition for this interactor
     private val repository: Repository
         get() = loginSessionRegistry.requireComponent.repository
 }
