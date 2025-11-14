@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.StatusUI
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -24,7 +25,7 @@ import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsIntera
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
-import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -102,7 +103,11 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindStockUI(impl: UserInterfaceImpl): StockUI
+    abstract fun bindCommonUI(impl: UserInterfaceImpl): CommonUI
+
+    @Singleton
+    @Binds
+    abstract fun bindStatusUI(impl: UserInterfaceImpl): StatusUI
 
     @Singleton
     @Binds

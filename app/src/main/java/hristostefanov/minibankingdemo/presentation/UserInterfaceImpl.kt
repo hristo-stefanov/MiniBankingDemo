@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.presentation
 
-import arrow.core.Either
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
@@ -13,7 +12,7 @@ import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.onCompletion
 import hristostefanov.minibankingdemo.usecase.input.onTermination
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
-import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.util.StringSupplier
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
@@ -24,8 +23,7 @@ class UserInterfaceImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    // TODO shouldn't we break this implementation into separate ones for each interface?
-) : EnsureLoginCredentialsUI, StockUI {
+) : EnsureLoginCredentialsUI, CommonUI, StatusUI {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
@@ -42,7 +40,7 @@ class UserInterfaceImpl @Inject constructor(
     }
 
 
-    override suspend fun promptUserToRetryRecovery(message: String, isCancellable: Boolean): Boolean {
+    override suspend fun askToConfirmRetrying(message: String, isCancellable: Boolean): Boolean {
         navigationChannel.send(
             Navigation.Forward(
                 NavGraphXmlDirections.toRetryDialog(
@@ -58,7 +56,7 @@ class UserInterfaceImpl @Inject constructor(
     }
 
     override suspend fun presentMessage(message: String) {
-        // TODO make it not navigate - display a temp
+        // TODO display the snackbar without navigating
         navigationChannel.send(
             Navigation.Message(message)
         )

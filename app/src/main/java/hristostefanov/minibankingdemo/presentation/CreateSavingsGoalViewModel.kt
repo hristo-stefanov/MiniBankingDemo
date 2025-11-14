@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +22,8 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val stockUI: StockUI,
+    private val commonUI: CommonUI,
+    private val statusUI: StatusUI,
     private val loginSessionData: LoginSessionData
 ) : ViewModel() {
 
@@ -57,7 +58,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
                     )
 
                     if (status.isFailure()) {
-                        stockUI.presentStatus(status)
+                        statusUI.presentStatus(status)
                     } else {
                         navigationChannel.send(Navigation.Backward)
                     }

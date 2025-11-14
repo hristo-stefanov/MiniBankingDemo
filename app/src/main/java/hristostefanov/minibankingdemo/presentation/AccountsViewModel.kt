@@ -12,7 +12,7 @@ import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.usecase.output.StockUI
+import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.NavigationChannel
@@ -48,7 +48,8 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
-    private val stockUI: StockUI,
+    private val commonUI: CommonUI,
+    private val statusUI: StatusUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
     private val logoutInteractor: LogoutInteractor,
     private val loginSessionData: LoginSessionData
@@ -209,9 +210,9 @@ class AccountsViewModel @Inject constructor(
         viewModelScope.launch {
             val status = viewSummaryInteractor()
             if (status.isFailure()) {
-                stockUI.presentStatus(status)
+                statusUI.presentStatus(status)
             } else if(status.isCancellation()) {
-                stockUI.presentMessage("Use the Refresh command to retry")
+                commonUI.presentMessage("Use the Refresh command to retry")
             }
         }
     }
