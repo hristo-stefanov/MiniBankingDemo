@@ -94,3 +94,11 @@ This way `SessionRegistry.component` will not be optional/nullable.
 This would require explicitly clearing all login session data in the *whole* dependency graph when logging out,
 i.e. including in Retrofit instance and cache files (if enabled).
 The `Closeable` interface can be used to help with that.
+
+Another downside is that all session data properties will need to be optional/nullable for the sake of handling the 
+case of not having a login session. Thus in expressions where more that one property is need, we will
+need to handle each one's availability individually instead of just handling the availability of a login session. 
+
+This can be mitigated by using the *for comprehension* FP technique or by having an anonymous user login session.
+
+
