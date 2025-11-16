@@ -2,8 +2,8 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
-import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.presentation.MainCommand
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -20,8 +20,8 @@ class LogoutSteps {
     internal lateinit var automation: PresentationTestAutomation
 
     @Inject
-    @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
+    @MainCommandChannel
+    internal lateinit var mainCommandChannel: Channel<MainCommand>
 
     @Before("@steps:logout")
     fun beforeEachScenario() {
@@ -40,7 +40,7 @@ class LogoutSteps {
         }
 
         // consume back navigation event
-        navigationChannel.receive()
+        mainCommandChannel.receive()
     }
 
     @Given("I am seeing my account information")
@@ -58,7 +58,7 @@ class LogoutSteps {
 
     @Then("my account information should be hidden")
     fun my_account_information_should_be_hidden() = runTest {
-        val nav = navigationChannel.receive()
-        Assertions.assertThat(nav).isEqualTo(Navigation.Restart)
+        val nav = mainCommandChannel.receive()
+        Assertions.assertThat(nav).isEqualTo(MainCommand.Restart)
     }
 }

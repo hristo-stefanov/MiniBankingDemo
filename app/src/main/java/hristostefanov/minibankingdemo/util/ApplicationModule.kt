@@ -9,7 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.presentation.EnsureLoginCredentialsUiImpl
-import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.presentation.MainUI
 import hristostefanov.minibankingdemo.presentation.MainUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
@@ -43,8 +43,8 @@ abstract class ApplicationModule {
         fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
         @Singleton
-        @Provides @NavigationChannel
-        fun provideNavigationChannel(): Channel<Navigation> = Channel()
+        @Provides @MainCommandChannel
+        fun provideMainCommandChannel(): Channel<MainCommand> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()

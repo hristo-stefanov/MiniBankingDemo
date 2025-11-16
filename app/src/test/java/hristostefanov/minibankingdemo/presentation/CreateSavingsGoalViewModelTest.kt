@@ -34,7 +34,7 @@ class CreateSavingsGoalViewModelTest() {
     private val createSavingsGoalsIterator = mock(CreateSavingsGoalInteractor::class.java)
 
     @Suppress("UNCHECKED_CAST")
-    private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
+    private val mainCommandChannel = spy(Channel::class.java) as Channel<MainCommand>
 
     @Suppress("UNCHECKED_CAST")
     val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
@@ -56,7 +56,7 @@ class CreateSavingsGoalViewModelTest() {
     )
 
     private val viewModelUnderTest by lazy {
-        CreateSavingsGoalViewModel(savedState, sessionRegistry, navigationChannel)
+        CreateSavingsGoalViewModel(savedState, sessionRegistry, mainCommandChannel)
     }
 
     @Before
@@ -165,7 +165,7 @@ class CreateSavingsGoalViewModelTest() {
 
         viewModelUnderTest.onCreateCommand()
 
-        then(navigationChannel).should(timeout(TIMEOUT)).send(Navigation.Backward)
+        then(mainCommandChannel).should(timeout(TIMEOUT)).send(MainCommand.NavigateBackward)
     }
 
     @Test
@@ -176,6 +176,6 @@ class CreateSavingsGoalViewModelTest() {
 
         viewModelUnderTest.onCreateCommand()
 
-        then(navigationChannel).should(timeout(TIMEOUT)).send(Navigation.Forward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
+        then(mainCommandChannel).should(timeout(TIMEOUT)).send(MainCommand.NavigateForward(CreateSavingsGoalFragmentDirections.toErrorDialog(error1)))
     }
 }

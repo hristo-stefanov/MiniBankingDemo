@@ -16,8 +16,8 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainViewModel
-import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.presentation.MainCommand
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import io.sentry.android.navigation.SentryNavigationListener
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
@@ -34,8 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     @Inject
-    @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
+    @MainCommandChannel
+    internal lateinit var mainCommandChannel: Channel<MainCommand>
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        navigationChannel
+        mainCommandChannel
             .receiveAsFlow()
             .flowWithLifecycle(lifecycle)
             .onEach { navigation ->
@@ -77,13 +77,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun onNavigation(navigation: Navigation, navController: NavController) {
-        when (navigation) {
-            is Navigation.Forward -> navController.navigate(navigation.navDirections)
-            is Navigation.ForwardToDestination -> navController.navigate(navigation
-                .destinationResId, navigation.args, navigation.navOptions)
-            is Navigation.Backward -> navController.popBackStack()
-            is Navigation.Restart -> {
+    private fun onNavigation(mainCommand: MainCommand, navController: NavController) {
+        when (mainCommand) {
+            is MainCommand.NavigateForward -> navController.navigate(mainCommand.navDirections)
+            is MainCommand.NavigateForwardToDestination -> navController.navigate(mainCommand
+                .destinationResId, mainCommand.args, mainCommand.navOptions)
+            is MainCommand.NavigateBackward -> navController.popBackStack()
+            is MainCommand.Restart -> {
                 // this way is better than restarting the Activity which may cause
                 // race condition for consuming the navigation emission
                 navController.navigate(R.id.accountsDestination, null, navOptions {
@@ -92,17 +92,17 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
-            is Navigation.BackTo -> navController.popBackStack(
-                navigation.destinationId,
+            is MainCommand.NavigateBackTo -> navController.popBackStack(
+                mainCommand.destinationId,
                 false
             )
-            is Navigation.Before -> navController.popBackStack(
-                navigation.destinationId,
+            is MainCommand.NavigateBefore -> navController.popBackStack(
+                mainCommand.destinationId,
                 true
             )
-            is Navigation.Message -> {
+            is MainCommand.ShowSnackbar -> {
                 val view = findViewById<ConstraintLayout>(R.id.rootLayout)
-                Snackbar.make(view, navigation.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(view, mainCommand.message, Snackbar.LENGTH_LONG).show()
             }
         }
     }

@@ -44,9 +44,9 @@ class AccountsViewModelTest {
     private val eventBus = spy(EventBus::class.java)
 
     @Suppress("UNCHECKED_CAST")
-    private val navigationChannel = spy(Channel::class.java) as Channel<Navigation>
+    private val mainCommandChannel = spy(Channel::class.java) as Channel<MainCommand>
 
-    private val userInterface = MainUiImpl(navigationChannel)
+    private val userInterface = MainUiImpl(mainCommandChannel)
 
     private val account1 = Summary.Item(
         "1",
@@ -76,7 +76,7 @@ class AccountsViewModelTest {
             Locale.UK,
             stringSupplier,
             amountFormatter,
-            navigationChannel,
+            mainCommandChannel,
             tokenStore,
             loginSessionRegistry,
             userInterface
@@ -147,8 +147,8 @@ class AccountsViewModelTest {
 
         viewModel.onTransferCommand()
 
-        then(navigationChannel).should().send(
-            Navigation.Forward(
+        then(mainCommandChannel).should().send(
+            MainCommand.NavigateForward(
                 AccountsFragmentDirections.actionToSavingsGoalsDestination(
                     account1.accountId,
                     account1.currency,

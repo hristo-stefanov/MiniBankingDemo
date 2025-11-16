@@ -8,14 +8,11 @@ import dagger.hilt.migration.DisableInstallInCheck
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.BusinessRulesTestAutomation
 import hristostefanov.minibankingdemo.acceptancetest.businessflow.PresentationTestAutomation
 import hristostefanov.minibankingdemo.acceptancetest.technical.*
-import hristostefanov.minibankingdemo.presentation.Navigation
+import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.*
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.greenrobot.eventbus.EventBus
 import java.time.ZoneId
 import java.util.*
@@ -31,8 +28,8 @@ abstract class TestApplicationModule {
         fun provideEventBus(): EventBus = EventBus.builder().addIndex(EventBusIndex()).build()
 
         @Singleton
-        @Provides @NavigationChannel
-        fun provideNavigationChannel(): Channel<Navigation> = Channel()
+        @Provides @MainCommandChannel
+        fun provideMainCommandChannel(): Channel<MainCommand> = Channel()
 
         @Provides
         fun provideLocale(): Locale = Locale.getDefault()

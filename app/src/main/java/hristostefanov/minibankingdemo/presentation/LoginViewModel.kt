@@ -2,7 +2,7 @@ package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -10,8 +10,8 @@ import kotlin.coroutines.resume
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>,
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>,
     private val mainUiImpl: MainUiImpl,
 ) : ViewModel() {
 
@@ -42,7 +42,7 @@ class LoginViewModel @Inject constructor(
 
                 // Note this will clear this view model and cancel this coroutine so
                 // should be called after calling the interactor
-                navigationChannel.send(Navigation.Backward)
+                mainCommandChannel.send(MainCommand.NavigateBackward)
             }
         }
     }

@@ -10,7 +10,7 @@ import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEven
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -23,8 +23,8 @@ class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val eventBus: EventBus,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>
 ) : ViewModel() {
 
     private val args = SavingsGoalsFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -58,8 +58,8 @@ class SavingsGoalsViewModel @Inject constructor(
             this.savingsGoalName = savingsGoalName
 
             viewModelScope.launch {
-                navigationChannel.send(
-                    Navigation.Forward(
+                mainCommandChannel.send(
+                    MainCommand.NavigateForward(
                         SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
                             savingsGoalName = savingsGoalName,
                             roundUpAmount = selectedAccount.roundUp,
@@ -73,8 +73,8 @@ class SavingsGoalsViewModel @Inject constructor(
 
     fun onAddSavingsGoalCommand() {
         viewModelScope.launch {
-            navigationChannel.send(
-                Navigation.Forward(
+            mainCommandChannel.send(
+                MainCommand.NavigateForward(
                     SavingsGoalsFragmentDirections.actionToCreateSavingsGoalDestination()
                 )
             )

@@ -2,8 +2,8 @@ package hristostefanov.minibankingdemo.acceptancetest.businessflow
 
 import hristostefanov.minibankingdemo.acceptancetest.technical.TestApp
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
-import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.presentation.MainCommand
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -20,8 +20,8 @@ class SaveRoundUps {
     @Inject
     internal lateinit var automation: PresentationTestAutomation
 
-    @Inject @NavigationChannel
-    internal lateinit var navigationChannel: Channel<Navigation>
+    @Inject @MainCommandChannel
+    internal lateinit var mainCommandChannel: Channel<MainCommand>
 
     private lateinit var accountsViewModel: AccountsViewModel
 
@@ -41,7 +41,7 @@ class SaveRoundUps {
         }
 
         // consume back navigation event
-        navigationChannel.receive()
+        mainCommandChannel.receive()
     }
 
     @Given("the calculated round-up for my account is {double}")

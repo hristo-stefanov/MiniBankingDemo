@@ -1,6 +1,6 @@
 package hristostefanov.minibankingdemo.presentation
 
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
@@ -19,8 +19,8 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class MainUiImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>,
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>,
 ) : MainUI {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
@@ -31,15 +31,15 @@ class MainUiImpl @Inject constructor(
     lateinit var retryRecoveryContinuation: Continuation<Boolean>
 
     override suspend fun promptUserToSubmitCredentials(): String? {
-        navigationChannel.send(Navigation.Forward(NavGraphXmlDirections.toLoginDestination()))
+        mainCommandChannel.send(MainCommand.NavigateForward(NavGraphXmlDirections.toLoginDestination()))
         return suspendCoroutine {
             loginCredentialsContinuation = it
         }
     }
 
     override suspend fun askToConfirmRetrying(message: String, isCancellable: Boolean): Boolean {
-        navigationChannel.send(
-            Navigation.Forward(
+        mainCommandChannel.send(
+            MainCommand.NavigateForward(
                 NavGraphXmlDirections.toRetryDialog(
                     // TODO how about cancelling uncancelable use case to close the app?
                     isCancelable = isCancellable,
@@ -54,8 +54,8 @@ class MainUiImpl @Inject constructor(
 
     override suspend fun presentMessage(message: String) {
         // TODO display the snackbar without navigating
-        navigationChannel.send(
-            Navigation.Message(message)
+        mainCommandChannel.send(
+            MainCommand.ShowSnackbar(message)
         )
     }
 

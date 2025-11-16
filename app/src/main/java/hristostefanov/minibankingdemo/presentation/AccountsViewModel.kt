@@ -14,7 +14,7 @@ import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -47,8 +47,8 @@ class AccountsViewModel @Inject constructor(
     private val locale: Locale,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>,
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val mainUI: MainUI,
@@ -99,8 +99,8 @@ class AccountsViewModel @Inject constructor(
             .filterNotNull()
             .onEach { it ->
                 val displaySavingsGoals = it.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
-                navigationChannel.send(
-                    Navigation.Forward(
+                mainCommandChannel.send(
+                    MainCommand.NavigateForward(
                         AccountsFragmentDirections.actionToSavingsGoalsDestination(
                             "Select destination",
                             displaySavingsGoals.toTypedArray()

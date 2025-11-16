@@ -3,7 +3,7 @@ package hristostefanov.minibankingdemo.presentation
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
@@ -15,26 +15,9 @@ class MainViewModel @Inject constructor(
     // TODO do we need this here exactly? Can't RetryDialog inject it?
     val mainUiImpl: MainUiImpl,
     private val eventBus: EventBus,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>,
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>,
     private val loginSessionRegistry: LoginSessionRegistry,
-) : ViewModel() {
-
-    /*
-    init {
-        setUpTrackingInteractorStateChanges()
-    }
+) : ViewModel()
 
 
-        createSavingsGoalInteractor.statusChanged
-            .onEach { status ->
-                Log.d(LOG_INTERACTORS_TAG, "CreateSavingsGoalInteractor.status = $status")
-                // TODO what statuses we need here?
-                if (status.isFinished()) {
-                    navigationChannel.send(Navigation.Backward)
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-     */
-}

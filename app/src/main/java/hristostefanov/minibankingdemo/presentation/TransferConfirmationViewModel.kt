@@ -12,7 +12,7 @@ import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.NavigationChannel
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -25,8 +25,8 @@ class TransferConfirmationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
-    @NavigationChannel
-    private val navigationChannel: Channel<Navigation>,
+    @MainCommandChannel
+    private val mainCommandChannel: Channel<MainCommand>,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
     private val loginSessionRegistry: LoginSessionRegistry,
     private val mainUI: MainUI
@@ -59,7 +59,7 @@ class TransferConfirmationViewModel @Inject constructor(
                 mainUI.presentStatus(status)
 
                 if (!status.isFailure()) {
-                    navigationChannel.send(Navigation.Before(R.id.savingsGoalsDestination))
+                    mainCommandChannel.send(MainCommand.NavigateBefore(R.id.savingsGoalsDestination))
                 }
             }
         }
