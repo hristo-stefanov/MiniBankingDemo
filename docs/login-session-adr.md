@@ -53,18 +53,17 @@ class AccountsViewModel @Inject constructor(
 }
 ```
 
-* It's hard to use AccountsViewModel without a login session or when the login session is replaced with another, because
-    * `requireComponent` will throw an exception when there is no login session - AccountsViewModel cannot be used
-without a login session.
-    * when replacing one login session data instance with another, observers will need to re-subscribe - it's AccountViewModel
+* It's hard to use AccountsViewModel without a login session or when the login session is replaced, because
+    * `requireComponent` will throw an exception when there is no login session — AccountsViewModel cannot be used without a login session.
+    * when replacing one login session data instance with another, existing observers need to re-subscribe.
 
 2. For some interactors, having a login session is precondition which needs to be ensured before invoking it.
 However if auto-closing a login session due to user inactivity is implemented, such interactors may fail
 during execution.
 
-3. The dependences provided by `LoginSessionComponent` and its modules cannot be injected directly into `ViewModel`, `Fragment` 
-or `Activity`. The reason is the rigid component hierarchy of hilt which doesn't allow inserting `LoginSessionComponent`
-between `SignletonComponent` and another stock components such as `ViewModelComponent`. 
+3. The dependencies provided by `LoginSessionComponent` and its modules cannot be injected directly into `ViewModel`, `Fragment` 
+or `Activity`. The reason is the rigid component hierarchy of Hilt which doesn't allow inserting `LoginSessionComponent`
+between `SingletonComponent` and other stock components such as `ViewModelComponent`.
 
 For this reason we CANNOT have:
 ```kotlin
@@ -78,9 +77,9 @@ and we need to access such dependencies by injecting `LoginSessionRegistry`.
 
 ## Goal state
 
-* It's easy and trouble-free to observe login session data in a view models.
-* It's each and trouble free to implement auto-closing a login session due to user inactivity.
-* Login session scoped dependencies can be injected directly
+* It's easy and trouble-free to observe login session data in view models.
+* It's easy and trouble-free to implement auto-closing a login session due to user inactivity.
+* Login session-scoped dependencies can be injected directly
 
 
 ## Potential solutions and mitigations
@@ -96,7 +95,7 @@ i.e. including in Retrofit instance and cache files (if enabled).
 The `Closeable` interface can be used to help with that.
 
 Another downside is that all session data properties will need to be optional/nullable for the sake of handling the 
-case of not having a login session. Thus in expressions where more that one property is need, we will
+case of not having a login session. Thus in expressions where more than one property is needed, we will
 need to handle each one's availability individually instead of just handling the availability of a login session. 
 
 This can be mitigated by using the *for comprehension* FP technique or by having an anonymous user login session.
@@ -118,9 +117,11 @@ A downside is some boilerplate code which can be mitigated with common extension
 
 ### Cancelling interactors when a login session is closed 
 
+Interactors that require an active session can run in a session-tied `CoroutineScope` so they automatically cancel when the session closes.
+
 ## Decision
 
 1. Use the "Observable login session component and switchMap for observing session data properties" approach.
-This seems to be a sold approach and elegant solution. Additionally it doesn't require big changes.
-2. Auto-closing login sessions is not on the agenda for now, but could be
+This is a solid and elegant solution and doesn't require big changes.
+2. Auto-closing login sessions is not on the agenda for now, but "Cancelling interactors when a login session is closed" can be used.
 3. It's not a big deal
