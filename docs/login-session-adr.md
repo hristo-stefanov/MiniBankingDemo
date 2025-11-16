@@ -41,7 +41,7 @@ class LoginSessionRegistry @Inject constructor( private val loginSessionComponen
 }
 ```
 
-Observing login session data is problematic, like in this view model:
+1. Observing login session data is problematic, like in this view model:
 
 ```kotlin
 @HiltViewModel
@@ -58,11 +58,11 @@ class AccountsViewModel @Inject constructor(
 without a login session.
     * when replacing one login session data instance with another, observers will need to re-subscribe - it's AccountViewModel
 
-For some interacrtors, having a login session is precondition which needs to be maintained before invoking it.
+2. For some interactors, having a login session is precondition which needs to be ensured before invoking it.
 However if auto-closing a login session due to user inactivity is implemented, such interactors may fail
 during execution.
 
-The dependences provided by `LoginSessionComponent` and its modules cannot be injected directly into `ViewModel`, `Fragment` 
+3. The dependences provided by `LoginSessionComponent` and its modules cannot be injected directly into `ViewModel`, `Fragment` 
 or `Activity`. The reason is the rigid component hierarchy of hilt which doesn't allow inserting `LoginSessionComponent`
 between `SignletonComponent` and another stock components such as `ViewModelComponent`. 
 
@@ -101,4 +101,26 @@ need to handle each one's availability individually instead of just handling the
 
 This can be mitigated by using the *for comprehension* FP technique or by having an anonymous user login session.
 
+### Observable login session component and switchMap for observing session data properties
 
+In Kotlin flows, the equivalent is `flatMapLatest`. No apparent downsides to this approach.
+This necessitates an observable `component` property in `LoginSessionRegistry`.
+
+Observing an observable login session data property would look like:
+
+```kotlin
+private val summary: Flow<Summary?> = loginSessionRegistry.componentFlow.flatMapLatest { component ->
+    component?.data?.summary ?: flowOf(null)
+}
+```
+
+A downside is some boilerplate code which can be mitigated with common extension properties or some other syntactic sugar approach. 
+
+### Cancelling interactors when a login session is closed 
+
+## Decision
+
+1. Use the "Observable login session component and switchMap for observing session data properties" approach.
+This seems to be a sold approach and elegant solution. Additionally it doesn't require big changes.
+2. Auto-closing login sessions is not on the agenda for now, but could be
+3. It's not a big deal
