@@ -12,7 +12,6 @@ import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel

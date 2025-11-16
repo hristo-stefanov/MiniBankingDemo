@@ -13,7 +13,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val stringSupplier: StringSupplier,
     // TODO do we need this here exactly? Can't RetryDialog inject it?
-    val userInterfaceImpl: UserInterfaceImpl,
+    val mainUiImpl: MainUiImpl,
     private val eventBus: EventBus,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,

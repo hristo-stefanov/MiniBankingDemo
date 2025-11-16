@@ -25,7 +25,7 @@ class RetryDialog : DialogFragment() {
             .setPositiveButton("Retry") { _, _ ->
                 val mainViewModel by activityViewModels<MainViewModel>()
                 lifecycleScope.launch {
-                    mainViewModel.userInterfaceImpl.retryRecoveryContinuation.resume(true)
+                    mainViewModel.mainUiImpl.retryRecoveryContinuation.resume(true)
 
                     // This is a must when using the navigation library
                     findNavController().popBackStack()
@@ -36,7 +36,7 @@ class RetryDialog : DialogFragment() {
                     setNegativeButton(android.R.string.cancel) { _, _ ->
                         val mainViewModel by activityViewModels<MainViewModel>()
                         lifecycleScope.launch {
-                            mainViewModel.userInterfaceImpl.retryRecoveryContinuation.resume(false)
+                            mainViewModel.mainUiImpl.retryRecoveryContinuation.resume(false)
                         }
                     }
                 } else {

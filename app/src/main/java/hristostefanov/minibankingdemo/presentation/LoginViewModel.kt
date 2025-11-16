@@ -12,7 +12,7 @@ import kotlin.coroutines.resume
 class LoginViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-    private val userInterfaceImpl: UserInterfaceImpl,
+    private val mainUiImpl: MainUiImpl,
 ) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)
@@ -32,13 +32,13 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onCancel() {
-        userInterfaceImpl.loginCredentialsContinuation.resume(null)
+        mainUiImpl.loginCredentialsContinuation.resume(null)
     }
 
     fun onAcceptCommand() {
         viewModelScope.launch {
             accessToken?.let {
-                this@LoginViewModel.userInterfaceImpl.loginCredentialsContinuation.resume(it)
+                this@LoginViewModel.mainUiImpl.loginCredentialsContinuation.resume(it)
 
                 // Note this will clear this view model and cancel this coroutine so
                 // should be called after calling the interactor

@@ -8,9 +8,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
+import hristostefanov.minibankingdemo.presentation.EnsureLoginCredentialsUiImpl
 import hristostefanov.minibankingdemo.presentation.Navigation
 import hristostefanov.minibankingdemo.presentation.MainUI
-import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
+import hristostefanov.minibankingdemo.presentation.MainUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
@@ -25,7 +26,6 @@ import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsIntera
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
-import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -103,15 +103,11 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindCommonUI(impl: UserInterfaceImpl): CommonUI
+    abstract fun bindStatusUI(impl: MainUiImpl): MainUI
 
     @Singleton
     @Binds
-    abstract fun bindStatusUI(impl: UserInterfaceImpl): MainUI
-
-    @Singleton
-    @Binds
-    abstract fun bindEnsureLoginCredentialsUI(impl: UserInterfaceImpl): EnsureLoginCredentialsUI
+    abstract fun binEnsureLoginCredentialsUI(impl: EnsureLoginCredentialsUiImpl): EnsureLoginCredentialsUI
 
     @Singleton
     @Binds

@@ -8,7 +8,7 @@ import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.presentation.LoginViewModel
 import hristostefanov.minibankingdemo.presentation.AccountsViewModel
 import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
+import hristostefanov.minibankingdemo.presentation.MainUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.EnsureLoginCredentialsInteractorImpl
@@ -76,7 +76,7 @@ class PresentationTestAutomationImpl @Inject constructor(
 
     private val startupInteractor = EnsureLoginCredentialsInteractorImpl(sessionRegistry, tokenStore, eventBus)
 
-    private val userInterface = UserInterfaceImpl(navigationChannel)
+    private val userInterface = MainUiImpl(navigationChannel)
 
     override suspend fun startUp() {
         startupInteractor(userInterface,)

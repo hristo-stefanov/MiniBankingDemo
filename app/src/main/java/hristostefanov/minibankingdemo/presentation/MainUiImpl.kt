@@ -11,19 +11,17 @@ import hristostefanov.minibankingdemo.usecase.input.Failure
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.onCompletion
 import hristostefanov.minibankingdemo.usecase.input.onTermination
-import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
-import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.util.StringSupplier
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
 @Singleton
-class UserInterfaceImpl @Inject constructor(
+class MainUiImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-) : EnsureLoginCredentialsUI, CommonUI, MainUI {
+) : MainUI {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
@@ -59,6 +57,10 @@ class UserInterfaceImpl @Inject constructor(
         navigationChannel.send(
             Navigation.Message(message)
         )
+    }
+
+    override suspend fun presentErrorDialog(message: String) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun presentStatus(status: Status) {
