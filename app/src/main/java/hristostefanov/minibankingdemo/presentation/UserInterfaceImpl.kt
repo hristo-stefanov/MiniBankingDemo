@@ -23,7 +23,7 @@ class UserInterfaceImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
-) : EnsureLoginCredentialsUI, CommonUI, StatusUI {
+) : EnsureLoginCredentialsUI, CommonUI, MainUI {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>

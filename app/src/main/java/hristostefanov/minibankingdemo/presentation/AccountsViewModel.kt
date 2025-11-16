@@ -52,8 +52,7 @@ class AccountsViewModel @Inject constructor(
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
     private val loginSessionRegistry: LoginSessionRegistry,
-    private val commonUI: CommonUI,
-    private val statusUI: StatusUI,
+    private val mainUI: MainUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
     private val logoutInteractor: LogoutInteractor,
 ) : ViewModel() {
@@ -215,9 +214,9 @@ class AccountsViewModel @Inject constructor(
         viewModelScope.launch {
             val status = viewSummaryInteractor()
             if (status.isFailure()) {
-                statusUI.presentStatus(status)
+                mainUI.presentStatus(status)
             } else if(status.isCancellation()) {
-                commonUI.presentMessage("Use the Refresh command to retry")
+                mainUI.presentMessage("Use the Refresh command to retry")
             }
         }
     }

@@ -9,7 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludingToday
 import hristostefanov.minibankingdemo.presentation.Navigation
-import hristostefanov.minibankingdemo.presentation.StatusUI
+import hristostefanov.minibankingdemo.presentation.MainUI
 import hristostefanov.minibankingdemo.presentation.UserInterfaceImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -107,7 +107,7 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindStatusUI(impl: UserInterfaceImpl): StatusUI
+    abstract fun bindStatusUI(impl: UserInterfaceImpl): MainUI
 
     @Singleton
     @Binds
