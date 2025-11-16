@@ -39,7 +39,6 @@ class UserInterfaceImpl @Inject constructor(
         }
     }
 
-
     override suspend fun askToConfirmRetrying(message: String, isCancellable: Boolean): Boolean {
         navigationChannel.send(
             Navigation.Forward(

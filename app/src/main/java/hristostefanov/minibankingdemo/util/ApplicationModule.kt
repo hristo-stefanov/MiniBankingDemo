@@ -111,7 +111,7 @@ abstract class ApplicationModule {
 
     @Singleton
     @Binds
-    abstract fun bindEnsureLoginCredentials(impl: UserInterfaceImpl): EnsureLoginCredentialsUI
+    abstract fun bindEnsureLoginCredentialsUI(impl: UserInterfaceImpl): EnsureLoginCredentialsUI
 
     @Singleton
     @Binds
