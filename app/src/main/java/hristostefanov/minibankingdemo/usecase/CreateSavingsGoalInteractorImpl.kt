@@ -22,7 +22,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
             throw IllegalArgumentException()
 
         return  Either.catch {
-            loginSessionRegistry.component!!.repository.createSavingsGoal(
+            loginSessionRegistry.requireComponent.repository.createSavingsGoal(
                 goalName,
                 accountId,
                 accountCurrency

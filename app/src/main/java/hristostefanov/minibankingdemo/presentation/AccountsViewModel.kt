@@ -14,9 +14,10 @@ import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.usecase.output.CommonUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionData
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -48,11 +51,11 @@ class AccountsViewModel @Inject constructor(
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val tokenStore: TokenStore,
+    private val loginSessionRegistry: LoginSessionRegistry,
     private val commonUI: CommonUI,
     private val statusUI: StatusUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
     private val logoutInteractor: LogoutInteractor,
-    private val loginSessionData: LoginSessionData
 ) : ViewModel() {
 
 
@@ -77,8 +80,10 @@ class AccountsViewModel @Inject constructor(
     private val _logoutCommandEnabled = MutableStateFlow(false)
     val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
 
-    private val summary: StateFlow<Summary?>
-        get() = loginSessionData.summary
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val summary: Flow<Summary?> = loginSessionRegistry.componentFlow.flatMapLatest { component ->
+       component?.data?.summary ?: flowOf(null)
+    }
 
     // TODO this can go in session data, no? We already have Summary there
     private val selectedAccountFlow: Flow<Summary.Item?> =
@@ -109,7 +114,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val accountId = summary.value?.items?.getOrNull(position)?.accountId
+        val accountId = loginSessionRegistry.requireComponent.data.summary.value?.items?.getOrNull(position)?.accountId
         // TODO do we really need to save it
         state[ACCOUNT_ID_KEY] = accountId
     }
@@ -170,7 +175,7 @@ class AccountsViewModel @Inject constructor(
 
         selectedAccountFlow.filterNotNull()
             .onEach {
-                loginSessionData.selectedAccount = it
+                loginSessionRegistry.requireComponent.data.selectedAccount = it
             }
             .launchIn(viewModelScope)
 

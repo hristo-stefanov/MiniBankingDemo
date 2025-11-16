@@ -1,19 +1,26 @@
 package hristostefanov.minibankingdemo.util
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class LoginSessionRegistryImp @Inject constructor(
     private val loginSessionComponentFactory: LoginSessionComponent.Factory
 ) : LoginSessionRegistry {
 
-    override var component: LoginSessionComponent? = null
+    private val _component = MutableStateFlow<LoginSessionComponent?>(null)
+
+    override val component: LoginSessionComponent?
+        get() = _component.value
+
+    override val componentFlow: StateFlow<LoginSessionComponent?> = _component.asStateFlow()
 
     override fun createSession(token: String, tokenType: String) {
-        component = loginSessionComponentFactory.create(token, tokenType)
+        _component.value = loginSessionComponentFactory.create(token, tokenType)
     }
 
-    override fun close() {
-        component = null
+    override fun closeSession() {
+        _component.value = null
     }
 }

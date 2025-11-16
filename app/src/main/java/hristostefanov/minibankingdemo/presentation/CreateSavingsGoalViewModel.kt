@@ -10,7 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.usecase.output.CommonUI
-import hristostefanov.minibankingdemo.util.LoginSessionData
+import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.NavigationChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -20,11 +20,11 @@ import javax.inject.Inject
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
+    private val loginSessionRegistry: LoginSessionRegistry,
     @NavigationChannel
     private val navigationChannel: Channel<Navigation>,
     private val commonUI: CommonUI,
     private val statusUI: StatusUI,
-    private val loginSessionData: LoginSessionData
 ) : ViewModel() {
 
     // Another approach could be using @EntryPoint, see
@@ -50,7 +50,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                loginSessionData.selectedAccount?.let { selectedAccount ->
+                with(loginSessionRegistry.requireComponent.data) {
                     val status = createSavingsGoalInteractor(
                         goalName = name,
                         accountId = selectedAccount.accountId,
@@ -62,7 +62,7 @@ open class CreateSavingsGoalViewModel @Inject constructor(
                     } else {
                         navigationChannel.send(Navigation.Backward)
                     }
-                } ?: throw IllegalStateException("No selected account")
+                }
             }
         }
     }
