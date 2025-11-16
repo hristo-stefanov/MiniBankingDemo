@@ -104,6 +104,11 @@ class MainActivity : AppCompatActivity() {
                 val view = findViewById<ConstraintLayout>(R.id.rootLayout)
                 Snackbar.make(view, mainCommand.message, Snackbar.LENGTH_LONG).show()
             }
+
+            is MainCommand.ShowErrorDialog -> {
+                val args = ErrorDialogArgs(mainCommand.message)
+                navController.navigate(R.id.errorDialog, args.toBundle())
+            }
         }
     }
 

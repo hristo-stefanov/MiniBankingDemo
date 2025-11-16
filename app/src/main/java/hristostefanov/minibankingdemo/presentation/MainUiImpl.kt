@@ -53,14 +53,15 @@ class MainUiImpl @Inject constructor(
     }
 
     override suspend fun presentMessage(message: String) {
-        // TODO display the snackbar without navigating
         mainCommandChannel.send(
             MainCommand.ShowSnackbar(message)
         )
     }
 
     override suspend fun presentErrorDialog(message: String) {
-        TODO("Not yet implemented")
+        mainCommandChannel.send(
+            MainCommand.ShowErrorDialog(message)
+        )
     }
 
     override suspend fun presentStatus(status: Status) {
