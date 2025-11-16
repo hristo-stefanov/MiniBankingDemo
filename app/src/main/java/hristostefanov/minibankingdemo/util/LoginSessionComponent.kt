@@ -6,9 +6,6 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.business.interactors.*
 import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 
-// TODO rename Session* to LoginSession* to make it clear that the lifecycle is the
-// as the one of the interactive user session
-
 // NOTE: Another option would be to use a Hilt's "custom component" which is essentially
 // a subcomponent but with less code and with some limitations. See
 // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
