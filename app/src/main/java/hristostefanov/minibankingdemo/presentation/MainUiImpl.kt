@@ -25,20 +25,25 @@ class MainUiImpl @Inject constructor(
 ) : MainUI, MainUiContinuation {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
-    lateinit var loginCredentialsContinuation: Continuation<String?>
+    private var loginCredentialsContinuation: Continuation<String?>? = null
 
-    // TODO consider the case of multiple async operations asking for retry confirmation
     // true - confirmed , false - cancelled
-    lateinit var retryRecoveryContinuation: Continuation<Boolean>
+    private var retryRecoveryContinuation: Continuation<Boolean>? = null
 
     override suspend fun promptUserToSubmitCredentials(): String? {
+        check(loginCredentialsContinuation == null) { "Nesting not supported" }
+
         mainCommandChannel.send(MainCommand.NavigateForward(NavGraphXmlDirections.toLoginDestination()))
         return suspendCoroutine {
             loginCredentialsContinuation = it
+        }.also {
+            loginCredentialsContinuation = null
         }
     }
 
     override suspend fun askToConfirmRetrying(message: String, isCancellable: Boolean): Boolean {
+        check(retryRecoveryContinuation == null) { "Nesting not supported" }
+
         mainCommandChannel.send(
             MainCommand.NavigateForward(
                 NavGraphXmlDirections.toRetryDialog(
@@ -50,6 +55,8 @@ class MainUiImpl @Inject constructor(
         )
         return suspendCoroutine {
             retryRecoveryContinuation = it
+        }.also {
+            retryRecoveryContinuation = null
         }
     }
 
@@ -69,7 +76,7 @@ class MainUiImpl @Inject constructor(
         status
             .onCompletion { presentMessage(stringSupplier.get(R.string.success)) }
             .onTermination {
-                when(it) {
+                when (it) {
                     Cancellation -> presentMessage("Cancelled")
                     is Failure -> {
                         if (it.exception is AuthException) {
@@ -83,18 +90,18 @@ class MainUiImpl @Inject constructor(
     }
 
     override fun onCancelSubmitCredentials() {
-        loginCredentialsContinuation.resume(null)
+        checkNotNull(loginCredentialsContinuation).resume(null)
     }
 
     override fun onSubmitCredentials(credentials: String) {
-        loginCredentialsContinuation.resume(credentials)
+        checkNotNull(loginCredentialsContinuation).resume(credentials)
     }
 
     override fun onCancelRetrying() {
-        retryRecoveryContinuation.resume(false)
+        checkNotNull(retryRecoveryContinuation).resume(false)
     }
 
     override fun onConfirmRetrying() {
-        retryRecoveryContinuation.resume(true)
+        checkNotNull(retryRecoveryContinuation).resume(true)
     }
 }
