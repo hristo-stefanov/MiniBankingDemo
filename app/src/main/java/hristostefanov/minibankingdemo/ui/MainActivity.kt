@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.flowWithLifecycle
@@ -15,7 +14,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import hristostefanov.minibankingdemo.R
-import hristostefanov.minibankingdemo.presentation.MainViewModel
 import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import io.sentry.android.navigation.SentryNavigationListener
@@ -44,8 +42,6 @@ class MainActivity : AppCompatActivity() {
         enableNavigationTracing = true,
     )
 
-    private val viewModel: MainViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -71,9 +67,6 @@ class MainActivity : AppCompatActivity() {
                 onNavigation(navigation, navController)
             }
             .launchIn(lifecycleScope)
-
-        // start the view model
-        viewModel
     }
 
 
