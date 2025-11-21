@@ -41,15 +41,14 @@ class MainUIImpl @Inject constructor(
         }
     }
 
-    override suspend fun askToConfirmRetrying(message: String, isCancellable: Boolean): Boolean {
+    override suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Boolean {
         check(retryRecoveryContinuation == null) { "Nesting not supported" }
 
         mainCommandChannel.send(
             MainCommand.NavigateForward(
                 NavGraphXmlDirections.toRetryDialog(
-                    // TODO how about cancelling uncancelable use case to close the app?
-                    isCancelable = isCancellable,
-                    message = message,
+                    isCancelable = isCancelable,
+                    message = errorMessage,
                 )
             )
         )

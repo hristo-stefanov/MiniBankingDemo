@@ -8,7 +8,7 @@ interface MainUI {
      *
      * @return true - confirmed, false - cancelled
      */
-    suspend fun askToConfirmRetrying(errorMessage: String, isCancellable: Boolean): Boolean
+    suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Boolean
 
     /**
      * Present a message without waiting for acknowledgement.
