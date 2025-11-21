@@ -14,14 +14,15 @@ import hristostefanov.minibankingdemo.usecase.input.onTermination
 import hristostefanov.minibankingdemo.util.StringSupplier
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-@Singleton
+@Singleton // scope the implementation so the two interface bindings resolve to the same instance
 class MainUiImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
-) : MainUI {
+) : MainUI, MainUiContinuation {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     lateinit var loginCredentialsContinuation: Continuation<String?>
@@ -79,5 +80,21 @@ class MainUiImpl @Inject constructor(
                     }
                 }
             }
+    }
+
+    override fun onCancelSubmitCredentials() {
+        loginCredentialsContinuation.resume(null)
+    }
+
+    override fun onSubmitCredentials(credentials: String) {
+        loginCredentialsContinuation.resume(credentials)
+    }
+
+    override fun onCancelRetrying() {
+        retryRecoveryContinuation.resume(false)
+    }
+
+    override fun onConfirmRetrying() {
+        retryRecoveryContinuation.resume(true)
     }
 }

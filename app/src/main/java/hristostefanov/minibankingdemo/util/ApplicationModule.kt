@@ -11,6 +11,7 @@ import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludin
 import hristostefanov.minibankingdemo.presentation.EnsureLoginCredentialsUiImpl
 import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.presentation.MainUI
+import hristostefanov.minibankingdemo.presentation.MainUiContinuation
 import hristostefanov.minibankingdemo.presentation.MainUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -101,9 +102,14 @@ abstract class ApplicationModule {
     @Binds
     abstract fun bindTransferRoundUpInteractor(impl: TransferRoundUpInteractorImpl): TransferRoundUpInteractor
 
-    @Singleton
+    // MainUiImpl is scoped instead of these two bindings so they can share the same implementation (Dagger bindings
+    // are scoped by key - the interface)
+
     @Binds
-    abstract fun bindStatusUI(impl: MainUiImpl): MainUI
+    abstract fun bindMainUI(impl: MainUiImpl): MainUI
+
+    @Binds
+    abstract fun bindMainUiContinuation(impl: MainUiImpl): MainUiContinuation
 
     @Singleton
     @Binds
