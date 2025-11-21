@@ -18,11 +18,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @Singleton // scope the implementation so the two interface bindings resolve to the same instance
-class MainUiImpl @Inject constructor(
+class MainUIImpl @Inject constructor(
     private val stringSupplier: StringSupplier,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
-) : MainUI, MainUiContinuation {
+) : MainUI, MainUIContinuation {
 
     // TODO handle cancellation in a explicit way - with a tagged union or monad
     private var loginCredentialsContinuation: Continuation<String?>? = null

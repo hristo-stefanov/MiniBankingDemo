@@ -8,7 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import hristostefanov.minibankingdemo.presentation.MainUiContinuation
+import hristostefanov.minibankingdemo.presentation.MainUIContinuation
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ class RetryDialog : DialogFragment() {
     private val args: RetryDialogArgs by navArgs()
 
     @Inject
-    internal lateinit var mainUiContinuation: MainUiContinuation
+    internal lateinit var mainUIContinuation: MainUIContinuation
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Set if can be cancelled by Back button or tapping outside of the dialog
@@ -28,7 +28,7 @@ class RetryDialog : DialogFragment() {
             .setTitle("Retry?")
             .setPositiveButton("Retry") { _, _ ->
                 lifecycleScope.launch {
-                    mainUiContinuation.onConfirmRetrying()
+                    mainUIContinuation.onConfirmRetrying()
 
                     // This is a must when using the navigation library
                     findNavController().popBackStack()
@@ -38,7 +38,7 @@ class RetryDialog : DialogFragment() {
                 if (args.isCancelable) {
                     setNegativeButton(android.R.string.cancel) { _, _ ->
                         lifecycleScope.launch {
-                            mainUiContinuation.onCancelRetrying()
+                            mainUIContinuation.onCancelRetrying()
                         }
                     }
                 } else {

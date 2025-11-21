@@ -11,8 +11,8 @@ import hristostefanov.minibankingdemo.business.calcStartOfSevenDayWindowIncludin
 import hristostefanov.minibankingdemo.presentation.EnsureLoginCredentialsUiImpl
 import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.presentation.MainUI
-import hristostefanov.minibankingdemo.presentation.MainUiContinuation
-import hristostefanov.minibankingdemo.presentation.MainUiImpl
+import hristostefanov.minibankingdemo.presentation.MainUIContinuation
+import hristostefanov.minibankingdemo.presentation.MainUIImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
@@ -106,10 +106,10 @@ abstract class ApplicationModule {
     // are scoped by key - the interface)
 
     @Binds
-    abstract fun bindMainUI(impl: MainUiImpl): MainUI
+    abstract fun bindMainUI(impl: MainUIImpl): MainUI
 
     @Binds
-    abstract fun bindMainUiContinuation(impl: MainUiImpl): MainUiContinuation
+    abstract fun bindMainUiContinuation(impl: MainUIImpl): MainUIContinuation
 
     @Singleton
     @Binds

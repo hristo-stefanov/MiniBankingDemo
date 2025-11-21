@@ -1,6 +1,6 @@
 package hristostefanov.minibankingdemo.presentation
 
-interface MainUiContinuation {
+interface MainUIContinuation {
     fun onCancelSubmitCredentials()
     fun onSubmitCredentials(credentials: String)
 

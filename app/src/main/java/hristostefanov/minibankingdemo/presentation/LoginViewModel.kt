@@ -11,7 +11,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
-    private val mainUiContinuation: MainUiContinuation
+    private val mainUIContinuation: MainUIContinuation
 ) : ViewModel() {
 
     private val _acceptCommandEnabled = MutableLiveData(false)
@@ -31,13 +31,13 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onCancel() {
-        mainUiContinuation.onCancelSubmitCredentials()
+        mainUIContinuation.onCancelSubmitCredentials()
     }
 
     fun onAcceptCommand() {
         viewModelScope.launch {
             accessToken?.let {
-                mainUiContinuation.onSubmitCredentials(it)
+                mainUIContinuation.onSubmitCredentials(it)
 
                 // Note this will clear this view model and cancel this coroutine so
                 // should be called after calling the interactor

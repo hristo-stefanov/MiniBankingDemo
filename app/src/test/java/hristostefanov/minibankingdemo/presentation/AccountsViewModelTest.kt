@@ -46,7 +46,7 @@ class AccountsViewModelTest {
     @Suppress("UNCHECKED_CAST")
     private val mainCommandChannel = spy(Channel::class.java) as Channel<MainCommand>
 
-    private val userInterface = MainUiImpl(mainCommandChannel)
+    private val userInterface = MainUIImpl(mainCommandChannel)
 
     private val account1 = Summary.Item(
         "1",
