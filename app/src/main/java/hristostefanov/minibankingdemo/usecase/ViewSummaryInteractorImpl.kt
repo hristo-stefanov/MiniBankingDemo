@@ -9,8 +9,9 @@ import hristostefanov.minibankingdemo.business.entities.Account
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
+import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
-import hristostefanov.minibankingdemo.usecase.input.Failure
+import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.status
@@ -54,6 +55,7 @@ class ViewSummaryInteractorImpl @Inject constructor(
             val summary = summarize(since, accountDetails)
 
             viewSummaryUI.presentSummary(summary)
+            Completion
         }.recover { e ->
             raise(Failure(e))
         }

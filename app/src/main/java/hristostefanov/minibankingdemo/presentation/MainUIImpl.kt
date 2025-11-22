@@ -7,8 +7,8 @@ import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.AuthException
 import hristostefanov.minibankingdemo.presentation.DialogResult.*
-import hristostefanov.minibankingdemo.usecase.input.Cancellation
-import hristostefanov.minibankingdemo.usecase.input.Failure
+import hristostefanov.minibankingdemo.usecase.input.Termination.Cancellation
+import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.onCompletion
 import hristostefanov.minibankingdemo.usecase.input.onTermination

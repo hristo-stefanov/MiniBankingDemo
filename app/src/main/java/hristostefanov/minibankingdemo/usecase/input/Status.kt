@@ -3,16 +3,18 @@ package hristostefanov.minibankingdemo.usecase.input
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import hristostefanov.minibankingdemo.usecase.input.Termination.*
 
 // NOTE: inlining functions is needed to allow for both suspend and non-suspend argument
 
 typealias Status = Either<Termination, Completion>
 
-sealed interface Termination
-data class Failure(val exception: Throwable) : Termination
-data object Cancellation : Termination
+sealed interface Termination {
+    data class Failure(val exception: Throwable) : Termination
+    data object Cancellation : Termination
+}
 
-typealias Completion = Unit
+object Completion
 
 fun Termination.status() = this.left()
 

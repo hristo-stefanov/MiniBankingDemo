@@ -3,8 +3,9 @@ package hristostefanov.minibankingdemo.usecase
 import arrow.core.Either
 import arrow.core.recover
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
-import hristostefanov.minibankingdemo.usecase.input.Failure
+import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import org.greenrobot.eventbus.EventBus
@@ -29,6 +30,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
             )
             // TODO
             eventBus.post(DataSourceChangedEvent())
+            Completion
         }.recover { exception ->
             // TODO think of more readable way to convert a Throwable into Failure
             raise(
