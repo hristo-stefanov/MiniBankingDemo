@@ -1,8 +1,9 @@
 package hristostefanov.minibankingdemo.usecase.output
 
+import arrow.core.Either
+
 interface EnsureLoginCredentialsUI {
-    /**
-     * @return null if cancelled and the credentials otherwise
-     */
-    suspend fun promptUserToSubmitCredentials(): String?
+    suspend fun promptUserToSubmitCredentials(): Either<Cancel, String>
 }
+
+object Cancel

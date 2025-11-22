@@ -1,21 +1,26 @@
 package hristostefanov.minibankingdemo.presentation
 
-import hristostefanov.minibankingdemo.util.MainCommandChannel
-import kotlinx.coroutines.channels.Channel
-import javax.inject.Inject
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import hristostefanov.minibankingdemo.NavGraphXmlDirections
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.business.dependences.AuthException
+import hristostefanov.minibankingdemo.presentation.DialogResult.*
 import hristostefanov.minibankingdemo.usecase.input.Cancellation
 import hristostefanov.minibankingdemo.usecase.input.Failure
 import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.onCompletion
 import hristostefanov.minibankingdemo.usecase.input.onTermination
+import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
+import kotlinx.coroutines.channels.Channel
+import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 
 @Singleton // scope the implementation so the two interface bindings resolve to the same instance
 class MainUIImpl @Inject constructor(
@@ -24,13 +29,11 @@ class MainUIImpl @Inject constructor(
     private val mainCommandChannel: Channel<MainCommand>,
 ) : MainUI, MainUIContinuation {
 
-    // TODO handle cancellation in a explicit way - with a tagged union or monad
-    private var loginCredentialsContinuation: Continuation<String?>? = null
+    private var loginCredentialsContinuation: Continuation<Either<Cancel, String>>? = null
 
-    // true - confirmed , false - cancelled
-    private var retryRecoveryContinuation: Continuation<Boolean>? = null
+    private var retryRecoveryContinuation: Continuation<Either<Cancel, Confirm>>? = null
 
-    override suspend fun promptUserToSubmitCredentials(): String? {
+    override suspend fun promptUserToSubmitCredentials(): Either<Cancel, String> {
         check(loginCredentialsContinuation == null) { "Nesting not supported" }
 
         mainCommandChannel.send(MainCommand.NavigateForward(NavGraphXmlDirections.toLoginDestination()))
@@ -41,7 +44,7 @@ class MainUIImpl @Inject constructor(
         }
     }
 
-    override suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Boolean {
+    override suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Either<Cancel, Confirm> {
         check(retryRecoveryContinuation == null) { "Nesting not supported" }
 
         mainCommandChannel.send(
@@ -89,18 +92,18 @@ class MainUIImpl @Inject constructor(
     }
 
     override fun onCancelSubmitCredentials() {
-        checkNotNull(loginCredentialsContinuation).resume(null)
+        checkNotNull(loginCredentialsContinuation).resume(Cancel.left())
     }
 
     override fun onSubmitCredentials(credentials: String) {
-        checkNotNull(loginCredentialsContinuation).resume(credentials)
+        checkNotNull(loginCredentialsContinuation).resume(credentials.right())
     }
 
     override fun onCancelRetrying() {
-        checkNotNull(retryRecoveryContinuation).resume(false)
+        checkNotNull(retryRecoveryContinuation).resume(Cancel.left())
     }
 
     override fun onConfirmRetrying() {
-        checkNotNull(retryRecoveryContinuation).resume(true)
+        checkNotNull(retryRecoveryContinuation).resume(Confirm.right())
     }
 }

@@ -1,5 +1,7 @@
 package hristostefanov.minibankingdemo.presentation
 
+import arrow.core.Either
+import hristostefanov.minibankingdemo.presentation.DialogResult.*
 import hristostefanov.minibankingdemo.usecase.input.Status
 
 interface MainUI {
@@ -8,7 +10,7 @@ interface MainUI {
      *
      * @return true - confirmed, false - cancelled
      */
-    suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Boolean
+    suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Either<Cancel, Confirm>
 
     /**
      * Present a message without waiting for acknowledgement.
@@ -17,5 +19,10 @@ interface MainUI {
 
     suspend fun presentStatus(status: Status)
     suspend fun presentErrorDialog(message: String)
-    suspend fun promptUserToSubmitCredentials(): String?
+    suspend fun promptUserToSubmitCredentials(): Either<Cancel, String>
+}
+
+interface DialogResult {
+    object Cancel: DialogResult
+    object Confirm: DialogResult
 }
