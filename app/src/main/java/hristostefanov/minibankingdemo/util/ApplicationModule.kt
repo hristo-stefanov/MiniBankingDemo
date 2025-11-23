@@ -58,7 +58,7 @@ abstract class ApplicationModule {
             // the provided implementation references the application context which is always
             // present during the life of the app process, hence no worries about leaks here
             return object : StringSupplier {
-                override fun get(resId: Int): String = application.getString(resId)
+                override fun get(resId: Int, vararg formatArgs: Any): String = application.getString(resId, *formatArgs)
             }
         }
 

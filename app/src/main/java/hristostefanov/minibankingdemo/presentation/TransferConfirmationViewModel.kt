@@ -42,8 +42,7 @@ class TransferConfirmationViewModel @Inject constructor(
             args.roundUpAmount,
             args.accountCurrency.currencyCode
         )
-        _info.value = stringSupplier.get(R.string.transferInfo)
-            .format(amountFormatted, args.savingsGoalName)
+        _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, args.savingsGoalName)
     }
 
     fun onConfirmCommand() {

@@ -141,7 +141,7 @@ class AccountsViewModel @Inject constructor(
             it?.roundUpSince?.format(formatter)
         }
             .onEach { date ->
-                val text = date?.let { stringSupplier.get(R.string.roundUpInfo).format(it) } ?: ""
+                val text = date?.let { stringSupplier.get(R.string.roundUpInfo, it) } ?: ""
                 _roundUpInfo.value = text
             }
             .launchIn(viewModelScope)
