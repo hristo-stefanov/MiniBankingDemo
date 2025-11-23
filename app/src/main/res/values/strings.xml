@@ -14,4 +14,7 @@
     <string name="logout">Logout</string>
     <string name="refresh">Refresh</string>
     <string name="login_title">Login</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="invalid_credentials">Your credentials are invalid. You need to Log out first</string>
+    <string name="failure">Failure: %1$s</string>
 </resources>

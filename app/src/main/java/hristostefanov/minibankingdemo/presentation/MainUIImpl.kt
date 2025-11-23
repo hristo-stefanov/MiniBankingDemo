@@ -79,12 +79,12 @@ class MainUIImpl @Inject constructor(
             .onCompletion { presentMessage(stringSupplier.get(R.string.success)) }
             .onTermination {
                 when (it) {
-                    Cancellation -> presentMessage("Cancelled")
+                    Cancellation -> presentMessage(stringSupplier.get(R.string.cancelled))
                     is Failure -> {
                         if (it.exception is AuthException) {
-                            presentMessage("Your credentials are invalid. You need to Log out first")
+                            presentMessage(stringSupplier.get(R.string.invalid_credentials))
                         } else {
-                            presentMessage("Failure: ${it.exception.localizedMessage}")
+                            presentMessage(stringSupplier.get(R.string.failure, it.exception.localizedMessage))
                         }
                     }
                 }
