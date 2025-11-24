@@ -61,35 +61,10 @@
             app:argType="java.util.Currency" />
     </fragment>
 
-    <action
-        android:id="@+id/to_errorDialog"
-        app:destination="@id/errorDialog" />
-
 
     <action
         android:id="@+id/to_loginDestination"
         app:destination="@id/loginDestination" />
 
-    <action
-        android:id="@+id/to_retryDialog"
-        app:destination="@id/retryDialog" />
 
-    <dialog
-        android:id="@+id/retryDialog"
-        android:name="hristostefanov.minibankingdemo.ui.RetryDialog">
-        <argument android:name="isCancelable"
-            app:argType="boolean" />
-        <argument
-            android:name="message"
-            app:argType="string" />
-    </dialog>
-
-
-    <dialog
-        android:id="@+id/errorDialog"
-        android:name="hristostefanov.minibankingdemo.ui.ErrorDialog">
-        <argument
-            android:name="message"
-            app:argType="string" />
-    </dialog>
 </navigation>

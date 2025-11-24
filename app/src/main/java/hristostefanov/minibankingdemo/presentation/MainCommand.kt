@@ -19,5 +19,5 @@ sealed class MainCommand {
         navOptions: NavOptions? = null
     ): MainCommand()
     data class ShowSnackbar(val message: String): MainCommand()
-    data class ShowErrorDialog(val message: String): MainCommand()
+    data class ShowConfirmationDialog(val title: String?, val message: String?, val isCancelable: Boolean): MainCommand()
 }

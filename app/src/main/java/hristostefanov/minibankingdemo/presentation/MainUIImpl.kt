@@ -14,7 +14,10 @@ import hristostefanov.minibankingdemo.usecase.input.onCompletion
 import hristostefanov.minibankingdemo.usecase.input.onTermination
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
@@ -29,9 +32,12 @@ class MainUIImpl @Inject constructor(
     private val mainCommandChannel: Channel<MainCommand>,
 ) : MainUI, MainUIContinuation {
 
+    // No need to cancel this scope, it'll be torn down with the process
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
     private var loginCredentialsContinuation: Continuation<Either<Cancel, String>>? = null
 
-    private var retryRecoveryContinuation: Continuation<Either<Cancel, Confirm>>? = null
+    private var confirmationContinuation: Continuation<Either<Cancel, OK>>? = null
 
     override suspend fun promptUserToSubmitCredentials(): Either<Cancel, String> {
         check(loginCredentialsContinuation == null) { "Nesting not supported" }
@@ -44,37 +50,32 @@ class MainUIImpl @Inject constructor(
         }
     }
 
-    override suspend fun askToConfirmRetrying(errorMessage: String, isCancelable: Boolean): Either<Cancel, Confirm> {
-        check(retryRecoveryContinuation == null) { "Nesting not supported" }
+    override suspend fun askForConfirmation(title: String?, message: String?, isCancelable: Boolean): Either<Cancel, OK> {
+        check(confirmationContinuation == null) { "Nesting not supported" }
 
         mainCommandChannel.send(
-            MainCommand.NavigateForward(
-                NavGraphXmlDirections.toRetryDialog(
-                    isCancelable = isCancelable,
-                    message = errorMessage,
-                )
-            )
+            MainCommand.ShowConfirmationDialog(title, message, isCancelable)
         )
         return suspendCoroutine {
-            retryRecoveryContinuation = it
+            confirmationContinuation = it
         }.also {
-            retryRecoveryContinuation = null
+            confirmationContinuation = null
         }
     }
 
-    override suspend fun presentMessage(message: String) {
-        mainCommandChannel.send(
-            MainCommand.ShowSnackbar(message)
-        )
+    override fun presentMessage(message: String) {
+        coroutineScope.launch {
+            mainCommandChannel.send(
+                MainCommand.ShowSnackbar(message)
+            )
+        }
     }
 
     override suspend fun presentErrorDialog(message: String) {
-        mainCommandChannel.send(
-            MainCommand.ShowErrorDialog(message)
-        )
+        askForConfirmation("Error", message, false)
     }
 
-    override suspend fun presentStatus(status: Status) {
+    override fun presentStatus(status: Status) {
         status
             .onCompletion { presentMessage(stringSupplier.get(R.string.success)) }
             .onTermination {
@@ -99,11 +100,11 @@ class MainUIImpl @Inject constructor(
         checkNotNull(loginCredentialsContinuation).resume(credentials.right())
     }
 
-    override fun onCancelRetrying() {
-        checkNotNull(retryRecoveryContinuation).resume(Cancel.left())
+    override fun onCancel() {
+        checkNotNull(confirmationContinuation).resume(Cancel.left())
     }
 
-    override fun onConfirmRetrying() {
-        checkNotNull(retryRecoveryContinuation).resume(Confirm.right())
+    override fun onConfirm() {
+        checkNotNull(confirmationContinuation).resume(OK.right())
     }
 }

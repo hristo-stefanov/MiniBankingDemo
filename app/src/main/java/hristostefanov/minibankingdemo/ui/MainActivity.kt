@@ -64,13 +64,13 @@ class MainActivity : AppCompatActivity() {
             .receiveAsFlow()
             .flowWithLifecycle(lifecycle)
             .onEach { navigation ->
-                onNavigation(navigation, navController)
+                onMainCommand(navigation, navController)
             }
             .launchIn(lifecycleScope)
     }
 
 
-    private fun onNavigation(mainCommand: MainCommand, navController: NavController) {
+    private fun onMainCommand(mainCommand: MainCommand, navController: NavController) {
         when (mainCommand) {
             is MainCommand.NavigateForward -> navController.navigate(mainCommand.navDirections)
             is MainCommand.NavigateForwardToDestination -> navController.navigate(mainCommand
@@ -97,10 +97,12 @@ class MainActivity : AppCompatActivity() {
                 val view = findViewById<ConstraintLayout>(R.id.rootLayout)
                 Snackbar.make(view, mainCommand.message, Snackbar.LENGTH_LONG).show()
             }
-
-            is MainCommand.ShowErrorDialog -> {
-                val args = ErrorDialogArgs(mainCommand.message)
-                navController.navigate(R.id.errorDialog, args.toBundle())
+            is MainCommand.ShowConfirmationDialog -> {
+                with(mainCommand) {
+                    ConfirmationDialog.create(title = title, message = message, isCancelable = isCancelable)
+                }.run {
+                    show(supportFragmentManager, null)
+                }
             }
         }
     }

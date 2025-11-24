@@ -4,6 +4,6 @@ interface MainUIContinuation {
     fun onCancelSubmitCredentials()
     fun onSubmitCredentials(credentials: String)
 
-    fun onCancelRetrying()
-    fun onConfirmRetrying()
+    fun onCancel()
+    fun onConfirm()
 }
