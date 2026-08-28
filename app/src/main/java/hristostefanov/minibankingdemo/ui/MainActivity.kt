@@ -100,9 +100,7 @@ class MainActivity : AppCompatActivity() {
             is MainCommand.ShowConfirmationDialog -> {
                 with(mainCommand) {
                     ConfirmationDialog.create(title = title, message = message, isCancelable = isCancelable)
-                }.run {
-                    show(supportFragmentManager, null)
-                }
+                }.show(supportFragmentManager, null)
             }
         }
     }

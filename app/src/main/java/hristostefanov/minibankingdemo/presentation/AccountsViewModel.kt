@@ -39,11 +39,8 @@ import javax.inject.Inject
 import kotlin.collections.map
 import kotlin.collections.toTypedArray
 
-const val ACCOUNT_ID_KEY = "accountId"
-
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
-    private val state: SavedStateHandle,
     private val locale: Locale,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
@@ -56,9 +53,7 @@ class AccountsViewModel @Inject constructor(
     private val logoutInteractor: LogoutInteractor,
 ) : ViewModel() {
 
-
-    private val savedAccountIdFlow: Flow<String?> =
-        state.getStateFlow<String?>(ACCOUNT_ID_KEY, null)
+    private val savedAccountIdFlow = MutableStateFlow<String?>(null)
 
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
@@ -113,8 +108,7 @@ class AccountsViewModel @Inject constructor(
 
     fun onAccountSelectionChanged(position: Int) {
         val accountId = loginSessionRegistry.requireComponent.data.summary.value?.items?.getOrNull(position)?.accountId
-        // TODO do we really need to save it
-        state[ACCOUNT_ID_KEY] = accountId
+        savedAccountIdFlow.value = accountId
     }
 
     init {
