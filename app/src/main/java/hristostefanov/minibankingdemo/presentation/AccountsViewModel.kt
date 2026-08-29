@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -88,6 +87,17 @@ class AccountsViewModel @Inject constructor(
         summary?.items?.find { it.accountId == selectedAccountId }
     }.distinctUntilChanged()
 
+    init {
+        hookAccountList()
+        hookRoundUpInfo()
+        hookSelectedAccountPosition()
+        hookRoundUpAmountText()
+        hookTransferCommandEnabled()
+        hookLogoutCommandEnabled()
+
+        viewSummary()
+    }
+
     fun onTransferCommand() {
         loginSessionRegistry.component?.data?.summary?.value?.items?.getOrNull(_selectedAccountPosition.value)?.let { account ->
             val displaySavingsGoals = account.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
@@ -111,8 +121,7 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    init {
-        // map Account to DisplayAccount
+    private fun hookAccountList() {
         summary.map { it ->
             it?.items?.map { item ->
                 val displayBalance = amountFormatter.format(
@@ -128,27 +137,28 @@ class AccountsViewModel @Inject constructor(
         }
             .onEach { _accountList.value = it }
             .launchIn(viewModelScope)
+    }
+    
 
-        summary.map { it ->
-            // TODO consider externalizing similarly to AmountFormatter
-            val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
-            it?.roundUpSince?.format(formatter)
-        }
-            .onEach { date ->
-                val text = date?.let { stringSupplier.get(R.string.roundUpInfo, it) } ?: ""
-                _roundUpInfo.value = text
-            }
-            .launchIn(viewModelScope)
-
-        combine(selectedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
-            val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
-            summary.items.indexOf(selectedAccount)
-        }
+    private fun hookLogoutCommandEnabled() {
+        tokenStore.tokenFlow
+            .map { it != null }
             .onEach {
-                _selectedAccountPosition.value = it
+                _logoutCommandEnabled.value = it
             }
             .launchIn(viewModelScope)
+    }
 
+    private fun hookTransferCommandEnabled() {
+        getSelectedAccountFlow()
+            .map { it != null }
+            .onEach {
+                _transferCommandEnabled.value = it
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun hookRoundUpAmountText() {
         getSelectedAccountFlow()
             .map {
                 if (it != null) {
@@ -164,22 +174,30 @@ class AccountsViewModel @Inject constructor(
                 _roundUpAmountText.value = it
             }
             .launchIn(viewModelScope)
+    }
 
-        getSelectedAccountFlow()
-            .map { it != null }
+    private fun hookSelectedAccountPosition() {
+        combine(selectedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
+            val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
+            summary.items.indexOf(selectedAccount)
+        }
             .onEach {
-                _transferCommandEnabled.value = it
+                _selectedAccountPosition.value = it
             }
             .launchIn(viewModelScope)
+    }
 
-        tokenStore.tokenFlow
-            .map { it != null }
-            .onEach {
-                _logoutCommandEnabled.value = it
+    private fun hookRoundUpInfo() {
+        summary.map { it ->
+            // TODO consider externalizing similarly to AmountFormatter
+            val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+            it?.roundUpSince?.format(formatter)
+        }
+            .onEach { date ->
+                val text = date?.let { stringSupplier.get(R.string.roundUpInfo, it) } ?: ""
+                _roundUpInfo.value = text
             }
             .launchIn(viewModelScope)
-
-        viewSummary()
     }
 
     fun onLogout() {
