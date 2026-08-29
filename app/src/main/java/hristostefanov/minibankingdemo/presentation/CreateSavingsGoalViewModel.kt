@@ -48,17 +48,19 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                with(loginSessionRegistry.requireComponent.data) {
-                    val status = createSavingsGoalInteractor(
-                        goalName = name,
-                        accountId = selectedAccount.accountId,
-                        accountCurrency = selectedAccount.currency
-                    )
+                loginSessionRegistry.requireComponent.data.selectedAccount?.let { account ->
+                    with(loginSessionRegistry.requireComponent.data) {
+                        val status = createSavingsGoalInteractor(
+                            goalName = name,
+                            accountId = account.accountId,
+                            accountCurrency = account.currency
+                        )
 
-                    if (status.isFailure()) {
-                        mainUI.presentStatus(status)
-                    } else {
-                        mainCommandChannel.send(MainCommand.NavigateBackward)
+                        if (status.isFailure()) {
+                            mainUI.presentStatus(status)
+                        } else {
+                            mainCommandChannel.send(MainCommand.NavigateBackward)
+                        }
                     }
                 }
             }

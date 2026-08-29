@@ -1,6 +1,5 @@
 package hristostefanov.minibankingdemo.presentation
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,8 +52,6 @@ class AccountsViewModel @Inject constructor(
     private val logoutInteractor: LogoutInteractor,
 ) : ViewModel() {
 
-    private val savedAccountIdFlow = MutableStateFlow<String?>(null)
-
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
 
@@ -78,22 +75,19 @@ class AccountsViewModel @Inject constructor(
        component?.data?.summary ?: flowOf(null)
     }
 
-    // TODO this can go in session data, no? We already have Summary there
-    private val selectedAccountFlow: Flow<Summary.Item?> =
-        combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
-            summary?.items?.getOrNull(position)
-        }.distinctUntilChanged()
-
-    private fun clearInMemoryLoginSessionData() {
-        // TODO what to clear here
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val selectedAccountIdFlow = loginSessionRegistry.componentFlow.flatMapLatest { component ->
+        component?.data?.selectedAccountIdFlow ?: flowOf(null)
     }
 
+    private fun getSelectedAccountFlow() = combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
+        summary?.items?.getOrNull(position)
+    }.distinctUntilChanged()
+
     fun onTransferCommand() {
-        selectedAccountFlow
-            .take(1)
-            .filterNotNull()
-            .onEach { it ->
-                val displaySavingsGoals = it.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
+        loginSessionRegistry.component?.data?.summary?.value?.items?.getOrNull(_selectedAccountPosition.value)?.let { account ->
+            val displaySavingsGoals = account.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
+            viewModelScope.launch {
                 mainCommandChannel.send(
                     MainCommand.NavigateForward(
                         AccountsFragmentDirections.actionToSavingsGoalsDestination(
@@ -103,12 +97,14 @@ class AccountsViewModel @Inject constructor(
                     )
                 )
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        val accountId = loginSessionRegistry.requireComponent.data.summary.value?.items?.getOrNull(position)?.accountId
-        savedAccountIdFlow.value = accountId
+        loginSessionRegistry.component?.data?.let { data ->
+            val accountId = data.summary.value?.items?.getOrNull(position)?.accountId
+            data.selectedAccountIdFlow.value = accountId
+        }
     }
 
     init {
@@ -140,7 +136,7 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        combine(savedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
+        combine(selectedAccountIdFlow, summary.filterNotNull()) { accountId: String?, summary: Summary ->
             val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
             summary.items.indexOf(selectedAccount)
         }
@@ -149,7 +145,7 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        selectedAccountFlow
+        getSelectedAccountFlow()
             .map {
                 if (it != null) {
                     amountFormatter.format(
@@ -165,13 +161,7 @@ class AccountsViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        selectedAccountFlow.filterNotNull()
-            .onEach {
-                loginSessionRegistry.requireComponent.data.selectedAccount = it
-            }
-            .launchIn(viewModelScope)
-
-        selectedAccountFlow
+        getSelectedAccountFlow()
             .map { it != null }
             .onEach {
                 _transferCommandEnabled.value = it
@@ -184,11 +174,6 @@ class AccountsViewModel @Inject constructor(
                 _logoutCommandEnabled.value = it
             }
             .launchIn(viewModelScope)
-
-        // TODO consider making SessionRegistry observable instead
-        tokenStore.tokenFlow.onEach {
-            if (it == null) clearInMemoryLoginSessionData()
-        }.launchIn(viewModelScope)
 
         viewSummary()
     }

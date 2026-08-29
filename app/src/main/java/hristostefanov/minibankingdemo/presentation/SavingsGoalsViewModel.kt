@@ -57,16 +57,18 @@ class SavingsGoalsViewModel @Inject constructor(
             this.savingsGoalId = savingsGoalId
             this.savingsGoalName = savingsGoalName
 
-            viewModelScope.launch {
-                mainCommandChannel.send(
-                    MainCommand.NavigateForward(
-                        SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
-                            savingsGoalName = savingsGoalName,
-                            roundUpAmount = selectedAccount.roundUp,
-                            accountCurrency = selectedAccount.currency,
+            selectedAccount?.let { account ->
+                viewModelScope.launch {
+                    mainCommandChannel.send(
+                        MainCommand.NavigateForward(
+                            SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination(
+                                savingsGoalName = savingsGoalName,
+                                roundUpAmount = account.roundUp,
+                                accountCurrency = account.currency,
+                            )
                         )
                     )
-                )
+                }
             }
         }
     }

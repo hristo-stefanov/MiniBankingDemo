@@ -48,17 +48,19 @@ class TransferConfirmationViewModel @Inject constructor(
     fun onConfirmCommand() {
         viewModelScope.launch {
             with(loginSessionRegistry.requireComponent.data) {
-                val status = transferRoundUpInteractor(
-                    accountId = selectedAccount.accountId,
-                    accountCurrency = selectedAccount.currency,
-                    savingsGoalId = savingsGoalId,
-                    roundUpAmount = selectedAccount.roundUp,
-                )
+                selectedAccount?.let { account ->
+                    val status = transferRoundUpInteractor(
+                        accountId = account.accountId,
+                        accountCurrency = account.currency,
+                        savingsGoalId = savingsGoalId,
+                        roundUpAmount = account.roundUp,
+                    )
 
-                mainUI.presentStatus(status)
+                    mainUI.presentStatus(status)
 
-                if (!status.isFailure()) {
-                    mainCommandChannel.send(MainCommand.NavigateBefore(R.id.savingsGoalsDestination))
+                    if (!status.isFailure()) {
+                        mainCommandChannel.send(MainCommand.NavigateBefore(R.id.savingsGoalsDestination))
+                    }
                 }
             }
         }
