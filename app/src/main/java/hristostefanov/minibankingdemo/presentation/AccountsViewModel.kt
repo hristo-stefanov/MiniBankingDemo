@@ -52,6 +52,8 @@ class AccountsViewModel @Inject constructor(
     private val logoutInteractor: LogoutInteractor,
 ) : ViewModel() {
 
+    // Data-bound properties - begin
+
     private val _accountList = MutableStateFlow<List<DisplayAccount>>(emptyList())
     val accountList: StateFlow<List<DisplayAccount>> = _accountList.asStateFlow()
 
@@ -70,6 +72,8 @@ class AccountsViewModel @Inject constructor(
     private val _logoutCommandEnabled = MutableStateFlow(false)
     val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
 
+    // Data-bound properties - end
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val summary: Flow<Summary?> = loginSessionRegistry.componentFlow.flatMapLatest { component ->
        component?.data?.summary ?: flowOf(null)
@@ -80,8 +84,8 @@ class AccountsViewModel @Inject constructor(
         component?.data?.selectedAccountIdFlow ?: flowOf(null)
     }
 
-    private fun getSelectedAccountFlow() = combine(_selectedAccountPosition, summary) { position: Int, summary: Summary? ->
-        summary?.items?.getOrNull(position)
+    private fun getSelectedAccountFlow() = combine(selectedAccountIdFlow, summary) { selectedAccountId: String?, summary: Summary? ->
+        summary?.items?.find { it.accountId == selectedAccountId }
     }.distinctUntilChanged()
 
     fun onTransferCommand() {
