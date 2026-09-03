@@ -29,8 +29,6 @@ interface LoginSessionComponent {
     @get:AccessToken
     val accessToken: String
 
-    val calcRoundUpInteractor: CalcRoundUpInteractor
-    val listSavingGoalInteractor: ListSavingGoalsInteractor
     val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
     val repository: Repository
     val data: LoginSessionData
