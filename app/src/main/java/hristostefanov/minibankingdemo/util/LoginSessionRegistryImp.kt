@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class LoginSessionRegistryImp @Inject constructor(
-    private val loginSessionComponentFactory: LoginSessionComponent.Factory
+    private val loginSessionComponentFactory: LoginSessionComponent.Factory,
+    private val loginSessionData: LoginSessionData
 ) : LoginSessionRegistry {
 
     private val _component = MutableStateFlow<LoginSessionComponent?>(null)
@@ -14,13 +15,12 @@ class LoginSessionRegistryImp @Inject constructor(
     override val component: LoginSessionComponent?
         get() = _component.value
 
-    override val componentFlow: StateFlow<LoginSessionComponent?> = _component.asStateFlow()
-
     override fun createSession(token: String, tokenType: String) {
         _component.value = loginSessionComponentFactory.create(token, tokenType)
     }
 
     override fun closeSession() {
         _component.value = null
+        loginSessionData.clear()
     }
 }

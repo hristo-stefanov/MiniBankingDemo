@@ -12,20 +12,16 @@ import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -45,7 +41,7 @@ class AccountsViewModel @Inject constructor(
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
     private val tokenStore: TokenStore,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val loginSessionData: LoginSessionData,
     private val mainUI: MainUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
     private val logoutInteractor: LogoutInteractor,
@@ -73,16 +69,6 @@ class AccountsViewModel @Inject constructor(
 
     // Data-bound properties - end
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val summaryInSession: Flow<Summary?> = loginSessionRegistry.componentFlow.flatMapLatest { component ->
-        component?.data?.summary ?: flowOf(null)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val selectedAccountIdInSession = loginSessionRegistry.componentFlow.flatMapLatest { component ->
-        component?.data?.selectedAccountIdFlow ?: flowOf(null)
-    }
-
     init {
         hookAccountList()
         hookRoundUpInfo()
@@ -95,7 +81,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onTransferCommand() {
-        loginSessionRegistry.component?.data?.summary?.value?.items?.getOrNull(_selectedAccountPosition.value)?.let { account ->
+        loginSessionData.summary.value?.items?.getOrNull(_selectedAccountPosition.value)?.let { account ->
             val displaySavingsGoals = account.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
             viewModelScope.launch {
                 mainCommandChannel.send(
@@ -111,14 +97,14 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun onAccountSelectionChanged(position: Int) {
-        loginSessionRegistry.component?.data?.let { data ->
+        loginSessionData.let { data ->
             val accountId = data.summary.value?.items?.getOrNull(position)?.accountId
             data.selectedAccountIdFlow.value = accountId
         }
     }
 
     private fun hookAccountList() {
-        summaryInSession.map { it ->
+        loginSessionData.summary.map { it ->
             it?.items?.map { item ->
                 val displayBalance = amountFormatter.format(
                     item.balance,
@@ -146,7 +132,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun hookTransferCommandEnabled() {
-        selectedAccountIdInSession
+        loginSessionData.selectedAccountIdFlow
             .map { it != null }
             .onEach {
                 _transferCommandEnabled.value = it
@@ -155,7 +141,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun hookRoundUpAmountText() {
-        combine(selectedAccountIdInSession, summaryInSession) { selectedAccountId: String?, summary: Summary? ->
+        combine(loginSessionData.selectedAccountIdFlow, loginSessionData.summary) { selectedAccountId: String?, summary: Summary? ->
             summary?.items?.find { it.accountId == selectedAccountId }
         }
             .distinctUntilChanged()
@@ -176,7 +162,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun hookSelectedAccountPosition() {
-        combine(selectedAccountIdInSession, summaryInSession.filterNotNull()) { accountId: String?, summary: Summary ->
+        combine(loginSessionData.selectedAccountIdFlow, loginSessionData.summary.filterNotNull()) { accountId: String?, summary: Summary ->
             val selectedAccount = summary.items.find { it.accountId == accountId } ?: summary.items.getOrNull(0)
             summary.items.indexOf(selectedAccount)
         }
@@ -187,7 +173,7 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun hookRoundUpInfo() {
-        summaryInSession.map { it ->
+        loginSessionData.summary.map { it ->
             // TODO consider externalizing similarly to AmountFormatter
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
             it?.roundUpSince?.format(formatter)

@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import javax.inject.Inject
 open class CreateSavingsGoalViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val loginSessionData: LoginSessionData,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
     private val mainUI: MainUI,
@@ -48,19 +48,17 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     open fun onCreateCommand() {
         savedState.get<String>(NAME_KEY)?.also { name ->
             viewModelScope.launch {
-                loginSessionRegistry.requireComponent.data.selectedAccount?.let { account ->
-                    with(loginSessionRegistry.requireComponent.data) {
-                        val status = createSavingsGoalInteractor(
-                            goalName = name,
-                            accountId = account.accountId,
-                            accountCurrency = account.currency
-                        )
+                loginSessionData.selectedAccount?.let { account ->
+                    val status = createSavingsGoalInteractor(
+                        goalName = name,
+                        accountId = account.accountId,
+                        accountCurrency = account.currency
+                    )
 
-                        if (status.isFailure()) {
-                            mainUI.presentStatus(status)
-                        } else {
-                            mainCommandChannel.send(MainCommand.NavigateBackward)
-                        }
+                    if (status.isFailure()) {
+                        mainUI.presentStatus(status)
+                    } else {
+                        mainCommandChannel.send(MainCommand.NavigateBackward)
                     }
                 }
             }

@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentArgs
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
@@ -21,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val loginSessionData: LoginSessionData,
     private val eventBus: EventBus,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>
@@ -53,7 +54,7 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     fun onSavingsGoalClicked(savingsGoalId: String, savingsGoalName: String) {
-        with(loginSessionRegistry.requireComponent.data) {
+        with(loginSessionData) {
             this.savingsGoalId = savingsGoalId
             this.savingsGoalName = savingsGoalName
 

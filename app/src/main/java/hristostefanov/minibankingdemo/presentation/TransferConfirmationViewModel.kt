@@ -11,7 +11,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +28,7 @@ class TransferConfirmationViewModel @Inject constructor(
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val loginSessionData: LoginSessionData,
     private val mainUI: MainUI
 ) : ViewModel() {
 
@@ -47,7 +47,7 @@ class TransferConfirmationViewModel @Inject constructor(
 
     fun onConfirmCommand() {
         viewModelScope.launch {
-            with(loginSessionRegistry.requireComponent.data) {
+            with(loginSessionData) {
                 selectedAccount?.let { account ->
                     val status = transferRoundUpInteractor(
                         accountId = account.accountId,

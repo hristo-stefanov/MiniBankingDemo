@@ -28,12 +28,11 @@ typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
 class ViewSummaryInteractorImpl @Inject constructor(
     val loginSessionRegistry: LoginSessionRegistry,
     val nowProvider: Provider<OffsetDateTime>,
+    private val viewSummaryUI: ViewSummaryUI,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
     private val ensureLoginCredentialsInteractor: EnsureLoginCredentialsInteractor,
 ) : ViewSummaryInteractor {
 
-    private val viewSummaryUI: ViewSummaryUI
-        get() = loginSessionRegistry.requireComponent.viewSummaryUI
 
     override suspend fun invoke(): Status {
            return ensureLoginCredentialsInteractor()

@@ -13,6 +13,7 @@ import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.presentation.MainUI
 import hristostefanov.minibankingdemo.presentation.MainUIContinuation
 import hristostefanov.minibankingdemo.presentation.MainUIImpl
+import hristostefanov.minibankingdemo.presentation.ViewSummaryUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.usecase.CalcSincePolicy
@@ -27,6 +28,7 @@ import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsIntera
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
+import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 import kotlinx.coroutines.channels.Channel
 import org.greenrobot.eventbus.EventBus
 import java.time.OffsetDateTime
@@ -114,6 +116,9 @@ abstract class ApplicationModule {
     @Singleton
     @Binds
     abstract fun binEnsureLoginCredentialsUI(impl: EnsureLoginCredentialsUiImpl): EnsureLoginCredentialsUI
+
+    @Binds
+    abstract fun bindPresentSummaryUi(impl: ViewSummaryUiImpl): ViewSummaryUI
 
     @Singleton
     @Binds

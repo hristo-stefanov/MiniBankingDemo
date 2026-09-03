@@ -18,7 +18,7 @@ class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI
 ) : EnsureLoginCredentialsInteractor {
     override suspend fun invoke(): Status {
-        return if (sessionRegistry.component == null) {
+        return if (tokenStore.tokenFlow.value == null) {
             val result = ensureLoginCredentialsUI.promptUserToSubmitCredentials()
 
             result.fold({

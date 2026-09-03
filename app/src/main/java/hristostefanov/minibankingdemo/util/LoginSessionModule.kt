@@ -12,9 +12,7 @@ import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteracto
 import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractorImpl
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
-import hristostefanov.minibankingdemo.presentation.ViewSummaryUiImpl
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -98,7 +96,4 @@ abstract class LoginSessionModule {
     @Binds
     abstract fun bindListAccountsInteractor(impl: ListAccountsInteractorImpl): ListAccountsInteractor
 
-    @LoginSessionScope
-    @Binds
-    abstract fun bindPresentSummaryUi(impl: ViewSummaryUiImpl): ViewSummaryUI
 }

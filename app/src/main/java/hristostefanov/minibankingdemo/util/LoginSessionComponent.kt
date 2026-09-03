@@ -31,6 +31,4 @@ interface LoginSessionComponent {
 
     val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
     val repository: Repository
-    val data: LoginSessionData
-    val viewSummaryUI: ViewSummaryUI
 }
