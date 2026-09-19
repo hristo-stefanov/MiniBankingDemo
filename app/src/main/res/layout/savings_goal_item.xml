@@ -4,10 +4,10 @@
     <data>
         <variable
             name="item"
-            type="hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal" />
+            type="hristostefanov.minibankingdemo.business.entities.SavingsGoal" />
         <variable
             name="onClick"
-            type="java.util.function.Consumer&lt;hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal&gt;" />
+            type="java.util.function.Consumer&lt;hristostefanov.minibankingdemo.business.entities.SavingsGoal&gt;" />
     </data>
 
     <androidx.cardview.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"

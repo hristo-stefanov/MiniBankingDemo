@@ -2,13 +2,11 @@ package hristostefanov.minibankingdemo.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
-import hristostefanov.minibankingdemo.ui.TransferConfirmationFragmentArgs
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
 import hristostefanov.minibankingdemo.util.LoginSessionData
@@ -22,7 +20,6 @@ private const val NAVIGATION_DELAY_MS = 2000L
 
 @HiltViewModel
 class TransferConfirmationViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val stringSupplier: StringSupplier,
     private val amountFormatter: AmountFormatter,
     @MainCommandChannel
@@ -32,17 +29,17 @@ class TransferConfirmationViewModel @Inject constructor(
     private val mainUI: MainUI
 ) : ViewModel() {
 
-    private val args = TransferConfirmationFragmentArgs.fromSavedStateHandle(savedStateHandle)
-
     private val _info = MutableLiveData("")
     val info: LiveData<String> = _info
 
     init {
-        val amountFormatted = amountFormatter.format(
-            args.roundUpAmount,
-            args.accountCurrency.currencyCode
-        )
-        _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, args.savingsGoalName)
+        loginSessionData.selectedAccount?.let { account ->
+            val amountFormatted = amountFormatter.format(
+                account.roundUp,
+                account.currency.currencyCode
+            )
+            _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, loginSessionData.savingsGoalName)
+        }
     }
 
     fun onConfirmCommand() {

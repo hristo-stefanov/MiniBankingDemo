@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class CreateSavingsGoalViewModel @Inject constructor(
-    private val savedState: SavedStateHandle,
+class CreateSavingsGoalViewModel @Inject constructor(
     private val createSavingsGoalInteractor: CreateSavingsGoalInteractor,
     private val loginSessionData: LoginSessionData,
     @MainCommandChannel
@@ -25,28 +24,20 @@ open class CreateSavingsGoalViewModel @Inject constructor(
     private val mainUI: MainUI,
 ) : ViewModel() {
 
-    // Another approach could be using @EntryPoint, see
-    // https://medium.com/androiddevelopers/hilt-adding-components-to-the-hierarchy-96f207d6d92d
-
-    companion object {
-        const val NAME_KEY = "name"
-    }
-
     // exposing MutableLiveData to allow two-way data binding
-    val name: MutableLiveData<String> = savedState.getLiveData(NAME_KEY)
+    val name: MutableLiveData<String> = MutableLiveData<String>()
 
     // TODO validation rule
     private fun validateName(name: String) = name.isNotBlank()
 
-    open val createCommandEnabled: LiveData<Boolean> by lazy {
-        savedState.getLiveData<String>(NAME_KEY).map { name ->
-            validateName(name) ?: false
-            true
+    val createCommandEnabled: LiveData<Boolean> by lazy {
+        name.map { name ->
+            validateName(name)
         }
     }
 
-    open fun onCreateCommand() {
-        savedState.get<String>(NAME_KEY)?.also { name ->
+    fun onCreateCommand() {
+        name.value?.let { name ->
             viewModelScope.launch {
                 loginSessionData.selectedAccount?.let { account ->
                     val status = createSavingsGoalInteractor(

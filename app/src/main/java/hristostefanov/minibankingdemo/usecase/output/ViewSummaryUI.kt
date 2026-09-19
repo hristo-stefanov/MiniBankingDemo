@@ -13,6 +13,7 @@ data class Summary(
     val roundUpSince: OffsetDateTime,
     val items: List<Item>
 ) {
+   // TODO Can't we use Account from the entities package like SavingsGoal?
     data class Item(
         val accountId: String,
         val number: String,

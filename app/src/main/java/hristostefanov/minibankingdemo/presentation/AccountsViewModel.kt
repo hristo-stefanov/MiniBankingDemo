@@ -82,14 +82,10 @@ class AccountsViewModel @Inject constructor(
 
     fun onTransferCommand() {
         loginSessionData.summary.value?.items?.getOrNull(_selectedAccountPosition.value)?.let { account ->
-            val displaySavingsGoals = account.savingsGoals.map { DisplaySavingsGoal(it.id, it.name) }
             viewModelScope.launch {
                 mainCommandChannel.send(
                     MainCommand.NavigateForward(
-                        AccountsFragmentDirections.actionToSavingsGoalsDestination(
-                            "Select destination",
-                            displaySavingsGoals.toTypedArray()
-                        )
+                        AccountsFragmentDirections.actionToSavingsGoalsDestination()
                     )
                 )
             }

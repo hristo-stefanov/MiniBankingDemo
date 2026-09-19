@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.databinding.SavingsGoalItemBinding
-import hristostefanov.minibankingdemo.presentation.DisplaySavingsGoal
 import java.util.function.Consumer
 
 class SavingsGoalsRecyclerViewAdapter(
-    private val onClick: (DisplaySavingsGoal) -> Unit
-) : ListAdapter<DisplaySavingsGoal, SavingsGoalsRecyclerViewAdapter.ViewHolder>(
+    private val onClick: (SavingsGoal) -> Unit
+) : ListAdapter<SavingsGoal, SavingsGoalsRecyclerViewAdapter.ViewHolder>(
     itemCallback
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,7 +27,7 @@ class SavingsGoalsRecyclerViewAdapter(
 
     class ViewHolder(private val binding: SavingsGoalItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: DisplaySavingsGoal, onClick: Consumer<DisplaySavingsGoal>) {
+        fun bind(item: SavingsGoal, onClick: Consumer<SavingsGoal>) {
             binding.item = item
             binding.onClick = onClick
             // https://stackoverflow.com/questions/53043412/android-why-use-executependingbindings-in-recyclerview
@@ -38,17 +38,17 @@ class SavingsGoalsRecyclerViewAdapter(
 
 }
 
-private val itemCallback = object : DiffUtil.ItemCallback<DisplaySavingsGoal?>() {
+private val itemCallback = object : DiffUtil.ItemCallback<SavingsGoal?>() {
     override fun areItemsTheSame(
-        oldItem: DisplaySavingsGoal,
-        newItem: DisplaySavingsGoal
+        oldItem: SavingsGoal,
+        newItem: SavingsGoal
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: DisplaySavingsGoal,
-        newItem: DisplaySavingsGoal
+        oldItem: SavingsGoal,
+        newItem: SavingsGoal
     ): Boolean {
         return oldItem == newItem
     }
