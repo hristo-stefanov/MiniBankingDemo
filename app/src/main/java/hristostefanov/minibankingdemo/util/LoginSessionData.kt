@@ -8,12 +8,13 @@ import javax.inject.Singleton
 @Singleton
 class LoginSessionData @Inject constructor() {
     val summary = MutableStateFlow<Summary?>(null)
-    lateinit var savingsGoalId: String
-    // TODO make this a derived property
-    lateinit var savingsGoalName: String
+
+    var selectedSavingsGoalId: String? = null
+
+    val selectedAccountIdFlow = MutableStateFlow<String?>(null)
+
     val selectedAccount: Summary.Item?
         get() = summary.value?.items?.find { it.accountId == selectedAccountIdFlow.value }
-    val selectedAccountIdFlow = MutableStateFlow<String?>(null)
 
     fun clear() {
         summary.value = null

@@ -38,27 +38,26 @@ class TransferConfirmationViewModel @Inject constructor(
                 account.roundUp,
                 account.currency.currencyCode
             )
-            _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, loginSessionData.savingsGoalName)
+            val savingsGoalName = account.savingsGoals.find { it.id == loginSessionData.selectedSavingsGoalId }?.name ?: ""
+            _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, savingsGoalName)
         }
     }
 
     fun onConfirmCommand() {
+        val account = loginSessionData.selectedAccount ?: return
+        val savingsGoalId = loginSessionData.selectedSavingsGoalId ?: return
         viewModelScope.launch {
-            with(loginSessionData) {
-                selectedAccount?.let { account ->
-                    val status = transferRoundUpInteractor(
-                        accountId = account.accountId,
-                        accountCurrency = account.currency,
-                        savingsGoalId = savingsGoalId,
-                        roundUpAmount = account.roundUp,
-                    )
+            val status = transferRoundUpInteractor(
+                accountId = account.accountId,
+                accountCurrency = account.currency,
+                savingsGoalId = savingsGoalId,
+                roundUpAmount = account.roundUp,
+            )
 
-                    mainUI.presentStatus(status)
+            mainUI.presentStatus(status)
 
-                    if (!status.isFailure()) {
-                        mainCommandChannel.send(MainCommand.NavigateBefore(R.id.savingsGoalsDestination))
-                    }
-                }
+            if (!status.isFailure()) {
+                mainCommandChannel.send(MainCommand.NavigateBefore(R.id.savingsGoalsDestination))
             }
         }
     }

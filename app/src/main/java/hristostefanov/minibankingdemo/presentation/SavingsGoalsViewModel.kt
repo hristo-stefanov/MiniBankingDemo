@@ -8,9 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
 import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.output.Summary
 import hristostefanov.minibankingdemo.util.LoginSessionData
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -50,10 +48,9 @@ class SavingsGoalsViewModel @Inject constructor(
         _list.value = loginSessionData.selectedAccount?.savingsGoals ?: emptyList()
     }
 
-    fun onSavingsGoalClicked(savingsGoalId: String, savingsGoalName: String) {
+    fun onSavingsGoalClicked(savingsGoalId: String) {
         with(loginSessionData) {
-            this.savingsGoalId = savingsGoalId
-            this.savingsGoalName = savingsGoalName
+            this.selectedSavingsGoalId = savingsGoalId
 
             selectedAccount?.let { account ->
                 viewModelScope.launch {
