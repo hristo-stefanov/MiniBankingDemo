@@ -14,6 +14,7 @@ class TokenStoreImpl(context: Context): TokenStore {
     override val tokenFlow = _tokenFlow.asStateFlow()
 
     private val pref: SharedPreferences by lazy {
+        // TODO reconsider this
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         EncryptedSharedPreferences.create("securePrefs", masterKeyAlias, context,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
