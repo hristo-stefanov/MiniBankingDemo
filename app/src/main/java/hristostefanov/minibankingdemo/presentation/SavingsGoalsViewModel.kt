@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
-import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.util.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
 import hristostefanov.minibankingdemo.util.LoginSessionData
 import hristostefanov.minibankingdemo.util.MainCommandChannel

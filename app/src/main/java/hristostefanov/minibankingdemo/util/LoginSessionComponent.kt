@@ -3,8 +3,6 @@ package hristostefanov.minibankingdemo.util
 import dagger.BindsInstance
 import dagger.Subcomponent
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.business.interactors.*
-import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 
 // NOTE: Another option would be to use a Hilt's "custom component" which is essentially
 // a subcomponent but with less code and with some limitations. See
@@ -29,6 +27,5 @@ interface LoginSessionComponent {
     @get:AccessToken
     val accessToken: String
 
-    val addMoneyIntoGoalInteractor: AddMoneyIntoGoalInteractor
     val repository: Repository
 }

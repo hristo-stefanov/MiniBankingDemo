@@ -2,7 +2,7 @@ package hristostefanov.minibankingdemo.usecase
 
 import arrow.core.Either
 import arrow.core.recover
-import hristostefanov.minibankingdemo.business.interactors.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.util.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
