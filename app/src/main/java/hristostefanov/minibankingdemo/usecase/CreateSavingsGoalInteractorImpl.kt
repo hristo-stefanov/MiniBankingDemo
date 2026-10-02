@@ -20,6 +20,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
     override suspend fun invoke(goalName: String, accountId: String, accountCurrency: Currency): Status {
         // TODO if that's a precondition we should not validate it, right?
         if (!validateName(goalName))
+            // should we throw or return Status
             throw IllegalArgumentException()
 
         return  Either.catch {
@@ -39,7 +40,6 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
         }
     }
 
-    // TODO it's also in the view model
-    private fun validateName(name: String) = name.isNotBlank()
+    override fun validateName(name: String) = name.isNotBlank()
 }
 

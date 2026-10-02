@@ -1,7 +1,5 @@
 package hristostefanov.minibankingdemo.util
 
-import kotlinx.coroutines.flow.StateFlow
-
 interface LoginSessionRegistry {
     val component: LoginSessionComponent?
     val requireComponent: LoginSessionComponent

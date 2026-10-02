@@ -6,10 +6,6 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import hristostefanov.minibankingdemo.BuildConfig
 import hristostefanov.minibankingdemo.business.dependences.Repository
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractor
-import hristostefanov.minibankingdemo.business.interactors.CalcRoundUpInteractorImpl
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractor
-import hristostefanov.minibankingdemo.business.interactors.ListAccountsInteractorImpl
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
@@ -87,13 +83,4 @@ abstract class LoginSessionModule {
     @LoginSessionScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
-
-    @LoginSessionScope
-    @Binds
-    abstract fun bindCalcRoundupInteractor(impl: CalcRoundUpInteractorImpl): CalcRoundUpInteractor
-
-    @LoginSessionScope
-    @Binds
-    abstract fun bindListAccountsInteractor(impl: ListAccountsInteractorImpl): ListAccountsInteractor
-
 }

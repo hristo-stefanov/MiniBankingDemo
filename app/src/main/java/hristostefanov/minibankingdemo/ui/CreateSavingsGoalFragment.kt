@@ -21,7 +21,7 @@ class CreateSavingsGoalFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = CreateSavingsGoalFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

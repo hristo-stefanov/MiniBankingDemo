@@ -8,4 +8,6 @@ interface CreateSavingsGoalInteractor {
         accountId: String,
         accountCurrency: Currency
     ): Status
+
+    fun validateName(name: String): Boolean
 }

@@ -27,12 +27,9 @@ class CreateSavingsGoalViewModel @Inject constructor(
     // exposing MutableLiveData to allow two-way data binding
     val name: MutableLiveData<String> = MutableLiveData<String>()
 
-    // TODO validation rule
-    private fun validateName(name: String) = name.isNotBlank()
-
     val createCommandEnabled: LiveData<Boolean> by lazy {
         name.map { name ->
-            validateName(name)
+            createSavingsGoalInteractor.validateName(name)
         }
     }
 
