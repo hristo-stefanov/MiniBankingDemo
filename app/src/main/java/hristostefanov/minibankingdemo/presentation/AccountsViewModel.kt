@@ -31,7 +31,6 @@ import java.time.format.FormatStyle
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.collections.map
-import kotlin.collections.toTypedArray
 
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
