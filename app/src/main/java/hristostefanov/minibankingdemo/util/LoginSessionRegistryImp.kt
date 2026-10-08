@@ -1,8 +1,5 @@
 package hristostefanov.minibankingdemo.util
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class LoginSessionRegistryImp @Inject constructor(
@@ -10,17 +7,18 @@ class LoginSessionRegistryImp @Inject constructor(
     private val loginSessionData: LoginSessionData
 ) : LoginSessionRegistry {
 
-    private val _component = MutableStateFlow<LoginSessionComponent?>(null)
+    private var _component: LoginSessionComponent? = null
 
     override val component: LoginSessionComponent?
-        get() = _component.value
+        get() = _component
 
     override fun createSession(token: String, tokenType: String) {
-        _component.value = loginSessionComponentFactory.create(token, tokenType)
+        _component = loginSessionComponentFactory.create(token, tokenType)
     }
 
     override fun closeSession() {
-        _component.value = null
+        _component = null
+        // TODO should this happen here?
         loginSessionData.clear()
     }
 }
