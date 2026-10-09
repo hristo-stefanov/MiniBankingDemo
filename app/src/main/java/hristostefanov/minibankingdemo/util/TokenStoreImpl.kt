@@ -10,8 +10,8 @@ import androidx.core.content.edit
 import kotlinx.coroutines.flow.asStateFlow
 
 class TokenStoreImpl(context: Context): TokenStore {
-    private val _tokenFlow = MutableStateFlow<String?>(null)
-    override val tokenFlow = _tokenFlow.asStateFlow()
+    private var _token: String? = null
+    override val token get() = _token
 
     private val pref: SharedPreferences by lazy {
         // TODO reconsider this
@@ -22,11 +22,11 @@ class TokenStoreImpl(context: Context): TokenStore {
     }
 
     init {
-        _tokenFlow.value = pref.getString("token", null)
+        _token = pref.getString("token", null)
     }
 
     override fun setToken(token: String?) {
         pref.edit { putString("token", token) }
-        _tokenFlow.value = token
+        _token = token
     }
 }

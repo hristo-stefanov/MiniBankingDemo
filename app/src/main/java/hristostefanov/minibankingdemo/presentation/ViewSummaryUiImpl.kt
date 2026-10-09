@@ -2,13 +2,14 @@ package hristostefanov.minibankingdemo.presentation
 
 import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionData
+import hristostefanov.minibankingdemo.util.Session
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ViewSummaryUiImpl @Inject constructor(
-    private val loginSessionData: LoginSessionData
+    private val session: Session
 ) : ViewSummaryUI {
     override fun presentSummary(summary: Summary) {
-        loginSessionData.summary.value = summary
+        session.update { it.copy(summary = summary) }
     }
 }

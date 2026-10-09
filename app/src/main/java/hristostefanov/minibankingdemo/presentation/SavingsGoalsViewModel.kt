@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.business.entities.SavingsGoal
-import hristostefanov.minibankingdemo.util.DataSourceChangedEvent
 import hristostefanov.minibankingdemo.ui.SavingsGoalsFragmentDirections
-import hristostefanov.minibankingdemo.util.LoginSessionData
+import hristostefanov.minibankingdemo.util.DataSourceChangedEvent
+import hristostefanov.minibankingdemo.util.Session
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SavingsGoalsViewModel @Inject constructor(
-    private val loginSessionData: LoginSessionData,
+    private val session: Session,
     private val eventBus: EventBus,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>
@@ -45,22 +45,17 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     private fun load() {
-        _list.value = loginSessionData.selectedAccount?.savingsGoals ?: emptyList()
+        _list.value = session.state.value.selectedAccount?.savingsGoals ?: emptyList()
     }
 
     fun onSavingsGoalClicked(savingsGoalId: String) {
-        with(loginSessionData) {
-            this.selectedSavingsGoalId = savingsGoalId
-
-            selectedAccount?.let { account ->
-                viewModelScope.launch {
-                    mainCommandChannel.send(
-                        MainCommand.NavigateForward(
-                            SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination()
-                        )
-                    )
-                }
-            }
+        session.update { it.copy(selectedSavingsGoalId = savingsGoalId) }
+        viewModelScope.launch {
+            mainCommandChannel.send(
+                MainCommand.NavigateForward(
+                    SavingsGoalsFragmentDirections.actionToTransferConfirmationDestination()
+                )
+            )
         }
     }
 

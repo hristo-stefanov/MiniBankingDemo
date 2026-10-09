@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 class LoginSessionRegistryImp @Inject constructor(
     private val loginSessionComponentFactory: LoginSessionComponent.Factory,
-    private val loginSessionData: LoginSessionData
+    private val session: Session
 ) : LoginSessionRegistry {
 
     private var _component: LoginSessionComponent? = null
@@ -19,6 +19,6 @@ class LoginSessionRegistryImp @Inject constructor(
     override fun closeSession() {
         _component = null
         // TODO should this happen here?
-        loginSessionData.clear()
+        session.clear()
     }
 }

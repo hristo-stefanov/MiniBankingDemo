@@ -8,6 +8,7 @@ import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.output.EnsureLoginCredentialsUI
 import hristostefanov.minibankingdemo.usecase.input.status
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.Session
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,17 +16,19 @@ import javax.inject.Singleton
 class EnsureLoginCredentialsInteractorImpl @Inject constructor(
     private val sessionRegistry: LoginSessionRegistry,
     private val tokenStore: TokenStore,
+    private val session: Session,
     private val ensureLoginCredentialsUI: EnsureLoginCredentialsUI
 ) : EnsureLoginCredentialsInteractor {
     override suspend fun invoke(): Status {
-        return if (tokenStore.tokenFlow.value == null) {
+        return if (!session.state.value.hasToken) {
             val result = ensureLoginCredentialsUI.promptUserToSubmitCredentials()
 
             result.fold({
                 Cancellation.status()
-            }, {
-                tokenStore.setToken(it)
-                sessionRegistry.createSession(it, "Bearer")
+            }, { credentials ->
+                tokenStore.setToken(credentials)
+                sessionRegistry.createSession(credentials, "Bearer")
+                session.update { it.copy(hasToken = true) }
 
                 Completion.status()
             })

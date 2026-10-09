@@ -9,7 +9,7 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.usecase.input.TransferRoundUpInteractor
 import hristostefanov.minibankingdemo.usecase.input.isFailure
-import hristostefanov.minibankingdemo.util.LoginSessionData
+import hristostefanov.minibankingdemo.util.Session
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.channels.Channel
@@ -25,7 +25,7 @@ class TransferConfirmationViewModel @Inject constructor(
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
     private val transferRoundUpInteractor: TransferRoundUpInteractor,
-    private val loginSessionData: LoginSessionData,
+    private val session: Session,
     private val mainUI: MainUI
 ) : ViewModel() {
 
@@ -33,19 +33,21 @@ class TransferConfirmationViewModel @Inject constructor(
     val info: LiveData<String> = _info
 
     init {
-        loginSessionData.selectedAccount?.let { account ->
+        val state = session.state.value
+        state.selectedAccount?.let { account ->
             val amountFormatted = amountFormatter.format(
                 account.roundUp,
                 account.currency.currencyCode
             )
-            val savingsGoalName = account.savingsGoals.find { it.id == loginSessionData.selectedSavingsGoalId }?.name ?: ""
+            val savingsGoalName = account.savingsGoals.find { it.id == state.selectedSavingsGoalId }?.name ?: ""
             _info.value = stringSupplier.get(R.string.transferInfo, amountFormatted, savingsGoalName)
         }
     }
 
     fun onConfirmCommand() {
-        val account = loginSessionData.selectedAccount ?: return
-        val savingsGoalId = loginSessionData.selectedSavingsGoalId ?: return
+        val state = session.state.value
+        val account = state.selectedAccount ?: return
+        val savingsGoalId = state.selectedSavingsGoalId ?: return
         viewModelScope.launch {
             val status = transferRoundUpInteractor(
                 accountId = account.accountId,

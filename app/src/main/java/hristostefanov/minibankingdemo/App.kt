@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.Session
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -14,11 +15,15 @@ class App : Application() {
     @Inject
     internal lateinit var sessionRegistry: LoginSessionRegistry
 
+    @Inject
+    internal lateinit var session: Session
+
     override fun onCreate() {
         super.onCreate()
 
-        tokenStore.tokenFlow.value?.let { token ->
+        tokenStore.token?.let { token ->
             sessionRegistry.createSession(token, "Bearer")
+            session.update { it.copy(hasToken = true) }
         }
     }
 }
