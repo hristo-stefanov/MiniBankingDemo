@@ -11,13 +11,14 @@ import hristostefanov.minibankingdemo.business.entities.Transaction
 import hristostefanov.minibankingdemo.business.isSpendingTransaction
 import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.EnsureLoginCredentialsInteractor
+import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
-import hristostefanov.minibankingdemo.usecase.input.Status
 import hristostefanov.minibankingdemo.usecase.input.status
-import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.usecase.output.ViewSummaryUI
+import hristostefanov.minibankingdemo.util.Session
+import kotlinx.coroutines.async
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import javax.inject.Inject
@@ -26,7 +27,7 @@ import javax.inject.Provider
 typealias CalcSincePolicy = (OffsetDateTime) -> OffsetDateTime
 
 class ViewSummaryInteractorImpl @Inject constructor(
-    val loginSessionRegistry: LoginSessionRegistry,
+    val session: Session,
     val nowProvider: Provider<OffsetDateTime>,
     private val viewSummaryUI: ViewSummaryUI,
     private val calcSincePolicy: @JvmSuppressWildcards CalcSincePolicy,
@@ -35,8 +36,14 @@ class ViewSummaryInteractorImpl @Inject constructor(
 
 
     override suspend fun invoke(): Status {
-           return ensureLoginCredentialsInteractor()
-               .fold( { it.status() }, { execute() } )
+        // Note: withContex() is not appropriate here because it's intended to keep the caller's Job ability to cancel
+        // the new coroutine, while we need to run the new coroutine a CoroutineScope with a cancellable Job.
+        // See: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html
+        return session.requireTokenComponent.scope.async {
+            // TODO this interactor changes the state, where do we do sope.async {} - here or there or both?
+            ensureLoginCredentialsInteractor()
+                .fold({ it.status() }, { execute() })
+        }.await()
     }
 
     private suspend fun execute(): Status {
@@ -62,7 +69,7 @@ class ViewSummaryInteractorImpl @Inject constructor(
 
     // TODO requireComponent is a pre-condition for this interactor
     private val repository: Repository
-        get() = loginSessionRegistry.requireComponent.repository
+        get() = session.requireTokenComponent.repository
 }
 
 

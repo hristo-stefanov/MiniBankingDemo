@@ -51,9 +51,9 @@ class PresentationTestAutomationImpl @Inject constructor(
         isThereInternetConnection = false
     }
 
-    private val loginSessionComponentFactory: LoginSessionComponent.Factory = object: LoginSessionComponent.Factory {
-        override fun create(token: String, tokenType: String): LoginSessionComponent {
-            return object : LoginSessionComponent {
+    private val tokenComponentFactory: TokenComponent.Factory = object: TokenComponent.Factory {
+        override fun create(token: String, tokenType: String): TokenComponent {
+            return object : TokenComponent {
                 override val calcRoundUpInteractor: CalcRoundUpInteractor
                     get() = this@PresentationTestAutomationImpl.calcRoundUpInteractorStub
                 override val listAccountsInteractor: ListAccountsInteractor
@@ -72,7 +72,7 @@ class PresentationTestAutomationImpl @Inject constructor(
         }
     }
 
-    private val sessionRegistry = LoginSessionRegistryImp(loginSessionComponentFactory)
+    private val sessionRegistry = LoginSessionRegistryImp(tokenComponentFactory)
 
     private val startupInteractor = EnsureLoginCredentialsInteractorImpl(sessionRegistry, tokenStore, eventBus)
 

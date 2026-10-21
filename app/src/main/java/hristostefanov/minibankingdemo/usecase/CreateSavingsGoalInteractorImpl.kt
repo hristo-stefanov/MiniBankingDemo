@@ -7,13 +7,13 @@ import hristostefanov.minibankingdemo.usecase.input.Completion
 import hristostefanov.minibankingdemo.usecase.input.CreateSavingsGoalInteractor
 import hristostefanov.minibankingdemo.usecase.input.Termination.Failure
 import hristostefanov.minibankingdemo.usecase.input.Status
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
+import hristostefanov.minibankingdemo.util.Session
 import org.greenrobot.eventbus.EventBus
 import java.util.Currency
 import javax.inject.Inject
 
 class CreateSavingsGoalInteractorImpl @Inject constructor(
-    private val loginSessionRegistry: LoginSessionRegistry,
+    private val session: Session,
     private val eventBus: EventBus,
 ) : CreateSavingsGoalInteractor {
 
@@ -24,7 +24,7 @@ class CreateSavingsGoalInteractorImpl @Inject constructor(
             throw IllegalArgumentException()
 
         return  Either.catch {
-            loginSessionRegistry.requireComponent.repository.createSavingsGoal(
+            session.requireTokenComponent.repository.createSavingsGoal(
                 goalName,
                 accountId,
                 accountCurrency

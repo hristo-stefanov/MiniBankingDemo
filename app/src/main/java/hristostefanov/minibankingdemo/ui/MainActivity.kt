@@ -1,5 +1,6 @@
 package hristostefanov.minibankingdemo.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -77,13 +78,11 @@ class MainActivity : AppCompatActivity() {
                 .destinationResId, mainCommand.args, mainCommand.navOptions)
             is MainCommand.NavigateBackward -> navController.popBackStack()
             is MainCommand.Restart -> {
-                // this way is better than restarting the Activity which may cause
-                // race condition for consuming the navigation emission
-                navController.navigate(R.id.accountsDestination, null, navOptions {
-                    popUpTo(R.id.accountsDestination) {
-                        inclusive = true
-                    }
-                })
+                val intent = Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
             }
             is MainCommand.NavigateBackTo -> navController.popBackStack(
                 mainCommand.destinationId,

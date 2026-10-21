@@ -90,7 +90,7 @@ class AccountsViewModel @Inject constructor(
     fun onAccountSelectionChanged(position: Int) {
         session.let { data ->
             val accountId = data.state.value.summary?.items?.getOrNull(position)?.accountId
-            session.update { it.copy(selectedAccountId = accountId) }
+            session.updateState { it.copy(selectedAccountId = accountId) }
         }
     }
 
@@ -186,6 +186,7 @@ class AccountsViewModel @Inject constructor(
     fun onLogout() {
         viewModelScope.launch {
             logoutInteractor()
+            mainCommandChannel.send(MainCommand.Restart)
         }
     }
 

@@ -3,7 +3,6 @@ package hristostefanov.minibankingdemo
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
-import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.Session
 import javax.inject.Inject
 
@@ -13,17 +12,13 @@ class App : Application() {
     internal lateinit var tokenStore: TokenStore
 
     @Inject
-    internal lateinit var sessionRegistry: LoginSessionRegistry
-
-    @Inject
     internal lateinit var session: Session
 
     override fun onCreate() {
         super.onCreate()
 
         tokenStore.token?.let { token ->
-            sessionRegistry.createSession(token, "Bearer")
-            session.update { it.copy(hasToken = true) }
+            session.setToken(token, "Bearer")
         }
     }
 }

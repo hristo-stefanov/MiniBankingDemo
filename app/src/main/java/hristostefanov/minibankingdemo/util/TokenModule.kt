@@ -9,6 +9,10 @@ import hristostefanov.minibankingdemo.business.dependences.Repository
 import hristostefanov.minibankingdemo.data.RepositoryImpl
 import hristostefanov.minibankingdemo.data.dependences.Service
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -20,10 +24,10 @@ import java.util.concurrent.TimeUnit
 
 @DisableInstallInCheck
 @Module
-abstract class LoginSessionModule {
+abstract class TokenModule {
 
-    companion object {
-        @LoginSessionScope
+    companion object Companion {
+        @TokenScope
         @Provides
         fun provideRetrofit(
             @AccessToken
@@ -56,7 +60,7 @@ abstract class LoginSessionModule {
                 .build()
         }
 
-        @LoginSessionScope
+        @TokenScope
         @Provides
         fun provideService(retrofit: Retrofit, tokenStore: TokenStore): Service  {
             // NOTE: Retrofit coroutines support fulfills the @AnyThread requirement of the Service interface
@@ -77,10 +81,19 @@ abstract class LoginSessionModule {
                 return retrofit.create(Service::class.java)
             }
         }
+
+        @TokenScope
+        @Provides
+        fun  provideJob(): Job = SupervisorJob()
+
+        @TokenScope
+        @Provides
+        // TODO why immediate?
+        fun provideScope(job: Job): CoroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
     }
 
-    // Repositories may cache session specific data, hence the scoping to session
-    @LoginSessionScope
+    // Repositories may cache token specific data, hence the scoping
+    @TokenScope
     @Binds
     abstract fun bindRepository(repository: RepositoryImpl): Repository
 }

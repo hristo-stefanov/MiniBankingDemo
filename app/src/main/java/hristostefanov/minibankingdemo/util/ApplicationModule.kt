@@ -37,7 +37,7 @@ import java.util.Locale
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
-@Module(subcomponents = [LoginSessionComponent::class])
+@Module(subcomponents = [TokenComponent::class])
 abstract class ApplicationModule {
 
     companion object {
@@ -82,10 +82,6 @@ abstract class ApplicationModule {
 
     @Binds
     abstract fun bindAmountFormatter(amountFormatter: AmountFormatterImpl): AmountFormatter
-
-    @Singleton
-    @Binds
-    abstract fun bind(impl: LoginSessionRegistryImp): LoginSessionRegistry
 
     @Singleton
     @Binds

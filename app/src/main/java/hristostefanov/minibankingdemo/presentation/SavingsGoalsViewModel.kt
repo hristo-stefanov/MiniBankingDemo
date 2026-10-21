@@ -49,7 +49,7 @@ class SavingsGoalsViewModel @Inject constructor(
     }
 
     fun onSavingsGoalClicked(savingsGoalId: String) {
-        session.update { it.copy(selectedSavingsGoalId = savingsGoalId) }
+        session.updateState { it.copy(selectedSavingsGoalId = savingsGoalId) }
         viewModelScope.launch {
             mainCommandChannel.send(
                 MainCommand.NavigateForward(

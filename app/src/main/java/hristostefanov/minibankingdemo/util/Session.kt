@@ -1,6 +1,7 @@
 package hristostefanov.minibankingdemo.util
 
 import hristostefanov.minibankingdemo.usecase.output.Summary
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,15 +10,43 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Session @Inject constructor() {
+class Session @Inject constructor(
+    private val tokenComponentFactory: TokenComponent.Factory,
+) {
     private val _state = MutableStateFlow(State())
     val state: StateFlow<State> = _state.asStateFlow()
 
-    fun clear() {
+    private var _tokenComponent: TokenComponent? = null
+
+    val tokenComponent: TokenComponent?
+        get() = _tokenComponent
+
+    // TODO this can crash
+    val requireTokenComponent: TokenComponent
+        get() = tokenComponent ?: throw IllegalStateException("No login session")
+
+    fun setToken(token: String, tokenType: String) {
+        _tokenComponent = tokenComponentFactory.create(token, tokenType)
+        updateState { it.copy(hasToken = true) }
+    }
+
+    suspend fun resetSession() {
+        val tokenComponent = _tokenComponent
+
+        // Prevent new operations on TokenComponent
+        _tokenComponent = null
+
+        // Cancel any coroutines in @TokenScope
+        tokenComponent?.run {
+            scope.cancel()
+            job.join()
+        }
+
         _state.value = State()
     }
 
-    fun update(transform: (State) -> State) {
+    // TODO make sure all calling coroutines are in @TokenScope
+    fun updateState(transform: (State) -> State) {
         _state.update(transform)
     }
 

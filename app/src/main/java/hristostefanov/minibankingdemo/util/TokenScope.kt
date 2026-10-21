@@ -7,4 +7,4 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
 @Scope
 @Documented
 @Retention(RUNTIME)
-annotation class LoginSessionScope
+annotation class TokenScope

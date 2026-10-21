@@ -10,7 +10,7 @@ import hristostefanov.minibankingdemo.business.interactors.CreateSavingsGoalInte
 import hristostefanov.minibankingdemo.presentation.CreateSavingsGoalViewModel.Companion.NAME_KEY
 import hristostefanov.minibankingdemo.ui.CreateSavingsGoalFragmentDirections
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
-import hristostefanov.minibankingdemo.util.LoginSessionComponent
+import hristostefanov.minibankingdemo.util.TokenComponent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -40,7 +40,7 @@ class CreateSavingsGoalViewModelTest() {
     val commandEnabledObserver = spy(Observer::class.java) as Observer<Boolean>
 
     private val sessionRegistry = mock(LoginSessionRegistry::class.java)
-    private val sessionComponent = mock(LoginSessionComponent::class.java)
+    private val sessionComponent = mock(TokenComponent::class.java)
 
     // test data
     private val gbp = Currency.getInstance("GBP")

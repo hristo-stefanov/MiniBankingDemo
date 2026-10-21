@@ -19,7 +19,7 @@ import java.util.*
 import javax.inject.Singleton
 
 @DisableInstallInCheck
-@Module(subcomponents = [LoginSessionComponent::class])
+@Module(subcomponents = [TokenComponent::class])
 abstract class TestApplicationModule {
 
     companion object {

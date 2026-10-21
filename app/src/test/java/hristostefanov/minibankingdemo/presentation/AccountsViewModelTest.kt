@@ -9,7 +9,7 @@ import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
 import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import hristostefanov.minibankingdemo.util.LoginSessionComponent
+import hristostefanov.minibankingdemo.util.TokenComponent
 import hristostefanov.minibankingdemo.util.LoginSessionRegistry
 import hristostefanov.minibankingdemo.util.StringSupplier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +36,7 @@ class AccountsViewModelTest {
     private val amountFormatter = mock(AmountFormatter::class.java)
     private val tokenStore = mock(TokenStore::class.java)
     private val loginSessionRegistry = mock(LoginSessionRegistry::class.java)
-    private val loginSessionComponent = mock(LoginSessionComponent::class.java)
+    private val tokenComponent = mock(TokenComponent::class.java)
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -85,7 +85,7 @@ class AccountsViewModelTest {
 
     @Before
     fun beforeEach() = runTest {
-        given(loginSessionRegistry.component).willReturn(loginSessionComponent)
+        given(loginSessionRegistry.component).willReturn(tokenComponent)
         given(stringSupplier.get(R.string.roundUpInfo)).willReturn("")
         given(amountFormatter.format(any(), any())).willReturn("")
     }
