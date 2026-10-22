@@ -8,7 +8,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -18,6 +17,7 @@ import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.MainCommand
 import hristostefanov.minibankingdemo.util.MainCommandChannel
 import io.sentry.android.navigation.SentryNavigationListener
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -78,6 +78,8 @@ class MainActivity : AppCompatActivity() {
                 .destinationResId, mainCommand.args, mainCommand.navOptions)
             is MainCommand.NavigateBackward -> navController.popBackStack()
             is MainCommand.Restart -> {
+                // Stop consuming channel events as some may be emitted for the new Activity
+                lifecycleScope.cancel()
                 val intent = Intent(this, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                             Intent.FLAG_ACTIVITY_CLEAR_TASK

@@ -81,15 +81,6 @@ abstract class TokenModule {
                 return retrofit.create(Service::class.java)
             }
         }
-
-        @TokenScope
-        @Provides
-        fun  provideJob(): Job = SupervisorJob()
-
-        @TokenScope
-        @Provides
-        // TODO why immediate?
-        fun provideScope(job: Job): CoroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
     }
 
     // Repositories may cache token specific data, hence the scoping

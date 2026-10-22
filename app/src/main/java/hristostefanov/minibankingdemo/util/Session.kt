@@ -30,22 +30,13 @@ class Session @Inject constructor(
         updateState { it.copy(hasToken = true) }
     }
 
-    suspend fun resetSession() {
-        val tokenComponent = _tokenComponent
-
-        // Prevent new operations on TokenComponent
+    fun resetSession() {
+        // TODO: Prevent new operations on TokenComponent
         _tokenComponent = null
-
-        // Cancel any coroutines in @TokenScope
-        tokenComponent?.run {
-            scope.cancel()
-            job.join()
-        }
 
         _state.value = State()
     }
 
-    // TODO make sure all calling coroutines are in @TokenScope
     fun updateState(transform: (State) -> State) {
         _state.update(transform)
     }

@@ -35,7 +35,6 @@ class AccountsViewModel @Inject constructor(
     private val amountFormatter: AmountFormatter,
     @MainCommandChannel
     private val mainCommandChannel: Channel<MainCommand>,
-    private val tokenStore: TokenStore,
     private val session: Session,
     private val mainUI: MainUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,

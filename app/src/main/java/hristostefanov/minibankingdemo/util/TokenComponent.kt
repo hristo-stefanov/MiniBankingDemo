@@ -30,12 +30,4 @@ interface TokenComponent {
     val accessToken: String
 
     val repository: Repository
-
-    val job: Job
-
-    /**
-     * A coroutine that updates [State] belongs to the same lifecycle as that state.
-     * Launch coroutines that use [state] in this scope.
-     */
-    val scope: CoroutineScope
 }

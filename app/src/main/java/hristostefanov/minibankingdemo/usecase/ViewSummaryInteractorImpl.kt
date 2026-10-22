@@ -36,14 +36,8 @@ class ViewSummaryInteractorImpl @Inject constructor(
 
 
     override suspend fun invoke(): Status {
-        // Note: withContex() is not appropriate here because it's intended to keep the caller's Job ability to cancel
-        // the new coroutine, while we need to run the new coroutine a CoroutineScope with a cancellable Job.
-        // See: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html
-        return session.requireTokenComponent.scope.async {
-            // TODO this interactor changes the state, where do we do sope.async {} - here or there or both?
-            ensureLoginCredentialsInteractor()
+            return ensureLoginCredentialsInteractor()
                 .fold({ it.status() }, { execute() })
-        }.await()
     }
 
     private suspend fun execute(): Status {
