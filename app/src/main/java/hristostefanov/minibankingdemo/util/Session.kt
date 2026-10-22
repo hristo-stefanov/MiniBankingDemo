@@ -1,7 +1,6 @@
 package hristostefanov.minibankingdemo.util
 
 import hristostefanov.minibankingdemo.usecase.output.Summary
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,9 +20,8 @@ class Session @Inject constructor(
     val tokenComponent: TokenComponent?
         get() = _tokenComponent
 
-    // TODO this can crash
     val requireTokenComponent: TokenComponent
-        get() = tokenComponent ?: throw IllegalStateException("No login session")
+        get() = tokenComponent ?: throw IllegalStateException("No TokenComponent")
 
     fun setToken(token: String, tokenType: String) {
         _tokenComponent = tokenComponentFactory.create(token, tokenType)
@@ -31,7 +29,7 @@ class Session @Inject constructor(
     }
 
     fun resetSession() {
-        // TODO: Prevent new operations on TokenComponent
+        // Prevent new operations on TokenComponent
         _tokenComponent = null
 
         _state.value = State()
