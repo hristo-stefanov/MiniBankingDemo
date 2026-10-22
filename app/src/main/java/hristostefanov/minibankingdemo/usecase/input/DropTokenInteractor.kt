@@ -1,5 +1,5 @@
 package hristostefanov.minibankingdemo.usecase.input
 
-interface LogoutInteractor {
+interface DropTokenInteractor {
     suspend operator fun invoke(): Status
 }

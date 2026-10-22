@@ -5,9 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hristostefanov.minibankingdemo.R
 import hristostefanov.minibankingdemo.presentation.dependences.AmountFormatter
-import hristostefanov.minibankingdemo.presentation.dependences.TokenStore
 import hristostefanov.minibankingdemo.ui.AccountsFragmentDirections
-import hristostefanov.minibankingdemo.usecase.input.LogoutInteractor
+import hristostefanov.minibankingdemo.usecase.input.DropTokenInteractor
 import hristostefanov.minibankingdemo.usecase.input.ViewSummaryInteractor
 import hristostefanov.minibankingdemo.usecase.input.isCancellation
 import hristostefanov.minibankingdemo.usecase.input.isFailure
@@ -38,7 +37,7 @@ class AccountsViewModel @Inject constructor(
     private val session: Session,
     private val mainUI: MainUI,
     private val viewSummaryInteractor: ViewSummaryInteractor,
-    private val logoutInteractor: LogoutInteractor,
+    private val dropTokenInteractor: DropTokenInteractor,
 ) : ViewModel() {
 
     // Data-bound properties - begin
@@ -58,8 +57,8 @@ class AccountsViewModel @Inject constructor(
     private val _transferCommandEnabled = MutableStateFlow(false)
     val transferCommandEnabled: StateFlow<Boolean> = _transferCommandEnabled.asStateFlow()
 
-    private val _logoutCommandEnabled = MutableStateFlow(false)
-    val logoutCommandEnabled: StateFlow<Boolean> = _logoutCommandEnabled.asStateFlow()
+    private val _dropTokenCommandEnabled = MutableStateFlow(false)
+    val dropTokenCommandEnabled: StateFlow<Boolean> = _dropTokenCommandEnabled.asStateFlow()
 
     // Data-bound properties - end
 
@@ -69,7 +68,7 @@ class AccountsViewModel @Inject constructor(
         hookSelectedAccountPosition()
         hookRoundUpAmountText()
         hookTransferCommandEnabled()
-        hookLogoutCommandEnabled()
+        hookDropTokenCommandEnabled()
 
         viewSummary()
     }
@@ -112,11 +111,11 @@ class AccountsViewModel @Inject constructor(
     }
 
 
-    private fun hookLogoutCommandEnabled() {
+    private fun hookDropTokenCommandEnabled() {
         session.state
             .map { it.hasToken }
             .onEach {
-                _logoutCommandEnabled.value = it
+                _dropTokenCommandEnabled.value = it
             }
             .launchIn(viewModelScope)
     }
@@ -182,9 +181,9 @@ class AccountsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun onLogout() {
+    fun onDropToken() {
         viewModelScope.launch {
-            logoutInteractor()
+            dropTokenInteractor()
             mainCommandChannel.send(MainCommand.Restart)
         }
     }

@@ -37,7 +37,7 @@ class AccountsFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewmodel = viewModel
 
-        viewModel.logoutCommandEnabled
+        viewModel.dropTokenCommandEnabled
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach {
                 invalidateOptionsMenu(requireActivity())
@@ -50,15 +50,15 @@ class AccountsFragment : Fragment() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        val logoutItem = menu.findItem(R.id.logout)
-        logoutItem.isVisible = viewModel.logoutCommandEnabled.value
+        val dropTokenItem = menu.findItem(R.id.dropToken)
+        dropTokenItem.isVisible = viewModel.dropTokenCommandEnabled.value
         super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.logout -> {
-                viewModel.onLogout()
+            R.id.dropToken -> {
+                viewModel.onDropToken()
                 true
             }
 

@@ -50,7 +50,7 @@ class LogoutSteps {
 
     @When("I log out")
     fun i_log_out() {
-        accountsViewModel.onLogout()
+        accountsViewModel.onDropToken()
 
         // restarting navigation reopens the screen
         accountsViewModel = automation.openAccountScreen()

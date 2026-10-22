@@ -11,7 +11,7 @@
     <string name="name_hint">Name</string>
     <string name="create_savings_goal">Create Savings Goal</string>
     <string name="confirm">Confirm</string>
-    <string name="logout">Logout</string>
+    <string name="dropToken">Drop token</string>
     <string name="refresh">Refresh</string>
     <string name="login_title">Login</string>
     <string name="cancelled">Cancelled</string>
